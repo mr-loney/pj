@@ -29,3 +29,5 @@ ios姿势
     	[self.placeholder drawInRect:rect withFont:self.font lineBreakMode:UILineBreakModeTailTruncation 
     				   	   alignment:self.textAlignment];  
 	}  
+
+	NSTimer因界面有动画和操作导致延迟执行解决：[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
