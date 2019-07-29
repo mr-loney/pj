@@ -1,0 +1,1 @@
+ffmpeg -i /Users/pengjun/Desktop/ffmpeg/IMG_1574.MOV -s 1080x1920 -r 30 /Users/pengjun/Desktop/ffmpeg/yoyi/%03d.png
