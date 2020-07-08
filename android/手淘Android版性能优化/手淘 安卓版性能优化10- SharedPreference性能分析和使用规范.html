@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/45469 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化10- SharedPreference性能分析和使用规范</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化10- SharedPreference性能分析和使用规范
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 212</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-02T14:58:07+08:00">2015-12-02 14:58:07</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/45469/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="性能优化 android " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="性能优化" class="item">性能优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="android" class="item">android<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">性能优化</a><a href="http://www.atatech.org/search?q=android&type=INSIDE_ARTICLE_TAG" class="label label-ata">android</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/45469/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 上一篇提到了SharedPreference对启动性能的影响。当时我们也找出了所有读取和写入的地方，包括apply和commit的调用。写入的频繁可能更容易理解，但是读取的函数调用并不多，造成加载线程繁忙就不太好理解了。莫看江面平如镜，要看水底万丈深，这里我们有必要从SharedPreference的原理说起。
+<h2 id="0">一、SharedPreference的读取过程</h2>
+&nbsp; &nbsp; 每个App有一个默认的SharedPreference文件，我们也可以额外再指定其他的SharedPreference文件。默认的SharedPreference文件通过PreferenceManager.getDefaultSharedPreferences(context)可以得到，其他的需要我们指定名称，通过ContextWrapper.getSharedPreferences函数得到。上面2个函数，其实最终都是通过ContextImpl.getSharedPreferences(String name, int mode)函数来处理的。该函数会创建一个指定文件名的SharedPreferencesImpl实例，用来处理对应的SharedPreference存储，并且将该实例添加到一个sSharedPrefs的ArrayMap中。<br>&nbsp; &nbsp; 那么接下来就来看SharedPreferencesImpl的实现了，在我们调用上面方法的时候，就会创建这个实例，我们先看该实例初始化的代码，如下：<br><br><pre><code class="hljs processing">
+    <span class="hljs-keyword">private</span> Map&lt;<span class="hljs-keyword">String</span>, <span class="hljs-keyword">Object</span>&gt; mMap;
+
+    SharedPreferencesImpl(File file, <span class="hljs-built_in">int</span> mode) {
+        mFile = file;
+        mBackupFile = makeBackupFile(file);
+        mMode = mode;
+        mLoaded = <span class="hljs-keyword">false</span>;
+        mMap = <span class="hljs-keyword">null</span>;
+        startLoadFromDisk();
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> startLoadFromDisk() {
+        <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {
+            mLoaded = <span class="hljs-keyword">false</span>;
+        }
+        <span class="hljs-keyword">new</span> Thread(<span class="hljs-string">"SharedPreferencesImpl-load"</span>) {
+            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> run() {
+                <span class="hljs-keyword">synchronized</span> (SharedPreferencesImpl.<span class="hljs-keyword">this</span>) {
+                    loadFromDiskLocked();
+                }
+            }
+        }.start();
+     }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> loadFromDiskLocked() {
+        <span class="hljs-keyword">if</span> (mLoaded) {
+            <span class="hljs-keyword">return</span>;
+        }
+        <span class="hljs-keyword">if</span> (mBackupFile.exists()) {
+            mFile.delete();
+            mBackupFile.renameTo(mFile);
+        }
+
+        <span class="hljs-comment">// Debugging</span>
+        <span class="hljs-keyword">if</span> (mFile.exists() &amp;&amp; !mFile.canRead()) {
+            Log.w(TAG, <span class="hljs-string">"Attempt to read preferences file "</span> + mFile + <span class="hljs-string">" without permission"</span>);
+        }
+
+        Map <span class="hljs-built_in">map</span> = <span class="hljs-keyword">null</span>;
+        StructStat stat = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">try</span> {
+            stat = Libcore.os.stat(mFile.getPath());
+            <span class="hljs-keyword">if</span> (mFile.canRead()) {
+                BufferedInputStream <span class="hljs-built_in">str</span> = <span class="hljs-keyword">null</span>;
+                <span class="hljs-keyword">try</span> {
+                    <span class="hljs-built_in">str</span> = <span class="hljs-keyword">new</span> BufferedInputStream(
+                            <span class="hljs-keyword">new</span> FileInputStream(mFile), <span class="hljs-number">16</span>*<span class="hljs-number">1024</span>);
+                    <span class="hljs-built_in">map</span> = XmlUtils.readMapXml(<span class="hljs-built_in">str</span>);
+                } <span class="hljs-keyword">catch</span> (XmlPullParserException e) {
+                    Log.w(TAG, <span class="hljs-string">"getSharedPreferences"</span>, e);
+                } <span class="hljs-keyword">catch</span> (FileNotFoundException e) {
+                    Log.w(TAG, <span class="hljs-string">"getSharedPreferences"</span>, e);
+                } <span class="hljs-keyword">catch</span> (IOException e) {
+                    Log.w(TAG, <span class="hljs-string">"getSharedPreferences"</span>, e);
+                } <span class="hljs-keyword">finally</span> {
+                    IoUtils.closeQuietly(<span class="hljs-built_in">str</span>);
+                }
+            }
+        } <span class="hljs-keyword">catch</span> (ErrnoException e) {
+        }
+        mLoaded = <span class="hljs-keyword">true</span>;
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">map</span> != <span class="hljs-keyword">null</span>) {
+            mMap = <span class="hljs-built_in">map</span>;
+            mStatTimestamp = stat.st_mtime;
+            mStatSize = stat.st_size;
+        } <span class="hljs-keyword">else</span> {
+            mMap = <span class="hljs-keyword">new</span> <span class="hljs-keyword">HashMap</span>&lt;<span class="hljs-keyword">String</span>, <span class="hljs-keyword">Object</span>&gt;();
+        }
+        notifyAll();
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> File makeBackupFile(File prefsFile) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> File(prefsFile.getPath() + <span class="hljs-string">".bak"</span>);
+    }<br>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> awaitLoadedLocked() {
+        <span class="hljs-keyword">if</span> (!mLoaded) {
+            <span class="hljs-comment">// Raise an explicit StrictMode onReadFromDisk for this</span>
+            <span class="hljs-comment">// thread, since the real read will be in a different</span>
+            <span class="hljs-comment">// thread and otherwise ignored by StrictMode.</span>
+            BlockGuard.getThreadPolicy().onReadFromDisk();
+        }
+        <span class="hljs-keyword">while</span> (!mLoaded) {
+            <span class="hljs-keyword">try</span> {
+                wait();
+            } <span class="hljs-keyword">catch</span> (InterruptedException unused) {
+            }
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">String</span> getString(<span class="hljs-keyword">String</span> <span class="hljs-built_in">key</span>, <span class="hljs-keyword">String</span> defValue) {
+        <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {
+            awaitLoadedLocked();
+            <span class="hljs-keyword">String</span> v = (<span class="hljs-keyword">String</span>)mMap.<span class="hljs-built_in">get</span>(<span class="hljs-built_in">key</span>);
+            <span class="hljs-keyword">return</span> v != <span class="hljs-keyword">null</span> ? v : defValue;
+        }
+    }
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;从上面的代码我们可以看到，构造函数中，会在内存中创建一个备份文件（.bak），但这里不会生成该文件到存储设备。接着就是调用startLoadFromDisk()函数，这个函数中会新起一个线程来加载文件。我们可以看到线程中的loadFromDiskLocked()函数，读入SharedPreference数据并且保存到一个HashMap中，而getString等函数获取数据的时候实际上是通过Map缓存读取的。<br>&nbsp; &nbsp; SharedPreference的加载过程其实也比较简单，在直接调用getDefaultSharedPreferences、getSharedPreferences函数的时候就已经开始实例化并启动线程来加载整个文件的数据。而不是发生在getString或者getInt等函数获取实际数据的时候才会去加载。整个加载的过程是在线程中执行的，加载过程受到synchronized (SharedPreferencesImpl.this)的保护，加载完成后，mLoaded才会等于true。我们查看getString等获取实际内容的函数，他们同样是用了synchronized (SharedPreferencesImpl.this)的保护，也就是，加载线程执行过程中，调用getString，getInt等函数的线程都会因为等待该锁而被阻塞。即使getString，getInt发生在加载线程开始执行前，也会因为awaitLoadedLocked()进入wait而被挂起，同时释放了synchronized (SharedPreferencesImpl.this)锁，进而加载线程可以获得该锁而开始执行加载文件的操作。等待加载完成后通过notifyAll()唤醒此前被wait的线程。<br>&nbsp; &nbsp; &nbsp;看到这里可以有一些理解，在默认的SharedPreference文件被调用，以及其他模块在调用各自的SharedPreference文件的时候，会启动对应数量的线程加载文件的内容，这个过程中涉及到XML文件的读取和解析，HashMap的操作，除了IO占据较多CPU外，内存分配的小对象也是相当的频繁。另外一个很明显的问题是，SharedPreference文件如果很复杂，加载的过程也会变得比较久，CPU也会占用更多，而且如果这个时候在主线程中调用getString等函数也会因为等待锁资源而进入阻塞状态，影响主线程的性能，我们也可以看到在awaitLoadedLocked函数中插入了严苛模式的检测代码以便提示。另外我们也看到加载线程并未设置线程的优先级，所以当该线程繁忙的时候会和主线程等抢占CPU资源。</p>
+<h2 id="1">二、SharedPreference的存储过程</h2>
+&nbsp; &nbsp;SharedPreference的写入主要有两个函数，一个是commit，一个是apply函数，两个函数有所区别，我们先看相关的代码，如下：
+<pre><code class="hljs processing">  
+    <span class="hljs-keyword">public</span> Editor edit() {
+        <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {
+            awaitLoadedLocked();
+        }
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> EditorImpl();
+    }
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> class MemoryCommitResult {
+        <span class="hljs-keyword">public</span> <span class="hljs-built_in">boolean</span> changesMade;  <span class="hljs-comment">// any keys different?</span>
+        <span class="hljs-keyword">public</span> List keysModified;  <span class="hljs-comment">// may be null</span>
+        <span class="hljs-keyword">public</span> Set listeners;  <span class="hljs-comment">// may be null</span>
+        <span class="hljs-keyword">public</span> Map mapToWriteToDisk;
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> CountDownLatch writtenToDiskLatch = <span class="hljs-keyword">new</span> CountDownLatch(<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">volatile</span> <span class="hljs-built_in">boolean</span> writeToDiskResult = <span class="hljs-keyword">false</span>;
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> setDiskWriteResult(<span class="hljs-built_in">boolean</span> result) {
+            writeToDiskResult = result;
+            writtenToDiskLatch.countDown();
+        }
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> class EditorImpl implements Editor {
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;<span class="hljs-keyword">String</span>, <span class="hljs-keyword">Object</span>&gt; mModified = Maps.newHashMap();
+        <span class="hljs-keyword">private</span> <span class="hljs-built_in">boolean</span> mClear = <span class="hljs-keyword">false</span>;
+
+        <span class="hljs-keyword">public</span> Editor putString(<span class="hljs-keyword">String</span> <span class="hljs-built_in">key</span>, <span class="hljs-keyword">String</span> value) {
+            <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {
+                mModified.put(<span class="hljs-built_in">key</span>, value);
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+            }
+        }
+
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> apply() {
+            <span class="hljs-keyword">final</span> MemoryCommitResult mcr = commitToMemory();
+            <span class="hljs-keyword">final</span> Runnable awaitCommit = <span class="hljs-keyword">new</span> Runnable() {
+                    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> run() {
+                        <span class="hljs-keyword">try</span> {
+                            mcr.writtenToDiskLatch.await();
+                        } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {
+                        }
+                    }
+                };
+
+            QueuedWork.<span class="hljs-built_in">add</span>(awaitCommit);
+
+            Runnable postWriteRunnable = <span class="hljs-keyword">new</span> Runnable() {
+                    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> run() {
+                        awaitCommit.run();
+                        QueuedWork.remove(awaitCommit);
+                    }
+                };
+
+            SharedPreferencesImpl.<span class="hljs-keyword">this</span>.enqueueDiskWrite(mcr, postWriteRunnable);
+
+            <span class="hljs-comment">// Okay to notify the listeners before it's hit disk</span>
+            <span class="hljs-comment">// because the listeners should always get the same</span>
+            <span class="hljs-comment">// SharedPreferences instance back, which has the</span>
+            <span class="hljs-comment">// changes reflected in memory.</span>
+            notifyListeners(mcr);
+        }
+
+        <span class="hljs-comment">// Returns true if any changes were made</span>
+        <span class="hljs-keyword">private</span> MemoryCommitResult commitToMemory() {
+            MemoryCommitResult mcr = <span class="hljs-keyword">new</span> MemoryCommitResult();
+            <span class="hljs-keyword">synchronized</span> (SharedPreferencesImpl.<span class="hljs-keyword">this</span>) {
+                <span class="hljs-comment">// We optimistically don't make a deep copy until</span>
+                <span class="hljs-comment">// a memory commit comes in when we're already</span>
+                <span class="hljs-comment">// writing to disk.</span>
+                <span class="hljs-keyword">if</span> (mDiskWritesInFlight &gt; <span class="hljs-number">0</span>) {
+                    <span class="hljs-comment">// We can't modify our mMap as a currently</span>
+                    <span class="hljs-comment">// in-flight write owns it.  Clone it before</span>
+                    <span class="hljs-comment">// modifying it.</span>
+                    <span class="hljs-comment">// noinspection unchecked</span>
+                    mMap = <span class="hljs-keyword">new</span> <span class="hljs-keyword">HashMap</span>&lt;<span class="hljs-keyword">String</span>, <span class="hljs-keyword">Object</span>&gt;(mMap);
+                }
+                mcr.mapToWriteToDisk = mMap;
+                mDiskWritesInFlight++;
+
+                <span class="hljs-built_in">boolean</span> hasListeners = mListeners.<span class="hljs-built_in">size</span>() &gt; <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">if</span> (hasListeners) {
+                    mcr.keysModified = <span class="hljs-keyword">new</span> ArrayList();
+                    mcr.listeners =
+                            <span class="hljs-keyword">new</span> HashSet(mListeners.keySet());
+                }
+
+                <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {
+                    <span class="hljs-keyword">if</span> (mClear) {
+                        <span class="hljs-keyword">if</span> (!mMap.isEmpty()) {
+                            mcr.changesMade = <span class="hljs-keyword">true</span>;
+                            mMap.<span class="hljs-built_in">clear</span>();
+                        }
+                        mClear = <span class="hljs-keyword">false</span>;
+                    }
+
+                    <span class="hljs-keyword">for</span> (Map.Entry&lt;<span class="hljs-keyword">String</span>, <span class="hljs-keyword">Object</span>&gt; e : mModified.entrySet()) {
+                        <span class="hljs-keyword">String</span> k = e.getKey();
+                        <span class="hljs-keyword">Object</span> v = e.getValue();
+                        <span class="hljs-keyword">if</span> (v == <span class="hljs-keyword">this</span>) {  <span class="hljs-comment">// magic value for a removal mutation</span>
+                            <span class="hljs-keyword">if</span> (!mMap.containsKey(k)) {
+                                <span class="hljs-keyword">continue</span>;
+                            }
+                            mMap.remove(k);
+                        } <span class="hljs-keyword">else</span> {
+                            <span class="hljs-built_in">boolean</span> isSame = <span class="hljs-keyword">false</span>;
+                            <span class="hljs-keyword">if</span> (mMap.containsKey(k)) {
+                                <span class="hljs-keyword">Object</span> existingValue = mMap.<span class="hljs-built_in">get</span>(k);
+                                <span class="hljs-keyword">if</span> (existingValue != <span class="hljs-keyword">null</span> &amp;&amp; existingValue.equals(v)) {
+                                    <span class="hljs-keyword">continue</span>;
+                                }
+                            }
+                            mMap.put(k, v);
+                        }
+
+                        mcr.changesMade = <span class="hljs-keyword">true</span>;
+                        <span class="hljs-keyword">if</span> (hasListeners) {
+                            mcr.keysModified.<span class="hljs-built_in">add</span>(k);
+                        }
+                    }
+
+                    mModified.<span class="hljs-built_in">clear</span>();
+                }
+            }
+            <span class="hljs-keyword">return</span> mcr;
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-built_in">boolean</span> commit() {
+            MemoryCommitResult mcr = commitToMemory();
+            SharedPreferencesImpl.<span class="hljs-keyword">this</span>.enqueueDiskWrite(
+                mcr, <span class="hljs-keyword">null</span> <span class="hljs-comment">/* sync write on this thread okay */</span>);
+            <span class="hljs-keyword">try</span> {
+                mcr.writtenToDiskLatch.await();
+            } <span class="hljs-keyword">catch</span> (InterruptedException e) {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            }
+            notifyListeners(mcr);
+            <span class="hljs-keyword">return</span> mcr.writeToDiskResult;
+        }
+}
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> enqueueDiskWrite(<span class="hljs-keyword">final</span> MemoryCommitResult mcr,
+                                  <span class="hljs-keyword">final</span> Runnable postWriteRunnable) {
+        <span class="hljs-keyword">final</span> Runnable writeToDiskRunnable = <span class="hljs-keyword">new</span> Runnable() {
+                <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> run() {
+                    <span class="hljs-keyword">synchronized</span> (mWritingToDiskLock) {
+                        writeToFile(mcr);
+                    }
+                    <span class="hljs-keyword">synchronized</span> (SharedPreferencesImpl.<span class="hljs-keyword">this</span>) {
+                        mDiskWritesInFlight--;
+                    }
+                    <span class="hljs-keyword">if</span> (postWriteRunnable != <span class="hljs-keyword">null</span>) {
+                        postWriteRunnable.run();
+                    }
+                }
+            };
+
+        <span class="hljs-keyword">final</span> <span class="hljs-built_in">boolean</span> isFromSyncCommit = (postWriteRunnable == <span class="hljs-keyword">null</span>);
+
+        <span class="hljs-comment">// Typical #commit() path with fewer allocations, doing a write on</span>
+        <span class="hljs-comment">// the current thread.</span>
+        <span class="hljs-keyword">if</span> (isFromSyncCommit) {
+            <span class="hljs-built_in">boolean</span> wasEmpty = <span class="hljs-keyword">false</span>;
+            <span class="hljs-keyword">synchronized</span> (SharedPreferencesImpl.<span class="hljs-keyword">this</span>) {
+                wasEmpty = mDiskWritesInFlight == <span class="hljs-number">1</span>;
+            }
+            <span class="hljs-keyword">if</span> (wasEmpty) {
+                writeToDiskRunnable.run();
+                <span class="hljs-keyword">return</span>;
+            }
+        }
+
+        QueuedWork.singleThreadExecutor().execute(writeToDiskRunnable);
+    }
+
+   <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> writeToFile(MemoryCommitResult mcr) {
+        <span class="hljs-comment">// Rename the current file so it may be used as a backup during the next read</span>
+        <span class="hljs-keyword">if</span> (mFile.exists()) {
+            <span class="hljs-keyword">if</span> (!mcr.changesMade) {
+                <span class="hljs-comment">// If the file already exists, but no changes were</span>
+                <span class="hljs-comment">// made to the underlying map, it's wasteful to</span>
+                <span class="hljs-comment">// re-write the file.  Return as if we wrote it</span>
+                <span class="hljs-comment">// out.</span>
+                mcr.setDiskWriteResult(<span class="hljs-keyword">true</span>);
+                <span class="hljs-keyword">return</span>;
+            }
+            <span class="hljs-keyword">if</span> (!mBackupFile.exists()) {
+                <span class="hljs-keyword">if</span> (!mFile.renameTo(mBackupFile)) {
+                    Log.e(TAG, <span class="hljs-string">"Couldn't rename file "</span> + mFile
+                          + <span class="hljs-string">" to backup file "</span> + mBackupFile);
+                    mcr.setDiskWriteResult(<span class="hljs-keyword">false</span>);
+                    <span class="hljs-keyword">return</span>;
+                }
+            } <span class="hljs-keyword">else</span> {
+                mFile.delete();
+            }
+        }
+
+        <span class="hljs-comment">// Attempt to write the file, delete the backup and return true as atomically as</span>
+        <span class="hljs-comment">// possible.  If any exception occurs, delete the new file; next time we will restore</span>
+        <span class="hljs-comment">// from the backup.</span>
+        <span class="hljs-keyword">try</span> {
+            FileOutputStream <span class="hljs-built_in">str</span> = createFileOutputStream(mFile);
+            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">str</span> == <span class="hljs-keyword">null</span>) {
+                mcr.setDiskWriteResult(<span class="hljs-keyword">false</span>);
+                <span class="hljs-keyword">return</span>;
+            }
+            XmlUtils.writeMapXml(mcr.mapToWriteToDisk, <span class="hljs-built_in">str</span>);
+            FileUtils.sync(<span class="hljs-built_in">str</span>);
+            <span class="hljs-built_in">str</span>.close();
+            ContextImpl.setFilePermissionsFromMode(mFile.getPath(), mMode, <span class="hljs-number">0</span>);
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">final</span> StructStat stat = Libcore.os.stat(mFile.getPath());
+                <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {
+                    mStatTimestamp = stat.st_mtime;
+                    mStatSize = stat.st_size;
+                }
+            } <span class="hljs-keyword">catch</span> (ErrnoException e) {
+                <span class="hljs-comment">// Do nothing</span>
+            }
+            <span class="hljs-comment">// Writing was successful, delete the backup file if there is one.</span>
+            mBackupFile.delete();
+            mcr.setDiskWriteResult(<span class="hljs-keyword">true</span>);
+            <span class="hljs-keyword">return</span>;
+        } <span class="hljs-keyword">catch</span> (XmlPullParserException e) {
+            Log.w(TAG, <span class="hljs-string">"writeToFile: Got exception:"</span>, e);
+        } <span class="hljs-keyword">catch</span> (IOException e) {
+            Log.w(TAG, <span class="hljs-string">"writeToFile: Got exception:"</span>, e);
+        }
+        <span class="hljs-comment">// Clean up an unsuccessfully written file</span>
+        <span class="hljs-keyword">if</span> (mFile.exists()) {
+            <span class="hljs-keyword">if</span> (!mFile.delete()) {
+                Log.e(TAG, <span class="hljs-string">"Couldn't clean up partially-written file "</span> + mFile);
+            }
+        }
+        mcr.setDiskWriteResult(<span class="hljs-keyword">false</span>);
+    }
+
+</code></pre>
+&nbsp; &nbsp; &nbsp;从上面的代码中我们看到，apply和commit函数开始都调用了commitToMemory()函数，将修改提交到内存map中，该函数会判断是否修改了内存中的数据，如果修改了MemoryCommitResult.changesMaded的值会变成true，在writeToFile(MemoryCommitResult mcr)函数中，会判断这个值，如果没有变化则放弃写文件的操作。提交commitToMemory() 中的代码受到synchronized (SharedPreferencesImpl.this)锁的保护，如果递交一次内存准备写入后会执行mDiskWritesInFlight++，这样下一次进入该函数，如果仍然在写文件的时候，就需要重新拷贝一份HashMap，以便对其内容进行修改，又不会影响上一次正在写入的过程。在执行putString等函数添加内容的时候，会记录在另外一个叫做mModified的HashMap中。commitToMemory()函数中在没有执行clear的情况下，会把mModified中的数据和原来的Map内容做一个对比，以判断是否需要写文件。在这个判断过程中，使用了synchronized (EditorImpl.this)的锁，在整个对比过程中，是不能再进行put操作了。commitToMemory返回前修改了changesMade的值，如果是false表示是没有进行数据的修改，和之前的一样，也就不用写文件了。<br>&nbsp; &nbsp; 在执行完MemoryCommitResult mcr = commitToMemory()后，mcr中保存了相关的信息。接着看两个不同的函数的执行过程。<br><span style="color:#3366ff;">第一个是commit函数</span>，它紧接着就调用了SharedPreferencesImpl.this.enqueueDiskWrite(mcr, null)。而enqueueDiskWrite这个函数中，首先会创建一个Runnable writeToDiskRunnable = new Runnable()的任务，接着判断是从哪个函数调用的，如果是commit函数，isFromSyncCommit=true，这样就在该线程中直接调用了writeToDiskRunnable.run()开始执行writeToFile函数进行写文件的操作。这就是主线程不应该调用commit的原因，因为主线程做写入操作会阻塞主线程。<br><span style="color:#3366ff;">第二个apply函数</span>，该函数开始创建了一个Runnable awaitCommit = new Runnable()等待写入完成的任务，利用了MemoryCommitResult中的CountDownLatch，该CountDownLatch的值为1，一旦写入完成后，就会通过setDiskWriteResult函数调用writtenToDiskLatch.countDown()。让wait在该锁存器的线程继续执行。这里只是创建了这样一个任务，接着创建了Runnable postWriteRunnable = new Runnable()的任务，该任务执行了awaitCommit的代码。创建完成这两个任务后，调用了SharedPreferencesImpl.this.enqueueDiskWrite(mcr, postWriteRunnable)函数，这里比commit多了一个postWriteRunnable。enqueueDiskWrite 和commit的时候一样，会先创建writeToDiskRunnable，如果是从applay函数调用的，就将该 writeToDiskRunnable交给一个串行的线程池执行，QueuedWork.singleThreadExecutor().execute(writeToDiskRunnable)。该线程就可以继续往下执行其他代码，不会阻塞。writeToDiskRunnable在执行完写入操作后，会执行postWriteRunnable的代码，和commit写完文件一样，都会执行 mcr.writtenToDiskLatch.await()的等待，不过在前面的writeToFile函数中已经执行了writtenToDiskLatch.countDown()，该线程不会因为这个而被挂起，并没有看到特别的意义。<br><br>&nbsp; &nbsp; &nbsp; 到这里，整个写入过程也基本已经清楚了，每次调用apply或者commit的时候都会把整个map的数据重新写回到文件，只是commit会阻塞当前线程而apply不会阻塞当前线程。这里我们也看到锁分离对性能提升的应用，在写入文件的时候用了另外一把锁synchronized (mWritingToDiskLock)，这样可以提升性能，因为写文件的过程会比较久，如果继续使用synchronized (SharedPreferencesImpl.this)锁保护，这样反而会影响到其他函数的执行效率。在做putString等函数的时候也是使用了synchronized (EditorImpl.this)的锁，并没有一直使用同一个锁。<br><br><h2 id="2">三、SharedPreference的性能分析</h2>
+&nbsp; &nbsp; 上面我们了解了SharedPreference的读取和写入的过程，接着就可以来看一下其对性能的影响。首先我们来看一下测试数据，这个是在我手机上测试的一组平均值，Nexus 5是Android 5.0以上的系统，单位是ms。<br><h3 id="3">1、存储1000条记录的性能</h3>
+<table border="1"><tbody>
+<tr>
+<td align="center">类型</td>
+<td align="center">文件大小</td>
+<td align="center">数据</td>
+<td align="center">I9300</td>
+<td align="center">Nexus 5</td>
+</tr>
+<tr>
+<td align="center">int</td>
+<td align="center">&nbsp;41850</td>
+<td align="center">&nbsp;0-999</td>
+<td align="center">&nbsp;46</td>
+<td align="center">&nbsp;18</td>
+</tr>
+<tr>
+<td align="center">long</td>
+<td align="center">&nbsp;42850&nbsp;</td>
+<td align="center">&nbsp;0-999</td>
+<td align="center">&nbsp;46</td>
+<td align="center">&nbsp;22</td>
+</tr>
+<tr>
+<td align="center">boolean</td>
+<td align="center">&nbsp;47910</td>
+<td align="center">false&nbsp;</td>
+<td align="center">&nbsp;43</td>
+<td align="center">&nbsp;20</td>
+</tr>
+<tr>
+<td align="center">float</td>
+<td align="center">&nbsp;49861</td>
+<td align="center">&nbsp;0-999.34567</td>
+<td align="center">&nbsp;63</td>
+<td align="center">&nbsp;46</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">&nbsp;107850</td>
+<td align="center">&nbsp;51- 54个简单字符串</td>
+<td align="center">&nbsp;30</td>
+<td align="center">&nbsp;24</td>
+</tr>
+</tbody></table>
+<br>&nbsp; &nbsp; 从上面可以看到插入1000条数据的时候，相对来说String是最快的，其他类型都有转化函数耗时，而float的转换最为耗时。除了float类型外，其余的类型整体上的时间也相差不大。我们再来看加载前面的1000条记录的数据。<br><br><table border="1"><tbody>
+<tr>
+<td align="center">类型</td>
+<td align="center">I9300</td>
+<td align="center">Nexus 5</td>
+</tr>
+<tr>
+<td align="center">int</td>
+<td align="center">&nbsp;42</td>
+<td align="center">&nbsp;14</td>
+</tr>
+<tr>
+<td align="center">long</td>
+<td align="center">&nbsp;36</td>
+<td align="center">&nbsp;17</td>
+</tr>
+<tr>
+<td align="center">boolean</td>
+<td align="center">&nbsp;34</td>
+<td align="center">&nbsp;14</td>
+</tr>
+<tr>
+<td align="center">float</td>
+<td align="center">&nbsp;94</td>
+<td align="center">&nbsp;36</td>
+</tr>
+<tr>
+<td align="center">String</td>
+<td align="center">&nbsp;50</td>
+<td align="center">&nbsp;18</td>
+</tr>
+</tbody></table>
+<br>&nbsp; &nbsp; 加载和存储数据类似，除了float比较慢，其余的时间是相差不大的。虽然读取大文件肯定会比小文件要耗时一点，但是在这里我们看到，文件的大小在性能上没有线性的关系，而且也没有因为文件大就导致整个过程变慢，因为后续的解析时间影响更大。<br><h3 id="4">2、存储字符串的性能</h3>
+<span style="color:#33cccc;">Json数据：</span>
+<p>"{&amp;quot;passivelocation4android&amp;quot;:{&amp;quot;channelSwitch&amp;quot;:&amp;quot;true&amp;quot;,&amp;quot;reportSwitch&amp;quot;:&amp;quot;false&amp;quot;,&amp;quot;timeTap&amp;quot;:&amp;quot;5&amp;quot;}}"<br><br><span style="color:#33cccc;">英文数据：</span></p>
+<p>"{-quot;passivelocation4android-quot;:{-quot;channelSwitch-quot;:-quot;true-quot;,-quot;reportSwitch-quot;:-quot;false-quot;,-quot;timeTap-quot;:-quot;5-quot;}}"<br><br><span style="color:#33cccc;">中文数据：</span></p>
+<p><span>"</span>《火星救援》剧情：人类实现了首次在火星上登陆，美国宇航员马克<span>·</span>沃特尼（马特<span>·</span>达蒙饰），他与其他五位宇航员遭遇巨型风暴，外太空之旅只能提前结束，他因为被误认为无法生还而被留在火星，成了太空鲁宾逊。清醒后的沃特尼发现自己远离地球家园，食物只够一个月的供应。幸好他天性幽默乐观，而且是个植物学专家，决定靠自己的力量生存下去。<span>"</span></p>
+<p>&nbsp; &nbsp; 以上3个数据的长度都是159，存储100条，循环存储的时候内容会+i，以便每次都不一样。测试数据中，中文的文件是最大的，这个和字符编码有关，英文的文件大小最小，以下数据为Trace下的CPU执行时间，文件大小为字节。</p>
+<table border="1"><tbody>
+<tr>
+<td align="center">类型</td>
+<td align="center">文件大小</td>
+<td align="center">存储时间</td>
+</tr>
+<tr>
+<td align="center">中文</td>
+<td align="center">51650</td>
+<td align="center">121</td>
+</tr>
+<tr>
+<td align="center">英文</td>
+<td align="center">20050</td>
+<td align="center">104</td>
+</tr>
+<tr>
+<td align="center">Json数据</td>
+<td align="center">25650</td>
+<td align="center">159</td>
+</tr>
+</tbody></table>
+<p>&nbsp; &nbsp; 存储的时间上来看，Json数据是最慢的，英文最快，中文稍慢，但是中文的文件大小要大的多，这里还不能认为中文的写入比英文慢。我们再来看下Trace的性能数据。<br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/0819d703e57365affad5b20fa9a1af890084b17e.png" alt="" width="1780"><br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/9b8ab222cfd5ff0ce370d70ef6e0a4a622f51faf.png" alt="" width="1680"></p>
+<p><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/39b595cbae184f18c9646fe702ff2f47b277f5bf.png" alt="" width="1564"><br><br>&nbsp; &nbsp; &nbsp; 上面的Trace结果我们可以明显看到一个问题，就是String.charAt(I)都执行了17098次，这样看来，在存储的时候，是一个字符一个字符进行检查的，所以这里有函数调用的耗时，字符越多，该函数的耗时就会越多，如下图所示：</p>
+<p><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/e5ece6b7e93a74c32fc4afea50e625c02b752b8e.png" alt="" width="1560"></p>
+<img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/d5758213c833bbf566fcde1ebe784340a5763068.png" alt="" width="1760"><br>&nbsp; &nbsp; <br>&nbsp; &nbsp; 另外，我们再来看Json的数据存储，它和中文，英文有一定的区别，我们看到有两个append函数的调用 ，还有String.getChars的调用，因为Json字符串中包含了“&amp;”这个特殊字符，每当遇到该字符串的时候就会做特殊处理，在我们的用例中刚好有14个“&amp;”，所有有1400次的拼接该字符。字符串被14个“&amp;”拆分成16段，所以还有1600次的其他字符串的拼接，因为Json字符串写入时候的额外处理开销，导致存储Json字符串的性能也会相应的变差，但是我们发现他的字符串拼接都是通过系统库函数 System.arrayCopy实现的，并没有分配临时的字符串对象和其他对象，所以下降的并不悬殊，主要是函数调用的开销。如下图所示：<br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/7f8d46cee40ef063e8831440f1c0c9ce96da6362.png" alt="" width="1564"><br>&nbsp; &nbsp;&nbsp;<br>&nbsp; &nbsp; &nbsp;为了再次验证“&amp;”的影响，将上面的字符串用例中删除2个“&amp;”，剩下12个，再次测试后发现，相应的函数也做了改变，变为1200次和1400次，如下图所示：<br>&nbsp; &nbsp;&nbsp;<img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/26fe8128751fbf7f9bd43eff4bc19b36821134b5.png" alt="" width="1368"><br><br>&nbsp; &nbsp; 接下来我们将Json数据和英文字符串加长，使得保存的文件大小都是51650，再来看对应的时间，这里也是Trace下的CPU时间，这里可以看到，当文件大小一样的时候，同样的100条的数据，中文是最快的，Json是最慢的。<br><br><table border="1"><tbody>
+<tr>
+<td align="center">类型</td>
+<td align="center">文件大小</td>
+<td align="center">存储时间</td>
+</tr>
+<tr>
+<td align="center">中文</td>
+<td align="center">51650</td>
+<td align="center">111</td>
+</tr>
+<tr>
+<td align="center">英文</td>
+<td align="center">51650</td>
+<td align="center">259</td>
+</tr>
+<tr>
+<td align="center">Json数据</td>
+<td align="center">51650</td>
+<td align="center">324</td>
+</tr>
+</tbody></table>
+<br>&nbsp; &nbsp; 我们可以通过性能数据来查看为什么中文是最快的，英文相同文件大小的情况下，中文的字符数量最少，所以花在String.charAt()函数上的时间是最少的。json和英文比，虽然字符数量更少，但是Json额外多了另外几个函数的调用耗时，所以Json是最慢的。<br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/822c39f08e82e96f431c18608db6d70a4ab43edd.png" alt="" width="1356"><div>
+<br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/613173dbccfba19c7cfb5eb77c84134232933891.png" alt="" width="1364"><br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/e0b1dad3fef072799ff21ef3e8396380d92ad674.png" alt="" width="1366"><br><br><h3 id="5">3、加载字符串的性能</h3>
+&nbsp; &nbsp; 我们沿用上面的字符串用例继续做测试，先测试159个字符串长度的文件，文件大小不一样。从测试结果来看，中文和英文的加载时间基本相同，差别很小。而Json的加载时间多了4倍。以下时间也是Trace下是CPU时间。<br><br><table border="1"><tbody>
+<tr>
+<td align="center">类型</td>
+<td align="center">文件大小</td>
+<td align="center">存储时间</td>
+</tr>
+<tr>
+<td align="center">中文</td>
+<td align="center">51650</td>
+<td align="center">90</td>
+</tr>
+<tr>
+<td align="center">英文</td>
+<td align="center">20050</td>
+<td align="center">90</td>
+</tr>
+<tr>
+<td align="center">Json数据</td>
+<td align="center">25650</td>
+<td align="center">364</td>
+</tr>
+</tbody></table>
+<br>&nbsp; &nbsp; 我们看下Trace的结果，如下图所示：<br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/0b44062a85afb128122816e7e0a109ba7165a467.jpeg" alt="" width="1350"><br><br>&nbsp; &nbsp; &nbsp;从上面可以发现，Json加载中的实现方式和前面2个不同，多了readEntity的处理。因为字符串中有14个“&amp;”符号，所以100条有1400次的readEntity调用，还有1400的subString的调用。另外由于“&amp;”的缘故，导致内容也是分段添加的，明显可以看到很多字符串拼接处理的函数调用，如StringBuilder的append的调用。另外从函数调用次数的排序中也可以发现，Json数据的处理使用了大量的字符串函数和额外的对象分配，这就是其性能下降的原因。<br><br>
+</div>
+<div><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/605e548b520cb123542377c831b9a230ce6434aa.jpeg" alt="" width="1350"></div>
+<div>
+<br>&nbsp; &nbsp; 上面看的是159个字符的情况下的加载情况，下面再看下文件大小都是51650字节的时候的加载性能，数据含义同上。<br><br><table border="1"><tbody>
+<tr>
+<td align="center">类型</td>
+<td align="center">文件大小</td>
+<td align="center">加载时间</td>
+</tr>
+<tr>
+<td align="center">中文</td>
+<td align="center">51650</td>
+<td align="center">99</td>
+</tr>
+<tr>
+<td align="center">英文</td>
+<td align="center">51650</td>
+<td align="center">126</td>
+</tr>
+<tr>
+<td align="center">Json数据</td>
+<td align="center">51650</td>
+<td align="center">716</td>
+</tr>
+</tbody></table>
+<br>&nbsp; &nbsp; &nbsp; 我们从Trace面板上来看各自的性能情况，因为文件大小一样的情况下，每条英文字符串的长度要比中文长的多，所以加载性能有一些下降，但是并没有下降很多，而Json耗时是中文的7倍多，性能相差悬殊，如下图所示：<br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/93371fc39ef4081d4cb9b7cf74ec6e905bfe335e.png" alt="" width="1384"><br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/a961dd9d7019b68d60841e7b6bdc195e71f59b78.png" alt="" width="1352"><br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/62af5b543fa86fa627a77b2d000193422244457b.png" alt="" width="1356"><br><br>&nbsp; &nbsp; 经过测试可以发现，在有字符串“&amp;”以及字符串“&lt;"、"&gt;"的情况下，SharedPreference存储和加载都会受到这些特殊字符的影响，导致性能的下降。加载性能上的损耗主要是多了一些System.arrayCopy的额外调用，性能下降的不多。而加载过程中不仅多了很多额外的函数调用和字符串的拼接，还有对象的分配，如多了更多的String对象和StringBuilder对象的分配。所以导致性能下降的很明显。<br><h2 id="6">四、SharedPreference的使用注意事项</h2>
+<h3 id="7">1、内存注意事项</h3>
+&nbsp; &nbsp; &nbsp;SharedPreferences是一个轻量级数据存储，是以键值对来存储应用程序的配置。使用不当会有性能和内存问题。<br><br>
+</div>
+<div>&nbsp; &nbsp; 1）文章开头介绍了SharedPreference的操作最终都是通过ContextImpl.getSharedPreferences(String name, int mode)函数来处理的，ContextImpl.java文件负责了该进程中所有SharedPreference实例的管理，所有实例都会存储在一个private static ArrayMap&lt;String, ArrayMap&lt;String, SharedPreferencesImpl&gt;&gt; sSharedPrefs的静态Map中，这样就会导致所有的SharedPreference实例一旦创建就会被长期引用，导致该内存无法释放。通过Mat工具的分析也能看出来，如下图所示：<br><br><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/decf8279f3a9f285758caa0251671bff302c0a91.png" alt="" width="772"><br><br>&nbsp; &nbsp; 因为SharedPreference一旦加载就会整个文件全部读取并缓存到HashMap中，而且该HashMap又被静态变量持有，所以就会导致这部分内存是无法释放的。<strong><span style="color:#ff0000;">因此从内存角度出发，SharedPreference是不能用来存储大数据块的，会造成额外的内存占用。</span></strong><br><br><div>2）我们在编辑修改的时候，需要获取Editor，而我们从上面的源代码中可以看到edit函数每次都会new EditorImpl()，如果频繁插入和修改，应该只获取一次Editor实例。不要在循环体中调用sharedPreferences.edit()，合理的使用SharedPreferences.Editor editor = sharedPreferences.edit()来一次性获取editor可以减少对象的分配。<br><br>3）在apply和commit函数执行的过程中，也会创建多个Runnable实例和MemoryCommitResult实例，因此也要控制这两个函数的使用时机和频率，不要因为一个小改动就保存一次数据。<br><h3 id="8">2、性能注意事项</h3>
+&nbsp; &nbsp; 从前面的数据测试中，我们也可以看出一些该注意点的。目前在性能栅栏中也已经做了对SharedPreference的监控，有利于提前发现问题。<br><br>1）SharedPreference<span style="color:#ff0000;">不适合存储Json数据和Html格式的数据，在包含越多的"&amp;"，"&lt;"、"&gt;"字符的时候性能下降的越明显</span>，较大的这类数据的存储需要考虑文本文件等方式代替。而且系统的加载线程并未设置线程的优先级，所以容易和主线程等抢占CPU资源，复杂的数据会导致该线程抢占较多的资源。<br><br>2）SharedPreference在每次调用commit()、apply()时都会将整个内容全部写到文件中，即使只改动了一个条目。所以只有在你修改所有的内容完成后才适合调用保存的方法，而不应该put一个就保存一个。<br><br>3）SharedPreference的<span style="color:#ff0000;">文件存储性能和文件大小是相关的</span>，而读入的时候又是整个文件缓存的，所以：第一，<span style="color:#ff0000;">不要将毫无关联的配置项保存在同一个文件中</span>，各模块的配置应该保存在自己的SharedPreference文件中，而不是添加到DefaultSharedPreference文件中，这样会导致Default文件过大，加载和存储都会变慢。第二，如果SharedPreference文件存储了较多内容时，<span style="color:#ff0000;">不要将频繁变动的条目和不太容易改变的条目同时存储在一个文件中</span>，避免在频繁写入的时候存储大量不必要的内容，以提升性能。<br><br>
+</div>
+</div>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/45469/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">1人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/30626" title="行直"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_8385583a61497aa5d15857e068482a65.png_80x80" width="26" height="26" alt="行直" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/45469#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (1)
+                  </a>
+        <a href="http://www.atatech.org/articles/45469/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          11
+        </a>
+        <a href="http://www.atatech.org/articles/45469/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          12
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="45469" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/45469/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          2
+        </a>
+        <a href="http://www.atatech.org/articles/45469/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          3
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/97119" title="雪梦"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/img_20150416165641.JPG_80x80" width="28" height="28" alt="雪梦" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13855" title="执明"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_32f84b597629f37d9ef53d714fce6fa1.png_80x80" width="28" height="28" alt="执明" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34964" title="丹琼"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_502c4afdfeedb869dd6c8c1496e7da0f.png_80x80" width="28" height="28" alt="丹琼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/66624" title="澜清"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_eef222c790cc35af6406e8f9663e7574.png_80x80" width="28" height="28" alt="澜清" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23049" title="连虎"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_d5a9ee07f24fb62f40781d00df2d47db.png_80x80" width="28" height="28" alt="连虎" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/44028">手淘安卓版性能优化7- 启动阶段的问题...</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/29553">手淘主链路性能优化实践</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/38014">YunOS相册冷启动性能优化实践</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/46764">Android基于Choreographer计算FPS</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/45333">手淘安卓版性能优化9- 其它因素对...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/7781">Android 性能优化</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/45333">上一篇：手淘安卓版性能优化9- 其它因素对启动性能的影响过程分析</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/45552">下一篇：手淘安卓版性能优化11 - 界面性能遇到的问题和主要使用的工具</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-75835">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/93471" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/u_identicon_16a7f1954ee6853fcf7dbd6de99c4d75.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/93471" class="author">通草</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/45469#comment-75835" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-10T00:54:48+08:00">2015-12-10 00:54:48</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>想问下如果之前在应用默认的SharedPreference文件中保存了大量数据，现在想在版本升级的时候将数据保存在单独的SharedPreference文件中，是否需要考虑把之前保存在系统默认SharedPreference中的数据给清除掉，因为版本升级不会清除原有SharedPreference中的数据。</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/75835/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/75835/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-75835&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-75835">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-75835">
+      <div class="sub-comments media-list" id="comment-75835-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-12-10T16:27:22+08:00">2015-12-10 16:27:22</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>需要主动清理掉的，否则日积月累原来那些数据还在，依然会影响性能。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/75835/subcomments/23185/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/75835/subcomments/23185/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-23185&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-23185" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/75835/subcomments/" method="POST" data-remote="true" data-target="#comment-75835-sub" data-done="$(&#39;#sub-comments-count-75835&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/75835/subcomments/" method="POST" data-remote="true" data-target="#comment-75835-sub" data-done="$(&#39;#sub-comments-count-75835&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="45469">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/stat.php" type="text/javascript"></script><script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/stat(1).php" type="text/javascript"></script><script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%08%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9610-+%08%08SharedPreference%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%92%8C%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F45469%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化10- SharedPreference性能分析和使用规范", "", "", 'article-45469']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/45469#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘 安卓版性能优化10- SharedPreference性能分析和使用规范_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/45469#0">一、SharedPreference的读取过程</a></li><li><a href="http://www.atatech.org/articles/45469#1">二、SharedPreference的存储过程</a></li><li><a href="http://www.atatech.org/articles/45469#2">三、SharedPreference的性能分析</a></li><ul><li><a href="http://www.atatech.org/articles/45469#3">1、存储1000条记录的性能</a></li><li><a href="http://www.atatech.org/articles/45469#4">2、存储字符串的性能</a></li><li><a href="http://www.atatech.org/articles/45469#5">3、加载字符串的性能</a></li></ul><li><a href="http://www.atatech.org/articles/45469#6">四、SharedPreference的使用注意事项</a></li><ul><li><a href="http://www.atatech.org/articles/45469#7">1、内存注意事项</a></li><li><a href="http://www.atatech.org/articles/45469#8">2、性能注意事项</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/45333 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化9- 其它因素对启动性能的影响过程分析</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化9- 其它因素对启动性能的影响过程分析
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 227</span>
+          <span class="info">
+                        <time class="" datetime="2015-11-30T16:35:10+08:00">2015-11-30 16:35:10</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/45333/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="性能优化 android " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="性能优化" class="item">性能优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="android" class="item">android<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">性能优化</a><a href="http://www.atatech.org/search?q=android&type=INSIDE_ARTICLE_TAG" class="label label-ata">android</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/45333/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 前面谈到了安全软件和同步锁对性能的影响，特别是同步锁使用不当会对主线程带来很大的隐患。安全软件对IO的影响修改起来并不容易，需要大家有意识的在IO操作上多做衡量。 IO的读写一直也是手机上的一个性能瓶颈，即使在没有安全软件的情况下，有时也会变得很糟糕。在双十一版本发布后，我们还是继续遇到了启动慢的问题。没错，就是启动慢，虽然一直在优化，看来有些问题真是深藏不露啊。<br>&nbsp; &nbsp; &nbsp;这次的主要问题是在用了时间长的手机上启动会变慢，说起来还真的忽略了这部分的测试。我们自己平时总是频繁的卸载、安装，还真没保留几天好好用过。为了排查这个问题，安装后认真的用了一段时间。选择TraceView作为分析工具对启动过程做分析。<br><h2 id="0">一、检查时间面板线，看线程执行情况</h2>
+&nbsp; &nbsp; &nbsp; 首先，我们查看时间线面板，下图的时间线面板中，我们可以看到很密集的函数执行，而且很多个线程的时间线分布上都比较密集，第一个感觉就是线程太多，太忙了。<br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/80a2ffecf94865feef022d3f42f349bdcad30812.jpeg" alt="" width="901"><br><br>&nbsp; &nbsp; &nbsp;接下来，我们在来看有哪些线程，很直观可以看到的主要有Main，MTOP SDK，SharedPreference的读写，UT，AppMonitor等线程。通过时间线面板可以基本了解到线程的信息和线程的执行繁忙情况了。接下来就是进一步查看线程中做的事情和这些模块的CPU占用。<br><h2 id="1">二、通过Profile面板，找出问题模块</h2>
+<img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/ce6293db732aa329321f515b01977b77023e7c56.jpeg" alt="" width="1192"><br><br>&nbsp; &nbsp; &nbsp; 从上图我们可以看到，MTOP中的线程执行了序列化读取操作，占用了近14%的CPU资源，支付宝SDK初始化时候的一个线程占用了10%左右的CPU，SharedPreference的读写线程都各自占用近10%的CPU，还有UT，AppMonitor相关的统计线程占了9.2%，仅这几个模块已经占据了近55%的CPU资源，启动阶段的CPU可见有多繁忙。<br>&nbsp; &nbsp; &nbsp; 通过上面的分析可以确定，启动阶段的线程太多太繁忙是一个主要原因，到这里我们大致可以定位到所属的模块了，然后再来进一步分析是什么原因导致的这些繁忙。<br><h2 id="2">二、检查Main线程，找出主线程耗时模块</h2>
+&nbsp; &nbsp; &nbsp; 虽然以前进行了多次的主线程检查，但还会有漏网之鱼，而且新添加的迭代中也可能引入新的问题。通过Trace的时间线面板，我们可以发现Main线程的靠右侧860ms起点处开始有近100ms的相同颜色的区域，这样来看就基本可以确定执行的是同一个函数，通过左上角的函数名称我们看到是Parcel.readInt()，这个是序列化读取数据的地方。进一步追踪，可以发现是Activitymanager.getRunningAppProcesses()函数，在Profile Panel面板查看该函数，如下图：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/bf0c669844fbc214673492fa287ac52504540fbb.png" alt="" width="1720"><br><br>&nbsp; &nbsp; &nbsp; 该函数共有两次调用，继续追踪主线程的调用。我们可以发现是LoginThreadHelpr调用的，如下图所示：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/4b1230a4a7449d3aadddd076531afb7ae777f041.png" alt="" width="1786"><br><br>&nbsp; &nbsp; &nbsp;我们可以看到主线程中调用了该函数，虽然只有80ms的cpu时间，但是这个又是一个额外隐患点。因为getRunningAppProcesses()函数是获取系统里所有正在运行的进程列表，<span style="color:#ff0000;"><strong>而这个又会与用户环境有关了</strong></span>，如果手机的内存足够，驻留了很多进程，或者系统自带的进程非常多，将会导致这个函数的时间相应的增加。因而这个函数具有不确定性，在主线程调用就存在不同的风险，后续有必要对这个做优化。<br><br>&nbsp; &nbsp; &nbsp;接着我们在另外的一次Trace过程中，我们又发现了旺信SDK的初始化放在了主线程，占用了主线程比较多的资源，如下图所示，旺信的在主线程的耗时占用了14.8%的CPU时间，所以有必要将该初始化做异步处理的优化：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/5baee191b00d0bc80f0c2187312eec3af8ade980.jpeg" alt="" width="2000"><br><h2 id="3">二、检查其他线程，找出耗时模块</h2>
+<h3 id="4">1、支付宝SDK模块的耗时</h3>
+&nbsp; &nbsp; 前面我们看到支付宝的SDK模块有个比较耗时的操作，接着我们来看它做了什么。该线程首先调用了SecureSdk.getApdidToken函数，除了少量类加载耗时外，97%的耗时是用在initApdid函数。接着看initApdid，该函数，75%左右的时间用在MainProcess，21%左右的耗时用在prepareLogTag函数。如下图所示：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/453f5cdd41fb299b5ef35a9c041aa923c48b8e58.png" alt="" width="1796"><br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/ab4547849eee707641d3a39be93129b056b8786b.png" alt="" width="1594"><br><br>&nbsp; &nbsp; 接着对这两个函数，分别进行进一步的跟进，首先来看ApdidManager.mainProcess函数的耗时。<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/d54198aac752d3890100a9a7785e11ce863a2af8.png" alt="" width="1594"><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/a35c69fa53ce25080fe009e659cb3b8d394c000d.png" alt="" width="1734"><br><br>&nbsp; &nbsp; &nbsp;从上面的信息我们看到，ApdidManager.mainProcess主要分成2条路径，其中64.5%耗时在ApplicationInfoModel.getAppInfo函数，29%耗时在DeviceInfoModel.getStaticDeviceInfo函数。继续看getAppInfo，跟踪后发现主要是因为调用了ApplicationPackageManager.getInstalledPackages函数而导致的，该函数可以获得所有已经安装的应用程序列表，因为这个会和用户手机所安卓的App多少有关系，<span style="color:#ff0000;"><strong>所以这个又是与用户环境有关的一个函数</strong></span>，同样具有不确定性。另外一个跟踪getStaticDeviceInfo函数后可以发现，主要耗时都用在获取传感器，内存，CPU等信息上，需要通过查看代码才能更确定是否有优化的余地。
+<p>&nbsp; &nbsp; &nbsp;继续对prepareLogTag函数做分析，从下面的跟踪中可以发现，该函数主要的耗时在读取SharedPreference的数据，然后对其进行解密，这样就和数据的长度、算法有关系了。当然SharedPreference的读取时间是在另外一个线程中完成的，后续会提到，如下图所示。<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/1e55d9fc019f9cd0aa2ac8dbbfb775569b424c26.jpeg" alt="" width="1592"></p>
+<h3 id="5">2、MTOP SDK模块的耗时</h3>
+<p>&nbsp; &nbsp; &nbsp;MtopSDK中线程的耗时，从Trace中可以定位到主要是一个反序列化的操作，该操作涉及到比较多的IO读取和内存对象的构建和类的加载。从业务上看，主要是网络库持久化的域名策略信息反序列化成对象，持久化的域名策略信息如果较多，耗时就会很久，<strong><span style="color:#ff0000;">所以这个也具有不确定性的因数，</span></strong>存在性能隐患。如下图所示：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/1363b1200e40df4e62a41c918d3d1e4cce925002.png" alt="" width="1778"><br><br></p>
+<h3 id="6">3、统计模块的耗时</h3>
+<p>&nbsp; &nbsp; &nbsp;从上面我们也可以看到统计的两个模块，UT和AppMonitor在初始化过程中也有较多的耗时，通过跟踪后发现，主要耗时都是因为Json的对象初始化或者解析Json数据，如下图所示：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/9b3ab47586eda3e18f381bc1dd0ec6b361206a26.png" alt="" width="1734"></p>
+<p><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/3a377859b29894800a23ab4bfa8a71d984a22209.png" alt="" width="1752"><br><br>&nbsp; &nbsp; 上面是非首次启动的时候的统计模块耗时情况。另外在对启动的其他次数跟踪过程中也发现UT有时候线程启动太早，并且该线程会从线上拉取配置并进行解析，这样就更加占用CPU和内存资源了。如下图所示，我们可以看到，线程很早就开始启动，而上面的UT线程我们可以看到是在比较右侧的时间线面板上才开始执行的。<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/2354027180675e0e07f02453e267c3eced29f513.png" alt="" width="2490"><br><br></p>
+<h3 id="7">4、SharedPreference的读写线程耗时</h3>
+<p>&nbsp; &nbsp; SharedPreference的读写线程占据了20%的CPU资源，这个是非常多的，有必要进行原因的定位。在首次安装时并没有发现这个特别耗时，而是在使用一段时间后，这个问题变得比较严重。因为启动阶段很多模块有读写Sp的操作，当时觉得可能是这个原因引起所以找出了所有读写相关的操作和模块，而且这些模块貌似也没存储特别复杂的数据，所以按理不会引起这么多的耗时才对。继续追究原因，用adb命令进入apk目录下，查看SharedPreference的文件，可以看到几十个sp文件，而且部分文件很大，默认的sp文件都有90多k了，另外30k以上的sp文件也有多个，如下图所示：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/db9538efbb78361418494645662cc2e1add4a1f5.jpeg" alt="" width="909"></p>
+<p>&nbsp; &nbsp; 看到这里或许有点眉目了，为了进一步确认，将默认的sp文件下载到本地。不看不知道，一看真的要吓一跳，这个文件中存了好多的Json等数据，而且非常的杂乱，没有相关性。我们可以看到一条搜索相关的配置也是存在默认的sp文件中，tbsearch_rainbow_config像的内容都是json的数据，而且比较大。<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/63c6571e22f8d567914c0bc3b024df822ecdcc71.png" alt="" width="1726"><br><br>&nbsp; &nbsp; 当然这个只是一个，另外还有好多个很大的项，更有一个&lt;string name="whitelist"&gt;字符串数据总长度71319，实在有点恐怖。为了追踪这个whitelist当时也费了好一番劲，当时没有人认领，只好自己寻找了。在操作中发现，如果没有进行过登录，就不会有这个whitelist项，一旦登录就出现了，所以锁定在登录过程。然后再对这个过程做Trace，最后找到调用方，原来是SSO模块惹的祸。<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/ea1047873ad267fee3f08baf034ce9cc521556d4.png" alt="" width="2006"><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/3ac30fcf1834845d6c5ecc684d876e42c57d9f83.png" alt="" width="1924"><br><br>&nbsp; &nbsp; 当然这里只是列出了几个，其他像&lt;string name="MOTU_APPMONITOR_CONFIG"&gt;等还有不少的条目都存储了了较大的数据块。到这里基本就能明白为什么SharedPreference的读写线程那么繁忙了。因为不仅仅默认的SP文件内容多，还有好几个大的SP文件，这些文件的频繁的加载和存储就会导致CPU和IO居高不下了。下一篇将更加详细的介绍SharedPreference的性能和怎么来使用。</p>
+<h3 id="8">5、Atlas线程的耗时</h3>
+&nbsp; &nbsp; &nbsp;在启动界面的排查中，也发现了atlas中的线程有较多的耗时操作，如下图所示，在函数installBundleWithDependency中有较多的耗时。<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/3020f5571e5e5579a814121b1460a46ae5c18da8.png" alt="" width="2466"><br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/b1400f2a707d8085a06a722fef3cbb22df9711a2.png" alt="" width="2418"><br><br>&nbsp; &nbsp; 这里可以看到Atlas读取apk内部有哪些内置bundle的代码的主要耗时是在ZipFile的构造函数中，但是这个不是首次启动的时候，占比这么高有点不合理，所有有必要做一些优化。<br>&nbsp; &nbsp; 另外Atlas在启动服务或bundle的时候，会找到该bundle，但是这里有个遍历过程，每次消耗在遍历上的时间已经大大超过了实际启动业务的时间，看起来有点喧宾夺主了，如下图所示：<br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/273d7b067be047c2ca3bd2f967233bb8c089d449.png" alt="" width="2388"><br><br><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/10ffa6277a6467f7de8089795cc007574740c056.png" alt="" width="1934"><br><p>&nbsp; &nbsp; &nbsp; 从上面2个服务的启动时间线面板上我们可以看到，绝大部分时间都是在执行getBundleForComponet函数做遍历，启动服务的代码耗时在时间线面板的最右侧，才占了一点点。所以这里又找到一处性能点，在启动bundle和服务的时候，做的这些遍历需要优化。可以用类似HashMap等来代替List的遍历，从而提高效率。<br><br>&nbsp; &nbsp; &nbsp; 在这次启动的排查过程中，我们发现了较多的问题，不仅业务代码和中间件存在性能问题，Atlas中的代码也存在一些性能点。而且我们也发现了3处性能不确定性因素，其中两处是和用户环境相关联的，这也是用户中经常出现比我们慢的原因之一，<span style="color:#ff0000;"><strong>ActivityManager.getRunningAppProcesses()/getRunningTasks()/getRunningServices()</strong></span>、<strong><span style="color:#ff0000;">ApplicationPackageManager.getInstalledPackages()，当参数是0的时候返回所有的自安装程序的个数，当参数是PackageManager.GET_ACTIVITIES或者是PackageManager.GET_SERVICES时，会遍历所有的Activity和Service，这个比参数为0要耗时好几倍，性能很糟糕。类似的还有ApplicationPackageManager.getInstalledApplications()</span></strong>这两个函数在使用的过程中应该特别注意，而且主线程不应该使用。另外一个是和业务相关的，如<strong><span style="color:#ff0000;">网络库持久化的域名策略信息反序列化成对象，这个序列化和数量有关</span></strong>，数量多了将会严重的影响性能，所以对于这种序列化和反序列的使用，在业务上我们也要格外注意。<br>&nbsp; &nbsp; &nbsp; 当然SharedPreference的使用也是这次发现的一大性能隐患，使用不当带来的问题也比较严重，后面会详细介绍怎么来使用SharedPreference。而且前面也介绍了安全软件对IO的影响比较大，而我们这里的SharedPreference读写，序列化，读取Bundle等都是和IO相关的，所以对这几个方面的优化也显得更有必要，对于业务上实在必须要调用的，我们也应该通过考虑降低线程的优先级等手段来减少对整体性能的影响。对于那些和用户环境有关的函数，将结合性能栅栏来检查，尽量在开发阶段可以发现这些性能。</p>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/45333/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">5人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/76156" title="溪拓"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_3b146217fedc75f4c9d7cf1c4777c32b.png_80x80" width="26" height="26" alt="溪拓" class="img-user"></a></li><li><a href="http://www.atatech.org/users/141868" title="唐送军"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_7a4c4d3272f153d7700d59c8ea0f1120.png_80x80" width="26" height="26" alt="唐送军" class="img-user"></a></li><li><a href="http://www.atatech.org/users/8447" title="老陛"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_avatar_20120725183027_8447_60.jpeg_80x80" width="26" height="26" alt="老陛" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74114" title="珏郎"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_fb682be6c22821271fa907fa719515fe.png_80x80" width="26" height="26" alt="珏郎" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34857" title="简歌"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_a1ba7595d9f1fa2fa235ba97c977a78a.png_80x80" width="26" height="26" alt="简歌" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/45333#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (0)
+                  </a>
+        <a href="http://www.atatech.org/articles/45333/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          20
+        </a>
+        <a href="http://www.atatech.org/articles/45333/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          21
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="45333" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/45333/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          2
+        </a>
+        <a href="http://www.atatech.org/articles/45333/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          3
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/67428" title="饮源"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_3ff00a469474bbe71a9218a7f0377518.png_80x80" width="28" height="28" alt="饮源" class="img-user"></a></li><li><a href="http://www.atatech.org/users/118867" title="擘山"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/img_20151229144211.JPG_80x80" width="28" height="28" alt="擘山" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132816" title="皙华"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/img_20150519171629.jpg_80x80" width="28" height="28" alt="皙华" class="img-user"></a></li><li><a href="http://www.atatech.org/users/97119" title="雪梦"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/img_20150416165641.JPG_80x80" width="28" height="28" alt="雪梦" class="img-user"></a></li><li><a href="http://www.atatech.org/users/124646" title="彭烈"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/img_20151013203959.jpg_80x80" width="28" height="28" alt="彭烈" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/11592" title="谢萱"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_avatar_20120719180810_11592_60.jpeg_80x80" width="28" height="28" alt="谢萱" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/8447" title="老陛"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_avatar_20120725183027_8447_60.jpeg_80x80" width="28" height="28" alt="老陛" class="img-user"></a></li><li><a href="http://www.atatech.org/users/9891" title="九重"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_avatar_20120725183035_9891_60.jpeg_80x80" width="28" height="28" alt="九重" class="img-user"></a></li><li><a href="http://www.atatech.org/users/6011" title="一熙"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_avatar_20120725183012_6011_60.jpeg_80x80" width="28" height="28" alt="一熙" class="img-user"></a></li><li><a href="http://www.atatech.org/users/33925" title="白书"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_71b539f8a0207a307900ca15cbebc334.png_80x80" width="28" height="28" alt="白书" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81631" title="士昭"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_3a8beff9989bacc12f6d2e64412c3f93.png_80x80" width="28" height="28" alt="士昭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13855" title="执明"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_32f84b597629f37d9ef53d714fce6fa1.png_80x80" width="28" height="28" alt="执明" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64157" title="如盐"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_652fca5e93b01f8e5bea89231142bd1e.png_80x80" width="28" height="28" alt="如盐" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34964" title="丹琼"><img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/u_identicon_502c4afdfeedb869dd6c8c1496e7da0f.png_80x80" width="28" height="28" alt="丹琼" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/41266">支付宝钱包客户端性能优化最佳实践分享--...</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/42723">手淘安卓版性能优化2 - TraceView使用经验</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/43380">手淘安卓版性能优化5 - 手淘遇到的性能...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/44028">手淘安卓版性能优化7- 启动阶段的问题...</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/31925">Android runtime resource overlay &amp; 性能调试工具</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/30208">Android开发，Activity生命周期</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/45112">上一篇：手淘安卓版性能优化8- 安全软件和同步锁对性能的影响案例</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/45469">下一篇：手淘安卓版性能优化10- SharedPreference性能分析和使用规范</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+
+<div class="pages comment-tip">
+        
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="45333">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/stat.php" type="text/javascript"></script><script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/stat(1).php" type="text/javascript"></script><script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%08%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%969-+%08%08%E5%85%B6%E5%AE%83%E5%9B%A0%E7%B4%A0%E5%AF%B9%E5%90%AF%E5%8A%A8%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F45333%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化9- 其它因素对启动性能的影响过程分析", "", "", 'article-45333']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/45333#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘 安卓版性能优化9- 其它因素对启动性能的影响过程分析_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: absolute; top: 10154px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/45333#0">一、检查时间面板线，看线程执行情况</a></li><li><a href="http://www.atatech.org/articles/45333#1">二、通过Profile面板，找出问题模块</a></li><li><a href="http://www.atatech.org/articles/45333#2">二、检查Main线程，找出主线程耗时模块</a></li><li><a href="http://www.atatech.org/articles/45333#3">二、检查其他线程，找出耗时模块</a></li><ul><li><a href="http://www.atatech.org/articles/45333#4">1、支付宝SDK模块的耗时</a></li><li><a href="http://www.atatech.org/articles/45333#5">2、MTOP SDK模块的耗时</a></li><li><a href="http://www.atatech.org/articles/45333#6">3、统计模块的耗时</a></li><li><a href="http://www.atatech.org/articles/45333#7">4、SharedPreference的读写线程耗时</a></li><li><a href="http://www.atatech.org/articles/45333#8">5、Atlas线程的耗时</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

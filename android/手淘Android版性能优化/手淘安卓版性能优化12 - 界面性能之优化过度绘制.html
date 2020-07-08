@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/45768 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化12 - 界面性能之优化过度绘制</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+                <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化12 - 界面性能之优化过度绘制
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 154</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-07T20:10:00+08:00">2015-12-07 20:10:00</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/45768/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="性能优化 android " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="性能优化" class="item">性能优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="android" class="item">android<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">性能优化</a><a href="http://www.atatech.org/search?q=android&type=INSIDE_ARTICLE_TAG" class="label label-ata">android</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/45768/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        
+<span><span><span><span>&nbsp; &nbsp; 在第一篇文章《<a href="http://www.atatech.org/articles/42703">手淘安卓版性能优化1 - 性能相关概念介绍</a>》中介绍了<span>Overdraw(</span><span>过度绘制</span><span>)，</span><span>即屏幕上的某个像素在同一帧的时间内被绘制了多次，这样</span><span>就浪费了</span><span>CPU</span><span>及</span><span>GPU</span><span><span>资源，对性能有一定的影响。蓝色，淡绿，淡红，深红代表了4种不同程度的Overdraw情况，当然，最好是只有蓝色的情况，但是在复杂的界面上实现有一定的难度。在界面上消除红色的Overdraw大部分情况下都可以实现。<br>&nbsp; &nbsp; 过度绘制说起来很简单，优化起来也并不难，但是我们在很多界面上都能发现比较严重的过度绘制，因为很多人并不重视，也没有这个去检查一下过渡绘制习惯。虽然简单的颜色、图片等引起的过度绘制消除后对帧率的提升不能立竿见影，但是仍然是能够起到一点提升作用。我们先用以下xml配置做一个测试，将该布局添加到ListView中，看滑动过程的性能：</span></span></span></span></span></span>
+<pre><code class="hljs xml"><br><span class="hljs-meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">FrameLayout</span> <span class="hljs-attr">xmlns:android</span>=<span class="hljs-string">"http://schemas.android.com/apk/res/android"</span>
+    <span class="hljs-attr">android:id</span>=<span class="hljs-string">"@+id/viestiub"</span>
+    <span class="hljs-attr">android:layout_width</span>=<span class="hljs-string">"match_parent"</span>
+    <span class="hljs-attr">android:layout_height</span>=<span class="hljs-string">"wrap_content"</span>
+    <span class="hljs-attr">android:background</span>=<span class="hljs-string">"#FF000000"</span> &gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">FrameLayout</span>
+        <span class="hljs-attr">android:layout_width</span>=<span class="hljs-string">"match_parent"</span>
+        <span class="hljs-attr">android:layout_height</span>=<span class="hljs-string">"wrap_content"</span>
+        <span class="hljs-attr">android:background</span>=<span class="hljs-string">"#FF000000"</span> &gt;</span>
+
+        <span class="hljs-tag">&lt;<span class="hljs-name">FrameLayout</span>
+            <span class="hljs-attr">android:layout_width</span>=<span class="hljs-string">"match_parent"</span>
+            <span class="hljs-attr">android:layout_height</span>=<span class="hljs-string">"wrap_content"</span>
+            <span class="hljs-attr">android:background</span>=<span class="hljs-string">"#FF000000"</span> &gt;</span>
+
+            <span class="hljs-tag">&lt;<span class="hljs-name">FrameLayout</span>
+                <span class="hljs-attr">android:layout_width</span>=<span class="hljs-string">"match_parent"</span>
+                <span class="hljs-attr">android:layout_height</span>=<span class="hljs-string">"wrap_content"</span>
+                <span class="hljs-attr">android:background</span>=<span class="hljs-string">"#FF000000"</span> &gt;</span>
+
+                <span class="hljs-tag">&lt;<span class="hljs-name">ImageView</span>
+                    <span class="hljs-attr">android:id</span>=<span class="hljs-string">"@+id/iamgeViewbg1"</span>
+                    <span class="hljs-attr">android:layout_width</span>=<span class="hljs-string">"130dp"</span>
+                    <span class="hljs-attr">android:layout_height</span>=<span class="hljs-string">"130dp"</span>
+                    <span class="hljs-attr">android:layout_marginRight</span>=<span class="hljs-string">"20dp"</span>
+                    <span class="hljs-attr">android:layout_marginTop</span>=<span class="hljs-string">"20dp"</span>
+                    <span class="hljs-attr">android:src</span>=<span class="hljs-string">"@drawable/pic"</span> /&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">FrameLayout</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">FrameLayout</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">FrameLayout</span>&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-name">FrameLayout</span>&gt;</span></code></pre>
+<span><span><span><span><span>&nbsp; &nbsp; 我们先看下在非Trace情况下的差别，如下图所示，左边是没有颜色背景的，右边是有4层颜色背景的，整体来看右边的红色线条的高度要比左边高一点点，但是对帧率的影响并不多，简单的背景颜色绘制并没有导致帧率下降的很明显。<br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/ae4013be271bdf9379235efe2129916cfd39c564.jpeg" alt="" width="1440"><br><br>&nbsp; &nbsp; &nbsp;但是从上图我们还是能看出，即使简单的颜色背景，还是对绘制过程有一点性能的影响，下面看下在Trace下，过度绘制对性能的影响，这样可以看的更清楚一些。<br></span></span></span></span></span>
+<p>&nbsp; &nbsp; &nbsp;对于该布局，有4层的多余背景设置，在滑动过程做Trace的性能跟踪，可以看出，在有android:background="#FF000000"设置背景的时候和去掉的时候，在性能上还是有一些差别。如下图所示，左边是带有4层颜色背景的，右边是去掉背景颜色的。<br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/f7d9c551364fbf0c22883b2289818769bf45965e.jpeg" alt="" width="2718"></p>
+<span><span><span><span>&nbsp; &nbsp; 上面的图中可以看到，在没有背景颜色的情况下，drawDisplayList的性能提升比较明显，所占百分比下降较多，平均执行时间只有4层背景情况下的63%。如果对于复杂的绘制命令，这个性能的提升就会大很多。<br><br>&nbsp; &nbsp; 要优化过渡绘制并不难，只要养成习惯，经常用开发者选项中的【调试GPU过度渲染】-【显示过度渲染区域】就可以发现界面上的过度绘制问题，当发现有过度绘制的时候，可以使用以下几个方法来优化。<br></span></span></span></span>
+<h2 id="0">1、不需要显示的布局及时隐藏</h2>
+<span><span>&nbsp; &nbsp; 复杂的界面经常会有很多布局和控件，而且很多布局都会遇到层叠。对于被遮挡的布局，如果前景是完全不透明的，背景的布局已经没有什么显示意义，这个时候就应该及时隐藏这些布局，避免不必要的绘制。<br><br></span></span>
+<h2 id="1">2、去掉层叠布局中多余的背景设置</h2>
+<span><span>&nbsp; &nbsp; 开发阶段经常会对界面做调整，而且随着功能的不停迭代，布局中以前的一些背景设置或许已经成了多余的设置。虽然界面上看起来功能正确，但此时被正确界面覆盖下的多余背景设置可能已经引起了过度绘制了。所以在开发的时候，要经常检查之前的布局中的配置项，如果那些配置已经过时了，请及时的清理掉。<br></span></span>
+<h2 id="2">3、图片控件有前景内容的时候不显示背景</h2>
+<span><span>&nbsp; &nbsp; &nbsp;图片是很容易引起过渡绘制的，因为我们经常会给图片控件设置一个默认背景，在没有图片的情况下先显示。当有图片的时候设置图片的src属性，这样该控件既有背景又有前景内容，绘制的时候就多了一层无用的绘制，前提是前景是完全不透明度的效果。所以这时可以对图片做特殊的处理，当有图片内容的时候，取消之前设置的背景内容。可以直接替换原来的背景，也可以通过自定义图片控件，在有前景Drawable的情况下，阻断背景的绘制。这样就可以减少一层的过渡绘制。<br></span></span>
+<h2 id="3">4、界面背景定义到Activity的主题中</h2>
+<span><span>&nbsp; &nbsp; &nbsp;Activity在显示的时候会优先使用主题中的背景配置，这个背景是顶层View（DecorView）的背景。为了便于理解，我们可以查看相关的源码来了解主题的应用过程：<br><br>&nbsp; &nbsp; Window 类是一个抽象类，提供了绘制窗口的一组通用API，这里选取部分有代表性的代码如下：<br><br></span></span>
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Window</span> </span>{    
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> FEATURE_NO_TITLE = <span class="hljs-number">1</span>;  
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> FEATURE_INDETERMINATE_PROGRESS = <span class="hljs-number">5</span>;  
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setContentView</span><span class="hljs-params">(<span class="hljs-keyword">int</span> layoutResID)</span></span>;  
+  
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setContentView</span><span class="hljs-params">(View view)</span></span>;  
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">requestFeature</span><span class="hljs-params">(<span class="hljs-keyword">int</span> featureId)</span> </span>{  
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> flag = <span class="hljs-number">1</span>&lt;&lt;featureId;  
+        mFeatures |= flag;  
+        mLocalFeatures |= mContainer != <span class="hljs-keyword">null</span> ? (flag&amp;~mContainer.mFeatures) : flag;  
+        <span class="hljs-keyword">return</span> (mFeatures&amp;flag) != <span class="hljs-number">0</span>;  
+    } 
+    <span class="hljs-comment">/** 
+	 * Return the {<span class="hljs-doctag">@link</span> android.R.styleable#Window} attributes from this 
+	 * window's theme. 
+    */</span>  
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> TypedArray <span class="hljs-title">getWindowStyle</span><span class="hljs-params">()</span> </span>{  
+	    <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) {  
+	        <span class="hljs-keyword">if</span> (mWindowStyle == <span class="hljs-keyword">null</span>) {  
+	            <span class="hljs-comment">//调用Context类的相应方法，返回对应的TypedArray对象，参数为自定义属性集合    </span>
+	            mWindowStyle = mContext.obtainStyledAttributes(com.android.internal.R.styleable.Window);  
+	        }  
+	        <span class="hljs-keyword">return</span> mWindowStyle;  
+	    }  
+    }<br>      
+}  
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;我们在Activity中常用的setContentView、requestFeature函数就是Window中定义的，而该类只是一个抽象类，具体的实现是PhoneWindow类。PhoneWindow类继承自Window类，通过该类具体去绘制窗口。Activity中调用的setContentView方法也是直接调用了PhoneWindow类的该方法。该类内部包含了一个DecorView对象，该DectorView对象是所有应用窗口(Activity界面)的根View。<br><br></p>
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PhoneWindow</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Window</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MenuBuilder</span>.<span class="hljs-title">Callback</span> </span>{
+
+	<span class="hljs-meta">@Override</span>
+	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setContentView</span><span class="hljs-params">(<span class="hljs-keyword">int</span> layoutResID)</span> </span>{
+		<span class="hljs-keyword">if</span> (mContentParent == <span class="hljs-keyword">null</span>) {
+			installDecor();
+		} <span class="hljs-keyword">else</span> {
+			mContentParent.removeAllViews();
+		}
+		mLayoutInflater.inflate(layoutResID, mContentParent);
+		<span class="hljs-keyword">final</span> Callback cb = getCallback();
+		<span class="hljs-keyword">if</span> (cb != <span class="hljs-keyword">null</span> &amp;&amp; !isDestroyed()) {
+			cb.onContentChanged();
+		}
+	}
+
+	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">installDecor</span><span class="hljs-params">()</span> </span>{  
+        <span class="hljs-keyword">if</span> (mDecor == <span class="hljs-keyword">null</span>) {    
+            mDecor = generateDecor();  
+            mDecor.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);  
+            mDecor.setIsRootNamespace(<span class="hljs-keyword">true</span>);  
+        }  
+        <span class="hljs-keyword">if</span> (mContentParent == <span class="hljs-keyword">null</span>) {  
+            mContentParent = generateLayout(mDecor);  
+        
+    }	
+
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> ViewGroup <span class="hljs-title">generateLayout</span><span class="hljs-params">(DecorView decor)</span> </span>{  
+        <span class="hljs-comment">// Apply data from current theme.  </span>
+        TypedArray a = getWindowStyle();   
+        mIsFloating = a.getBoolean(com.android.internal.R.styleable.Window_windowIsFloating, <span class="hljs-keyword">false</span>);  
+        <span class="hljs-keyword">int</span> flagsToUpdate = (FLAG_LAYOUT_IN_SCREEN|FLAG_LAYOUT_INSET_DECOR)   
+            &amp; (~getForcedWindowFlags());  
+      
+        <span class="hljs-keyword">if</span> (mIsFloating) {   
+            setLayout(WRAP_CONTENT, WRAP_CONTENT);   
+            setFlags(<span class="hljs-number">0</span>, flagsToUpdate); <span class="hljs-comment">//取消FLAG_LAYOUT_IN_SCREEN | FLAG_LAYOUT_INSET_DECOR 位标记  </span>
+        } <span class="hljs-keyword">else</span> {  
+            setFlags(FLAG_LAYOUT_IN_SCREEN|FLAG_LAYOUT_INSET_DECOR, flagsToUpdate);  
+        }  
+        <span class="hljs-comment">//是否是没有标题栏 , android:windowNoTitle属性  </span>
+        <span class="hljs-keyword">if</span> (a.getBoolean(com.android.internal.R.styleable.Window_windowNoTitle, <span class="hljs-keyword">false</span>)) {  
+            requestFeature(FEATURE_NO_TITLE); <span class="hljs-comment">//添加FEATURE_NO_TITLE  </span>
+        }  
+        <span class="hljs-comment">//是否是全屏, android:windowFullscreen属性  </span>
+        <span class="hljs-keyword">if</span> (a.getBoolean(com.android.internal.R.styleable.Window_windowFullscreen, <span class="hljs-keyword">false</span>)) {  
+            setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN&amp;(~getForcedWindowFlags()));  
+        }  
+    	...
+        <span class="hljs-keyword">if</span> (getContainer() == <span class="hljs-keyword">null</span>) {    
+            <span class="hljs-keyword">if</span> (mBackgroundDrawable == <span class="hljs-keyword">null</span>) {     
+                <span class="hljs-keyword">if</span> (mBackgroundResource == <span class="hljs-number">0</span>) {   
+                    mBackgroundResource = a.getResourceId(com.android.internal.R.styleable.Window_windowBackground, <span class="hljs-number">0</span>);  
+                }  
+            }  
+            ...  
+        }  
+         
+        ...  
+        <span class="hljs-keyword">if</span> (getContainer() == <span class="hljs-keyword">null</span>) {  
+            Drawable drawable = mBackgroundDrawable;     
+            <span class="hljs-keyword">if</span> (mBackgroundResource != <span class="hljs-number">0</span>) {        <br>                <span class="hljs-comment">//获取背景资源  </span>
+                drawable = getContext().getResources().getDrawable(mBackgroundResource);  
+            }  
+            <strong><span style="color:#ff0000;">mDecor.setWindowBackground(drawable); <span class="hljs-comment">//为DecorView设置背景资源</span></span></strong><span class="hljs-comment">  </span>
+            drawable = <span class="hljs-keyword">null</span>;  
+            <span class="hljs-comment">//判断是否需要设置WindowFrame资源，该资源代表一个前景资源，  </span>
+            <span class="hljs-keyword">if</span> (mFrameResource != <span class="hljs-number">0</span>) { 
+                drawable = getContext().getResources().getDrawable(mFrameResource);  
+            }  
+            mDecor.setWindowFrame(drawable);  
+        }  
+        <span class="hljs-keyword">return</span> contentParent;               
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DecorView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">FrameLayout</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">RootViewSurfaceTaker</span> </span>{
+         <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setWindowBackground</span><span class="hljs-params">(Drawable drawable)</span> </span>{
+            <span class="hljs-keyword">if</span> (getBackground() != drawable) {
+                setBackgroundDrawable(drawable);
+                <span class="hljs-keyword">if</span> (drawable != <span class="hljs-keyword">null</span>) {
+                    drawable.getPadding(mBackgroundPadding);
+                } <span class="hljs-keyword">else</span> {
+                    mBackgroundPadding.setEmpty();
+                }
+                drawableChanged();
+            }
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setBackgroundDrawable</span><span class="hljs-params">(Drawable d)</span> </span>{
+            <span class="hljs-keyword">super</span>.setBackgroundDrawable(d);
+            <span class="hljs-keyword">if</span> (getWindowToken() != <span class="hljs-keyword">null</span>) {
+                updateWindowResizeState();
+            }
+        }
+    }
+}</code></pre>
+<p>&nbsp; &nbsp; 上面的代码我们可以看到，在调用setContentView函数后，会调用PhoneWindow的installDecor()函数，该函数会先创建一个DecorView对象，接着再通过generateLayout(mDecor)函数创建mContentParent对象，这个过程中就会应用到主题Theme相关的配置。我们在上面的代码已经可以看到mBackgroundResource的获取和mDecor.setWindowBackground(drawable)设置背景的代码。DecorView作为PhoneWindow的内部类，继承自FrameLayout，其setWindowBackground函数也就是间接调用了FrameLayout的setBackgroundDrawable函数。<br><br>&nbsp; &nbsp; 另外该函数开头的getWindowStyle()是由Window类实现的，可以查看前面Window类代码。继续追踪Theme的实现方式，在Context.java类中定义了obtainStyledAttributes的函数，也就是前面getWindowStyle中调用的函数。getTheme()函数在Context.java类中是抽象函数，由其子类实现。查看Activity的代码，Activity是继承自ContextThemeWrapper类，该类中实现了getTheme和setTheme函数，如下面的代码：</p>
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Activity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ContextThemeWrapper</span>
+        <span class="hljs-keyword">implements</span> <span class="hljs-title">LayoutInflater</span>.<span class="hljs-title">Factory2</span>,
+        <span class="hljs-title">Window</span>.<span class="hljs-title">Callback</span>, <span class="hljs-title">KeyEvent</span>.<span class="hljs-title">Callback</span>,
+        <span class="hljs-title">OnCreateContextMenuListener</span>, <span class="hljs-title">ComponentCallbacks2</span> </span>{
+
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ContextThemeWrapper</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ContextWrapper</span> </span>{
+
+    <span class="hljs-meta">@Override</span> <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setTheme</span><span class="hljs-params">(<span class="hljs-keyword">int</span> resid)</span> </span>{
+        mThemeResource = resid;
+        initializeTheme();
+    }
+    
+
+    <span class="hljs-meta">@Override</span> <span class="hljs-keyword">public</span> Resources.<span class="hljs-function">Theme <span class="hljs-title">getTheme</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">if</span> (mTheme != <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">return</span> mTheme;
+        }
+
+        mThemeResource = Resources.selectDefaultTheme(mThemeResource,
+                getApplicationInfo().targetSdkVersion);
+        initializeTheme();
+
+        <span class="hljs-keyword">return</span> mTheme;
+    }
+
+    <span class="hljs-comment">/**
+     * Called by {<span class="hljs-doctag">@link</span> #setTheme} and {<span class="hljs-doctag">@link</span> #getTheme} to apply a theme
+     * resource to the current Theme object.  Can override to change the
+     * default (simple) behavior.  This method will not be called in multiple
+     * threads simultaneously.
+     *
+     * <span class="hljs-doctag">@param</span> theme The Theme object being modified.
+     * <span class="hljs-doctag">@param</span> resid The theme style resource being applied to theme.
+     * <span class="hljs-doctag">@param</span> first Set to true if this is the first time a style is being
+     *              applied to theme.
+     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onApplyThemeResource</span><span class="hljs-params">(Resources.Theme theme, <span class="hljs-keyword">int</span> resid, <span class="hljs-keyword">boolean</span> first)</span> </span>{
+        theme.applyStyle(resid, <span class="hljs-keyword">true</span>);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">initializeTheme</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> first = mTheme == <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">if</span> (first) {
+            mTheme = getResources().newTheme();
+            Resources.Theme theme = mBase.getTheme();<span class="hljs-comment">//调用ContextImpl类的getTheme()，获取默认的Theme</span>
+            <span class="hljs-keyword">if</span> (theme != <span class="hljs-keyword">null</span>) {
+                mTheme.setTo(theme);&nbsp;<span><span class="hljs-comment">//将theme配置应用到mTheme属性中</span></span><span class="hljs-comment">&nbsp;</span>
+            }
+        }
+        onApplyThemeResource(mTheme, mThemeResource, first);
+    }
+<br>
+}
+
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ContextWrapper</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Context</span> </span>{
+	Context mBase;
+     <span class="hljs-comment">/**
+     * Set the base theme for this context.  Note that this should be called
+     * before any views are instantiated in the Context (for example before
+     * calling {<span class="hljs-doctag">@link</span> android.app.Activity#setContentView} or
+     * {<span class="hljs-doctag">@link</span> android.view.LayoutInflater#inflate}).
+     *
+     * <span class="hljs-doctag">@param</span> resid The style resource describing the theme.
+     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setTheme</span><span class="hljs-params">(<span class="hljs-keyword">int</span> resid)</span></span>;
+
+    <span class="hljs-comment">/**
+     * Return the Theme object associated with this Context.
+     */</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> Resources.<span class="hljs-function">Theme <span class="hljs-title">getTheme</span><span class="hljs-params">()</span></span>;
+
+    <span class="hljs-comment">/**
+     * Retrieve styled attribute information in this Context's theme.  See
+     * {<span class="hljs-doctag">@link</span> Resources.Theme#obtainStyledAttributes(int[])}
+     * for more information.
+     *
+     * <span class="hljs-doctag">@see</span> Resources.Theme#obtainStyledAttributes(int[])
+     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> TypedArray <span class="hljs-title">obtainStyledAttributes</span><span class="hljs-params">(
+            <span class="hljs-keyword">int</span>[] attrs)</span> </span>{
+        <span class="hljs-keyword">return</span> getTheme().obtainStyledAttributes(attrs);
+    }
+}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;到这里我们差不多已经可以明白了，如果没有手动设置mThemeResource，则选取系统中为我们提供的默认Theme。当然我们也可以手动设置Theme ，第一种是通过前面的setTheme函数，第二种是在AndroidManifest文件中，为Activity节点配置android:theme属性. 当通过startActivity()启动一个Activity时，系统会自动调用setTheme()方法。<br><br>&nbsp; &nbsp; 通过上面的分析，可以基本了解Android中Theme的应用过程了，在Android系统中，定义了多种Style/Theme ，常见的如 ：</p>
+<pre><code class="hljs groovy"><span class="hljs-string">android:</span>theme=<span class="hljs-string">"Theme"</span>            <span class="hljs-comment">//默认地Theme  </span>
+<span class="hljs-string">android:</span>theme=<span class="hljs-string">"Theme.Light"</span>      <span class="hljs-comment">//背景为白色    </span>
+<span class="hljs-string">android:</span>theme=<span class="hljs-string">"Theme.Light.NoTitleBar"</span>              <span class="hljs-comment">//白色背景并无标题栏     </span>
+<span class="hljs-string">android:</span>theme=<span class="hljs-string">"Theme.Light.NoTitleBar.Fullscreen"</span>  <span class="hljs-comment">//白色背景，无标题栏，全屏    </span>
+<span class="hljs-string">android:</span>theme=<span class="hljs-string">"Theme.Black"</span>                        <span class="hljs-comment">//背景黑色  </span></code></pre>
+<p>&nbsp; &nbsp; &nbsp;这里选取最基础的Theme中的部分属性来看，如下：</p>
+<pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">style</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"Theme"</span>&gt;</span><span class="xml">  
+  <span class="hljs-comment">&lt;!-- Window attributes --&gt;</span>  
+  </span><span style="color:#ff0000;"><strong><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"windowBackground"</span>&gt;</span>@android:drawable/screen_background_dark<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span></span></strong><span class="xml"> </span></span><span class="xml"> 
+  <span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"windowFrame"</span>&gt;</span>@null<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span>  
+  <span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"windowNoTitle"</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span>  
+  <span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"windowFullscreen"</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span>  
+  <span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"windowTitleBackgroundStyle"</span>&gt;</span>@android:style/WindowTitleBackground<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span>  
+  <span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"android:windowAnimationStyle"</span>&gt;</span>@android:style/Animation.Activity<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span>  
+  <span class="hljs-tag">&lt;<span class="hljs-name">item</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"android:windowSoftInputMode"</span>&gt;</span>stateUnspecified|adjustUnspecified<span class="hljs-tag">&lt;/<span class="hljs-name">item</span>&gt;</span>      
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span> </code></pre>
+<p>&nbsp; &nbsp; &nbsp;该Theme作为一个超元素集，所有其他的Style/Theme都继承自它。看红色部分，这里定义了界面的背景资源，而我们前面也看到了，mDecor.setWindowBackground(drawable)为DecorView设置了背景资源。<br>&nbsp; &nbsp; &nbsp;到这里，我们可以清楚了，Activity会有一个默认的背景，但是我们可以改变这个背景。如果我们在配置Activity的布局文件的时候设置了整个界面的背景，那么就相当于在原来背景之上又覆盖了一层，这样就多了一次绘制。所以这个时候正确的做法是自定义一个主题，将你的背景资源覆盖主题中的windowBackground项。<br>&nbsp; &nbsp; &nbsp;还有一种情况，即使整个Activity没有用到背景，但是界面上大部分的区域都用了同一个颜色，这种情况下，也适合将这个颜色配置到主题中，以减少布局中颜色的设置，减少一层绘制。例如，购物车界面，大部分区域都是灰色的#f8f8f8，将该颜色配置到主题中，这样这块区域就不用再额外设置颜色了，如下图所示：<br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/e314be45b34ee859934396782a9c5fa1f960d47e.png" alt="" width="360"><br>&nbsp; &nbsp;&nbsp;<br>&nbsp; &nbsp; <strong><span style="color:#ff0000;">当然，对于透明的颜色或者Activity使用透明背景，系统会自动忽略该颜色的绘制，透明的颜色不会增加过渡绘制。所以也可以将Activity主题的背景设置为透明，然后在Activity自己的布局中再设置背景，这样也可以减少一层绘制。不过两种方式各有优势，配置在Activity节点中的android:theme属性会在Activity创建前就开始先应用一次该背景，可以给人视觉上更快展现界面的感觉，所以如果要尽可能快的看到界面的背景（如对于启动界面），应用在<strong><span style="color:#ff0000;">Activity节点中的android:theme属性会更合适。而定义在Activity布局文件中Layout的背景需要等到<strong><span style="color:#ff0000;"><strong><span style="color:#ff0000;">Activity显示的时候才能看到，这样容易造成短暂的黑屏或者短暂的停留在原界面上（如果<strong><span style="color:#ff0000;"><strong><span style="color:#ff0000;">Activity</span></strong></span></strong>定义成了背景透明的Theme）。</span></strong></span></strong></span></strong></span></strong><br><br></p>
+<h2 id="4">5、减少Drawable的复杂Shape使用</h2>
+<p>&nbsp; &nbsp; &nbsp;复杂的Shape有时候也是引起过度绘制的一个因素，比如Stroke，虽然只是描边，但是会增加整个区域的一层过度绘制。例如，将下面的配置作为ImageView的背景。<br><br></p>
+<pre><code class="hljs stylus">&lt;shape xmlns:android=<span class="hljs-string">"http://schemas.android.com/apk/res/android"</span>
+    android:shape=<span class="hljs-string">"rectangle"</span> &gt;
+
+    &lt;solid android:<span class="hljs-attribute">color</span>=<span class="hljs-string">"#FFF8F8F8"</span> /&gt;
+
+    &lt;stroke
+        android:dashGap=<span class="hljs-string">"4dp"</span>
+        android:dashWidth=<span class="hljs-string">"2dp"</span>
+        android:<span class="hljs-attribute">width</span>=<span class="hljs-string">"2dp"</span>
+        android:<span class="hljs-attribute">color</span>=<span class="hljs-string">"#ff1111"</span> /&gt;
+
+    &lt;<span class="hljs-attribute">padding</span>
+        android:<span class="hljs-attribute">bottom</span>=<span class="hljs-string">"10dp"</span>
+        android:<span class="hljs-attribute">left</span>=<span class="hljs-string">"10dp"</span>
+        android:<span class="hljs-attribute">right</span>=<span class="hljs-string">"10dp"</span>
+        android:<span class="hljs-attribute">top</span>=<span class="hljs-string">"10dp"</span> /&gt;
+
+    &lt;corners android:radius=<span class="hljs-string">"6dp"</span> /&gt;
+
+&lt;/shape&gt;</code></pre>
+<p>&nbsp; &nbsp; &nbsp;在有stroke属性的时候，显示为淡红色，去掉stroke属性后，显示为绿色。<br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/fda4c7eb90f958d8c939322b5be916d18f8a8b30.jpeg" alt="" width="576"><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/8fa7222ef7d4c8c0926b91aafcd61bd05d7b5e03.jpeg" alt="" width="576"></p>
+<p>&nbsp; &nbsp; 从上面的图上可以看出，按理stroke属性虽然只是描边形状的外围，但是它却影响了整个区域的绘制，这里Android的实现确实是有点特殊。</p>
+<h2 id="5">6、自定义控件中onDraw函数的正确使用</h2>
+<span><span>&nbsp; &nbsp; 在自定义控件中，我们经常会通过onDraw函数绘制一些复杂的形状、文字、图片等。但是这些Canvas的绘制函数，每一次调用就会增加一层的绘制，次数越多也就会导致越多的过度绘制。如我们用如下代码来自定义绘制图形：<br></span></span>
+<pre><code class="hljs hsp">	protected void onDraw(Canvas canvas) {
+		<span class="hljs-comment">// TODO Auto-generated method stub</span>
+		<span class="hljs-keyword">int</span> <span class="hljs-keyword">width</span> = getWidth()<span class="hljs-comment">;</span>
+		<span class="hljs-keyword">int</span> height = getHeight()<span class="hljs-comment">;</span>
+		Paint paint = new Paint()<span class="hljs-comment">;</span>
+		paint.setColor(<span class="hljs-number">0</span>xFFFFFFFF)<span class="hljs-comment">;</span>
+		canvas.drawColor(<span class="hljs-number">0</span>xFFFFFFFF)<span class="hljs-comment">;</span>
+		canvas.drawRect(<span class="hljs-number">20</span>, <span class="hljs-number">20</span>, <span class="hljs-keyword">width</span> - <span class="hljs-number">20</span>, height - <span class="hljs-number">20</span>, paint)<span class="hljs-comment">;</span>
+		canvas.drawCircle(<span class="hljs-keyword">width</span> / <span class="hljs-number">2</span>, height / <span class="hljs-number">2</span>, <span class="hljs-number">50</span>, paint)<span class="hljs-comment">;</span>
+		
+	}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;看一下上面这个控件的绘制后的效果，如下图所示：<br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/b7e76561d5ffdd13b9568e2390b404d3c35ceabf.jpeg" alt="" width="574"></p>
+<span><span>&nbsp; &nbsp; 通过上面我们能够看到，3个绘制图形的函数调用，产生了3层的绘制。这里只是简单的演示，或许在实际开发中用到的绘制还要复杂的多，在这种情况下，就不应该在onDraw函数中这样每次绘制。而是应该先准备一个Bitmap图，然后将所有图案绘制在这个Bitmap上，onDraw中只是draw这个bitmap图片就可以了，这样就可以避免不必要的过度绘制。<br></span></span>
+<h2 id="6">7、自定义控件使用canvas.clipRect</h2>
+<span><span><span>&nbsp; &nbsp; 自定义控件中的onDraw函数，可以使用canvas.clipRect方法建立一个裁剪区，将绘制控制在指定的范围内，只有在这个区域内才会被绘制，其他的区域会被忽视。但是对于开启了硬件加速的控件，该方法部分操作会被忽略。<br><br></span></span></span> &nbsp;&nbsp;<span><br></span>&nbsp; &nbsp; 通过多种手段配合，就可以很好的优化过度绘制了，例如购物车，在优化前后，从很多3x的过度绘制到大部分区域没有过度绘制。如下图：<br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/ec00819fe5e69a1e6c98112e69be9ca2e0ad3799.png" alt="" width="335"><br><br><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/558d093ffef5569b42dfb02175f015320afa7bd3.png" alt="" width="335"><br><h2 id="7">附：不被硬件加速所支持的操作</h2>
+<span>&nbsp; &nbsp;开启硬件加速之后，Android中的2D渲染管道可以支持绝大部分常用的Canvas的绘画操作函数，但是以下列表是已知的不被硬件加速所支持的操作：<br><br>Canvas<br>&nbsp; &nbsp;clipPath()<br>&nbsp; &nbsp;clipRegion()<br>&nbsp; &nbsp;drawPicture()<br>&nbsp; &nbsp;drawTextOnPath()<br>&nbsp; &nbsp;drawVertices()<br><br>Paint<br>&nbsp; &nbsp;setLinearText()<br>&nbsp; &nbsp;setMaskFilter()<br>&nbsp; &nbsp;setRasterizer()<br><br>Xfermodes<br>&nbsp; &nbsp;AvoidXfermode<br>&nbsp; &nbsp;PixelXorXfermode<br><br>有些操作的效果在硬件加速之后会有变化:<br>Canvas<br>&nbsp; &nbsp;clipRect(): XOR, Difference 和 ReverseDifference 这三种裁剪模式被忽略。3D转换不适用于修剪矩形<br>&nbsp; &nbsp;drawBitmapMesh(): 颜色矩阵被忽略<br><br>Paint<br>&nbsp; &nbsp;setDither(): 被忽略<br>&nbsp; &nbsp;setFilterBitmap(): 过滤一直处于开启状态<br>&nbsp; &nbsp;setShadowLayer(): 只能和文字一起使用<br><br>PorterDuffXfermode<br>&nbsp; &nbsp; PorterDuff.Mode.DARKEN 等价于 SRC_OVER 如果帧缓冲区不支持混合<br>&nbsp; &nbsp;&nbsp;PorterDuff.Mode.LIGHTEN 等价于 SRC_OVER 如果帧缓冲区不支持混合<br>&nbsp; &nbsp;&nbsp;PorterDuff.Mode.OVERLAY 等价于 SRC_OVER 如果帧缓冲区不支持混合<br><br>ComposeShader<br>&nbsp; &nbsp;&nbsp;ComposeShader 仅能包含不同类型的着色器(比如包含一个 BitmapShader 的实例和一个 LinearGradient的实例是允许的，包含两个 BitmapShader 的实例却是不行的)<br>&nbsp; &nbsp;&nbsp;ComposeShader 不能包含一个 ComposeShader<br><br>&nbsp; &nbsp; 如果程序使用了以上不被支持或者是受限制的操作，可以在使用了上述操作的View中调用setLayerType(View.LAYER_TYPE_SOFTWARE, null)来关闭硬件加速。也可以事先绘制在Bitmap上，然后真实绘制的时候绘制该Bitmap。<br></span>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/45768/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">1人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/4741" title="阿信"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_a5585a4d4b12277fee5cad0880611bc6.png_80x80" width="26" height="26" alt="阿信" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/45768#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (0)
+                  </a>
+        <a href="http://www.atatech.org/articles/45768/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          9
+        </a>
+        <a href="http://www.atatech.org/articles/45768/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          10
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="45768" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/45768/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          1
+        </a>
+        <a href="http://www.atatech.org/articles/45768/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          2
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/124646" title="彭烈"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/img_20151013203959.jpg_80x80" width="28" height="28" alt="彭烈" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/157934" title="简燃"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_7d0de71cfd44806280ef83bcb88effee.png_80x80" width="28" height="28" alt="简燃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23291" title="雷曼"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_45967c732254e9fc1e4ecb653b5f38cb.png_80x80" width="28" height="28" alt="雷曼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/45282">Android的硬件加速</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/33596">Android倒计时视图优化</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/46175">手淘安卓版性能优化15 - 界面性能之减...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/18550">android basic chapter 2</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/43366">【转】TextView预渲染研究</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/30208">Android开发，Activity生命周期</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/45552">上一篇：手淘安卓版性能优化11 - 界面性能遇到的问题和主要使用的工具</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/45920">下一篇：手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+
+<div class="pages comment-tip">
+        
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="45768">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/pic.gif"></a></span><script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/pic.gif"></a></span><script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9612+-+%E7%95%8C%E9%9D%A2%E6%80%A7%E8%83%BD%E4%B9%8B%E4%BC%98%E5%8C%96%E8%BF%87%E5%BA%A6%E7%BB%98%E5%88%B6%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F45768%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化12 - 界面性能之优化过度绘制", "", "", 'article-45768']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/45768#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化12 - 界面性能之优化过度绘制_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/45768#0">1、不需要显示的布局及时隐藏</a></li><li><a href="http://www.atatech.org/articles/45768#1">2、去掉层叠布局中多余的背景设置</a></li><li><a href="http://www.atatech.org/articles/45768#2">3、图片控件有前景内容的时候不显示背景</a></li><li><a href="http://www.atatech.org/articles/45768#3">4、界面背景定义到Activity的主题中</a></li><li><a href="http://www.atatech.org/articles/45768#4">5、减少Drawable的复杂Shape使用</a></li><li><a href="http://www.atatech.org/articles/45768#5">6、自定义控件中onDraw函数的正确使用</a></li><li><a href="http://www.atatech.org/articles/45768#6">7、自定义控件使用canvas.clipRect</a></li><li><a href="http://www.atatech.org/articles/45768#7">附：不被硬件加速所支持的操作</a></li></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

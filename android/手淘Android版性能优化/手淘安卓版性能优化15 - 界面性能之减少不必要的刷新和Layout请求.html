@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/46175 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+                <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 153</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-15T12:57:55+08:00">2015-12-15 12:57:55</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/46175/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="Android性能 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="Android性能" class="item">Android性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=Android%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">Android性能</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/46175/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 前面谈到了Android中的界面布局性能问题，在很多界面的开发过程中也会涉及到界面的性能。比如在ListView的开发过程中通过使用布局复用、自定义ViewHolder，Item局部修改，Scroll Status等来提升界面的性能，减少不必要的开销，这些基本都已经是约定俗成了。不过在其它一些开发过程中，还是有一些容易忽略的地方，这些地方会影响耗电量，同时也都会影响界面的性能和帧率。<br>&nbsp; &nbsp; 几乎每个App上都能看到动画、广告轮播的效果，但是在这些界面上，也容易忽略一些性能的细节点，导致后续的耗电及性能的下降。<br><h2 id="0">&nbsp;一、注意可视区域</h2>
+&nbsp; &nbsp; 像广告Banner的轮播，一般都是通过Handler等定时来执行的。手淘中的首页，社区、微淘等多个界面都存在Banner广告轮播，但是当时检测的时候发现，细节点上存在问题。为了性能及减少耗电，应该注意以下几点：<br>1）<span style="color:#ff0000;">当这些轮播控件移出可视区域后，需要将定时逻辑也一起停止</span>，否则后续的定时将会耗电甚至影响帧率。<br>2）<span style="color:#ff0000;">当界面被遮挡或者退到后台后，也一样要停止定时逻辑的执行</span>。<br>3）<span style="color:#ff0000;">将ViewPager的缓存数量和广告数目的条数设置成相等</span>，防止该控件在滚动中添加和删除控件，导致触发不必要的整个界面的onLayout。如果缓存的数量比较多，考虑到图片的内存问题，可以监听滚动事件，在该Banner Item不在可视范围后就可以将该控件引用的图片释放。目前手淘中的Banner控件还无法设置缓存数量，有待于扩充功能。<br><br>&nbsp; &nbsp; 对于这个细节点的检测，选用TraceView是最方便的一个工具，在这些动画不可见或者被其他界面遮挡（如锁屏界面）、或者切换到后台后。启动TraceView的工具，跟踪一段时间，再来看有没有定时对广告条的操作。如果出现下图所示的对ViewPager的操作函数，就可以发现，定时广告还在工作，并没有因为移出界面而停止。当然如果不是用ViewPager实现的话，需要通过其他函数来检查。<br><br><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/cb3d22305936f6a2b15e772cf357100dfab57125.png" alt="" width="1892"><br><br>&nbsp; &nbsp; 如上图所示，首页上能够发现Banner条继续在工作，直接观察并没有发现业务实现有不对的地方，但是通过工具可以发现这个细节点上给耗电和性能带来的问题。<span style="color:#ff0000;"><strong>所以对于有动画和广告Banner等界面的测试，开发时候的自测以及测试人员在以上提到的几个测试细节是必须要做的，而且不是一次测试就可以排除问题的，因为之前也发现有时候定时的停止逻辑出现问题，并不是每次都能停止。</strong></span><br><h2 id="1">&nbsp;二、注意控件的属性设置</h2>
+&nbsp; &nbsp; &nbsp;控件部分属性的设置也会引起界面的重新布局，比如Visibility的VISIBLE和GONE之间切换、给控件设置LayoutParams、设置MinimumHeight、BackgroundDrawable，容器控件在动态添加和删除控件时，图片控件设置前景Drawable，TextView设置文字内容、行数等等都会触发requestLayout()的向上请求，进而导致整个界面被重新onMeasure和onLayout，影响了界面的性能。所以在对诸多属性的使用过程中要注意是否会触发requestLayout，比如Visibility的属性GONE如果不是必要的话可以改用INVISIBLE，以避免触发requestLayout。另外就像上面提到的，广告轮播控件避免动态的添加和删除控件，缓存足够数量的Item也是因为这个原因。<br>&nbsp; &nbsp; &nbsp;当然在非列表界面，requestLayout被触发对性能的感知可能不太明显，但是在动画界面、ListView等滑动界面在动画或者滑动的过程中，如果触发了requestLayout就会导致比较明显的卡顿和丢帧。之前在测试的时候发现几乎所有带有这些效果的界面都没有注意到这个细节。
+<h3 id="2">2.1 发现和测试这这类问题</h3>
+&nbsp; &nbsp; &nbsp;这类问题可以通过TraceView或者Systrace工具来排查，在动画过程中，或者在滑动过程中，如果出现了ListView等控件的onMeasure或者onLayout事件等，如下图所示，在社区界面滑动过程中：<br><br><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/b1697b1da5ce955190714e7b6a20cc39915a164d.png" alt="" width="1372"><br>&nbsp; &nbsp; &nbsp;<br>&nbsp; &nbsp; 如上图所示，ListView出现了onLayout事件，而下图是Systrace工具的测试结果，同样可以看到measure和layout事件，如下图所示：<br><br><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/e91601ef07b6334bc7e24a583aa298d87566c589.png" alt="" width="1322"><br>&nbsp; &nbsp; &nbsp;以上是通过工具来判断是否有这类性能问题，但是通过该方法找触发控件的源头并不是很方便，有时候能够看到一些调用requestLayout的控件，但也不太能确定是否真是该控件引起的。最直观的方法就是自定义一个Layout，例如作为Activity的根布局，重写requestLayout方法。进入断点调试模式进行测试，如果进入到断点，就可以看到是哪个控件触发的了。例如在社区界面，可以看到是TUrlImageView控件引起的requestLayout，因为图片控件背景内容被重设了。<br><br><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/161fb6d15bf07f871010026a33238ae4e0118c7a.png" alt="" width="1216"><br><h3 id="3">2.2 如何避免这类问题</h3>
+&nbsp; &nbsp; 1）注意控件会引起requestLayout的属性的使用，尽量避免触发。<br>&nbsp; &nbsp; 2）扩展自定义控件的功能，合理控制比如手淘中的Banner控件等。<br>&nbsp; &nbsp; 3）对于ImageView、TextView等控件，在列表中，我们可以确定该控件的大小，后续不会改变，那么就可以利用该方法来阻断requestLayout。这里并不是将width和height属性配置成固定的大小，而是需要使用自定义控件，因为即使配置成固定大小，仍然会触发requestLayout的请求。在大多数的界面中，图片控件的显示区域是固定大小的，文字区域也基本能确定大小范围，这样的话，还是可以阻断这些不必要的requestLayout请求。例如<strong><span style="color:#ff0000;">通过设置一个是否允许requestLayout的变量，然后重写控件的requestlayout、onSizeChanged方法，判断控件的大小没有改变的情况下，当进入requestLayout的时候，直接返回而不调用super的requestLayout方法，这样就可以阻断无用的requestLayout，提高界面的性能了。</span></strong><br><h3 id="4">2.3 为什么正常的getView等方法不会触发requestLayout</h3>
+&nbsp; &nbsp; &nbsp;这是不少开发人员有点疑惑的地方，并不了解为什么和什么情况下会触发到类似于ListView这样滑动界面的requestLayout。的确，在正常的情况下，getView过程中是不会触发requestLayout方法，因为ListView内部已经控制掉了。问题出在其他时刻去改写内容的时候，例如图片，我们是异步解码的，getView的时候可能图片还没有准备好，等到getView返回后，线程才解码完成。此时我们会通过Handler来设置图片的Drawable，这个时候就会触发requestLayout了。这也是图片显示容易引起这个问题的原因。<br>&nbsp; &nbsp; &nbsp;我们来看下ListView实现中的部分源码，就可以更好的理解这个问题，代码如下：<br><br><pre><code class="hljs zephir"> 
+    <span class="hljs-comment">/**
+     * Obtain the view and add it to our list of children. The view can be made
+     * fresh, converted from an unused view, or used as is if it was in the
+     * recycle bin.
+     *
+     * <span class="hljs-doctag">@param</span> position Logical position in the list
+     * <span class="hljs-doctag">@param</span> y Top or bottom edge of the view to add
+     * <span class="hljs-doctag">@param</span> flow If flow is true, align top edge to y. If false, align bottom
+     *        edge to y.
+     * <span class="hljs-doctag">@param</span> childrenLeft Left edge where children should be positioned
+     * <span class="hljs-doctag">@param</span> selected Is this position selected?
+     * <span class="hljs-doctag">@return</span> View that was added
+     */</span>
+    <span class="hljs-keyword">private</span> View makeAndAddView(<span class="hljs-keyword">int</span> position, <span class="hljs-keyword">int</span> y, <span class="hljs-keyword">boolean</span> flow, <span class="hljs-keyword">int</span> childrenLeft,
+            <span class="hljs-keyword">boolean</span> selected) {
+        View child;
+
+
+        <span class="hljs-keyword">if</span> (!mDataChanged) {
+            <span class="hljs-comment">// Try to use an existing view for this position</span>
+            child = mRecycler.getActiveView(position);
+            <span class="hljs-keyword">if</span> (child != <span class="hljs-keyword">null</span>) {
+                <span class="hljs-comment">// Found it -- we're using an existing child</span>
+                <span class="hljs-comment">// This just needs to be positioned</span>
+                setupChild(child, position, y, flow, childrenLeft, selected, <span class="hljs-keyword">true</span>);
+
+                <span class="hljs-keyword">return</span> child;
+            }
+        }
+
+        <span class="hljs-comment">// Make a new view for this position, or convert an unused view if possible</span>
+        child = obtainView(position, mIsScrap);
+
+        <span class="hljs-comment">// This needs to be positioned and measured</span>
+        setupChild(child, position, y, flow, childrenLeft, selected, mIsScrap[<span class="hljs-number">0</span>]);
+
+        <span class="hljs-keyword">return</span> child;
+    }
+
+    <span class="hljs-comment">/**
+     * Add a view as a child and make sure it is measured (if necessary) and
+     * positioned properly.
+     *
+     * <span class="hljs-doctag">@param</span> child The view to add
+     * <span class="hljs-doctag">@param</span> position The position of this child
+     * <span class="hljs-doctag">@param</span> y The y position relative to which this view will be positioned
+     * <span class="hljs-doctag">@param</span> flowDown If true, align top edge to y. If false, align bottom
+     *        edge to y.
+     * <span class="hljs-doctag">@param</span> childrenLeft Left edge where children should be positioned
+     * <span class="hljs-doctag">@param</span> selected Is this position selected?
+     * <span class="hljs-doctag">@param</span> recycled Has this view been pulled from the recycle bin? If so it
+     *        does not need to be remeasured.
+     */</span>
+    <span class="hljs-keyword">private</span> void setupChild(View child, <span class="hljs-keyword">int</span> position, <span class="hljs-keyword">int</span> y, <span class="hljs-keyword">boolean</span> flowDown, <span class="hljs-keyword">int</span> childrenLeft,
+            <span class="hljs-keyword">boolean</span> selected, <span class="hljs-keyword">boolean</span> recycled) {
+        Trace.traceBegin(Trace.TRACE_TAG_VIEW, <span class="hljs-string">"setupListItem"</span>);
+
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> isSelected = selected &amp;&amp; shouldShowSelector();
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> updateChildSelected = isSelected != child.isSelected();
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> mode = mTouchMode;
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> isPressed = mode &gt; TOUCH_MODE_DOWN &amp;&amp; mode &lt; TOUCH_MODE_SCROLL &amp;&amp;
+                mMotionPosition == position;
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> updateChildPressed = isPressed != child.isPressed();
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> needToMeasure = !recycled || updateChildSelected || child.isLayoutRequested();
+
+        <span class="hljs-comment">// Respect layout params that are already in the view. Otherwise make some up...</span>
+        <span class="hljs-comment">// noinspection unchecked</span>
+        AbsListView.LayoutParams p = (AbsListView.LayoutParams) child.getLayoutParams();
+        <span class="hljs-keyword">if</span> (p == <span class="hljs-keyword">null</span>) {
+            p = (AbsListView.LayoutParams) generateDefaultLayoutParams();
+        }
+        p.viewType = mAdapter.getItemViewType(position);
+
+        <span class="hljs-keyword">if</span> ((recycled &amp;&amp; !p.forceAdd) || (p.recycledHeaderFooter &amp;&amp;
+                p.viewType == AdapterView.ITEM_VIEW_TYPE_HEADER_OR_FOOTER)) {
+            attachViewToParent(child, flowDown ? <span class="hljs-number">-1</span> : <span class="hljs-number">0</span>, p);
+        } <span class="hljs-keyword">else</span> {
+            p.forceAdd = <span class="hljs-keyword">false</span>;
+            <span class="hljs-keyword">if</span> (p.viewType == AdapterView.ITEM_VIEW_TYPE_HEADER_OR_FOOTER) {
+                p.recycledHeaderFooter = <span class="hljs-keyword">true</span>;
+            }
+            addViewInLayout(child, flowDown ? <span class="hljs-number">-1</span> : <span class="hljs-number">0</span>, p, <span class="hljs-keyword">true</span>);
+        }
+
+        <span class="hljs-keyword">if</span> (updateChildSelected) {
+            child.setSelected(isSelected);
+        }
+
+        <span class="hljs-keyword">if</span> (updateChildPressed) {
+            child.setPressed(isPressed);
+        }
+
+        <span class="hljs-keyword">if</span> (mChoiceMode != CHOICE_MODE_NONE &amp;&amp; mCheckStates != <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">if</span> (child <span class="hljs-keyword">instanceof</span> Checkable) {
+                ((Checkable) child).setChecked(mCheckStates.get(position));
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (getContext().getApplicationInfo().targetSdkVersion
+                    &gt;= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                child.setActivated(mCheckStates.get(position));
+            }
+        }
+
+        <span class="hljs-keyword">if</span> (needToMeasure) {
+            <span class="hljs-keyword">int</span> childWidthSpec = ViewGroup.getChildMeasureSpec(mWidthMeasureSpec,
+                    mListPadding.left + mListPadding.right, p.width);
+            <span class="hljs-keyword">int</span> lpHeight = p.height;
+            <span class="hljs-keyword">int</span> childHeightSpec;
+            <span class="hljs-keyword">if</span> (lpHeight &gt; <span class="hljs-number">0</span>) {
+                childHeightSpec = MeasureSpec.makeMeasureSpec(lpHeight, MeasureSpec.EXACTLY);
+            } <span class="hljs-keyword">else</span> {
+                childHeightSpec = MeasureSpec.makeMeasureSpec(<span class="hljs-number">0</span>, MeasureSpec.UNSPECIFIED);
+            }
+            child.measure(childWidthSpec, childHeightSpec);
+        } <span class="hljs-keyword">else</span> {
+            cleanupLayoutState(child);
+        }
+
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> w = child.getMeasuredWidth();
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> h = child.getMeasuredHeight();
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> childTop = flowDown ? y : y - h;
+
+        <span class="hljs-keyword">if</span> (needToMeasure) {
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> childRight = childrenLeft + w;
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> childBottom = childTop + h;
+            child.layout(childrenLeft, childTop, childRight, childBottom);
+        } <span class="hljs-keyword">else</span> {
+            child.offsetLeftAndRight(childrenLeft - child.getLeft());
+            child.offsetTopAndBottom(childTop - child.getTop());
+        }
+
+        <span class="hljs-keyword">if</span> (mCachingStarted &amp;&amp; !child.isDrawingCacheEnabled()) {
+            child.setDrawingCacheEnabled(<span class="hljs-keyword">true</span>);
+        }
+
+        <span class="hljs-keyword">if</span> (recycled &amp;&amp; (((AbsListView.LayoutParams)child.getLayoutParams()).scrappedFromPosition)
+                != position) {
+            child.jumpDrawablesToCurrentState();
+        }
+
+        Trace.traceEnd(Trace.TRACE_TAG_VIEW);
+    }</code></pre>
+<p>&nbsp;</p>
+&nbsp; &nbsp; 通过上面的代码我们可以看到，在makeAndAddView函数中，通过obtainView函数获取Adapter的getView返回的View，再调用了setupChild方法。在setupChild方法中，先会把View添加到ListView的View树中，然后再执行了对该子View的measure、layout，并没有触发整个界面的重新布局，而是内部自己实现了这个过程。<br><br>&nbsp; &nbsp; 我们再来看一下ListView父类AbsListView的部分代码：<br><br><pre><code class="hljs hsp">    @Override
+    public void requestLayout() {
+        <span class="hljs-keyword">if</span> (!<strong><span style="color:#ff0000;">mBlockLayoutRequests</span></strong> &amp;&amp; !mInLayout) {
+            super.requestLayout()<span class="hljs-comment">;</span>
+        }
+    }
+
+
+    <span class="hljs-comment">/**
+     * Track a motion scroll
+     *
+     * @param deltaY Amount to offset mMotionView. This is the accumulated delta since the motion
+     *        began. Positive numbers mean the user's finger is moving down the screen.
+     * @param incrementalDeltaY Change in deltaY from the previous event.
+     * @return true if we're already at the beginning/end of the list and have nothing to do.
+     */</span>
+    boolean trackMotionScroll(<span class="hljs-keyword">int</span> deltaY, <span class="hljs-keyword">int</span> incrementalDeltaY) {
+        final <span class="hljs-keyword">int</span> childCount = getChildCount()<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> (childCount == <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">return</span> true<span class="hljs-comment">;</span>
+        }
+
+        final <span class="hljs-keyword">int</span> firstTop = getChildAt(<span class="hljs-number">0</span>).getTop()<span class="hljs-comment">;</span>
+        final <span class="hljs-keyword">int</span> lastBottom = getChildAt(childCount - <span class="hljs-number">1</span>).getBottom()<span class="hljs-comment">;</span>
+
+        final Rect listPadding = mListPadding<span class="hljs-comment">;</span>
+
+        <span class="hljs-comment">// "effective padding" In this case is the amount of padding that affects</span>
+        <span class="hljs-comment">// how much space should not be filled by items. If we don't clip to padding</span>
+        <span class="hljs-comment">// there is no effective padding.</span>
+        <span class="hljs-keyword">int</span> effectivePaddingTop = <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+        <span class="hljs-keyword">int</span> effectivePaddingBottom = <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> ((mGroupFlags &amp; CLIP_TO_PADDING_MASK) == CLIP_TO_PADDING_MASK) {
+            effectivePaddingTop = listPadding.top<span class="hljs-comment">;</span>
+            effectivePaddingBottom = listPadding.bottom<span class="hljs-comment">;</span>
+        }
+
+         <span class="hljs-comment">// FIXME account for grid vertical spacing too?</span>
+        final <span class="hljs-keyword">int</span> spaceAbove = effectivePaddingTop - firstTop<span class="hljs-comment">;</span>
+        final <span class="hljs-keyword">int</span> <span class="hljs-keyword">end</span> = getHeight() - effectivePaddingBottom<span class="hljs-comment">;</span>
+        final <span class="hljs-keyword">int</span> spaceBelow = lastBottom - <span class="hljs-keyword">end</span><span class="hljs-comment">;</span>
+
+        final <span class="hljs-keyword">int</span> height = getHeight() - mPaddingBottom - mPaddingTop<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> (deltaY &lt; <span class="hljs-number">0</span>) {
+            deltaY = Math.max(-(height - <span class="hljs-number">1</span>), deltaY)<span class="hljs-comment">;</span>
+        } <span class="hljs-keyword">else</span> {
+            deltaY = Math.min(height - <span class="hljs-number">1</span>, deltaY)<span class="hljs-comment">;</span>
+        }
+
+        <span class="hljs-keyword">if</span> (incrementalDeltaY &lt; <span class="hljs-number">0</span>) {
+            incrementalDeltaY = Math.max(-(height - <span class="hljs-number">1</span>), incrementalDeltaY)<span class="hljs-comment">;</span>
+        } <span class="hljs-keyword">else</span> {
+            incrementalDeltaY = Math.min(height - <span class="hljs-number">1</span>, incrementalDeltaY)<span class="hljs-comment">;</span>
+        }
+
+        final <span class="hljs-keyword">int</span> firstPosition = mFirstPosition<span class="hljs-comment">;</span>
+
+        <span class="hljs-comment">// Update our guesses for where the first and last views are</span>
+        <span class="hljs-keyword">if</span> (firstPosition == <span class="hljs-number">0</span>) {
+            mFirstPositionDistanceGuess = firstTop - listPadding.top<span class="hljs-comment">;</span>
+        } <span class="hljs-keyword">else</span> {
+            mFirstPositionDistanceGuess += incrementalDeltaY<span class="hljs-comment">;</span>
+        }
+        <span class="hljs-keyword">if</span> (firstPosition + childCount == mItemCount) {
+            mLastPositionDistanceGuess = lastBottom + listPadding.bottom<span class="hljs-comment">;</span>
+        } <span class="hljs-keyword">else</span> {
+            mLastPositionDistanceGuess += incrementalDeltaY<span class="hljs-comment">;</span>
+        }
+
+        final boolean cannotScrollDown = (firstPosition == <span class="hljs-number">0</span> &amp;&amp;
+                firstTop &gt;= listPadding.top &amp;&amp; incrementalDeltaY &gt;= <span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+        final boolean cannotScrollUp = (firstPosition + childCount == mItemCount &amp;&amp;
+                lastBottom &lt;= getHeight() - listPadding.bottom &amp;&amp; incrementalDeltaY &lt;= <span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+
+        <span class="hljs-keyword">if</span> (cannotScrollDown || cannotScrollUp) {
+            <span class="hljs-keyword">return</span> incrementalDeltaY != <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+        }
+
+        final boolean down = incrementalDeltaY &lt; <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+
+        final boolean inTouchMode = isInTouchMode()<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> (inTouchMode) {
+            hideSelector()<span class="hljs-comment">;</span>
+        }
+
+        final <span class="hljs-keyword">int</span> headerViewsCount = getHeaderViewsCount()<span class="hljs-comment">;</span>
+        final <span class="hljs-keyword">int</span> footerViewsStart = mItemCount - getFooterViewsCount()<span class="hljs-comment">;</span>
+
+        <span class="hljs-keyword">int</span> start = <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+        <span class="hljs-keyword">int</span> count = <span class="hljs-number">0</span><span class="hljs-comment">;</span>
+
+        <span class="hljs-keyword">if</span> (down) {
+            <span class="hljs-keyword">int</span> top = -incrementalDeltaY<span class="hljs-comment">;</span>
+            <span class="hljs-keyword">if</span> ((mGroupFlags &amp; CLIP_TO_PADDING_MASK) == CLIP_TO_PADDING_MASK) {
+                top += listPadding.top<span class="hljs-comment">;</span>
+            }
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; childCount; i++) {</span>
+                final View child = getChildAt(i)<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">if</span> (child.getBottom() &gt;= top) {
+                    <span class="hljs-keyword">break</span><span class="hljs-comment">;</span>
+                } <span class="hljs-keyword">else</span> {
+                    count++<span class="hljs-comment">;</span>
+                    <span class="hljs-keyword">int</span> position = firstPosition + i<span class="hljs-comment">;</span>
+                    <span class="hljs-keyword">if</span> (position &gt;= headerViewsCount &amp;&amp; position &lt; footerViewsStart) {
+                        <span class="hljs-comment">// The view will be rebound to new data, clear any</span>
+                        <span class="hljs-comment">// system-managed transient state.</span>
+                        <span class="hljs-keyword">if</span> (child.isAccessibilityFocused()) {
+                            child.clearAccessibilityFocus()<span class="hljs-comment">;</span>
+                        }
+                        mRecycler.addScrapView(child, position)<span class="hljs-comment">;</span>
+                    }
+                }
+            }
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">int</span> bottom = getHeight() - incrementalDeltaY<span class="hljs-comment">;</span>
+            <span class="hljs-keyword">if</span> ((mGroupFlags &amp; CLIP_TO_PADDING_MASK) == CLIP_TO_PADDING_MASK) {
+                bottom -= listPadding.bottom<span class="hljs-comment">;</span>
+            }
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = childCount - <span class="hljs-number">1</span><span class="hljs-comment">; i &gt;= 0; i--) {</span>
+                final View child = getChildAt(i)<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">if</span> (child.getTop() &lt;= bottom) {
+                    <span class="hljs-keyword">break</span><span class="hljs-comment">;</span>
+                } <span class="hljs-keyword">else</span> {
+                    start = i<span class="hljs-comment">;</span>
+                    count++<span class="hljs-comment">;</span>
+                    <span class="hljs-keyword">int</span> position = firstPosition + i<span class="hljs-comment">;</span>
+                    <span class="hljs-keyword">if</span> (position &gt;= headerViewsCount &amp;&amp; position &lt; footerViewsStart) {
+                        <span class="hljs-comment">// The view will be rebound to new data, clear any</span>
+                        <span class="hljs-comment">// system-managed transient state.</span>
+                        <span class="hljs-keyword">if</span> (child.isAccessibilityFocused()) {
+                            child.clearAccessibilityFocus()<span class="hljs-comment">;</span>
+                        }
+                        mRecycler.addScrapView(child, position)<span class="hljs-comment">;</span>
+                    }
+                }
+            }
+        }
+
+        mMotionViewNewTop = mMotionViewOriginalTop + deltaY<span class="hljs-comment">;</span>
+
+        <span style="color:#ff0000;"><strong>mBlockLayoutRequests = true<span class="hljs-comment">;</span></strong></span>
+
+        <span class="hljs-keyword">if</span> (count &gt; <span class="hljs-number">0</span>) {
+            detachViewsFromParent(start, count)<span class="hljs-comment">;</span>
+            mRecycler.removeSkippedScrap()<span class="hljs-comment">;</span>
+        }
+
+        <span class="hljs-comment">// invalidate before moving the children to avoid unnecessary invalidate</span>
+        <span class="hljs-comment">// calls to bubble up from the children all the way to the top</span>
+        <span class="hljs-keyword">if</span> (!awakenScrollBars()) {
+           invalidate()<span class="hljs-comment">;</span>
+        }
+
+        offsetChildrenTopAndBottom(incrementalDeltaY)<span class="hljs-comment">;</span>
+
+        <span class="hljs-keyword">if</span> (down) {
+            mFirstPosition += count<span class="hljs-comment">;</span>
+        }
+
+        final <span class="hljs-keyword">int</span> absIncrementalDeltaY = Math.<span class="hljs-keyword">abs</span>(incrementalDeltaY)<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> (spaceAbove &lt; absIncrementalDeltaY || spaceBelow &lt; absIncrementalDeltaY) {
+            fillGap(down)<span class="hljs-comment">;</span>
+        }
+
+        <span class="hljs-keyword">if</span> (!inTouchMode &amp;&amp; mSelectedPosition != INVALID_POSITION) {
+            final <span class="hljs-keyword">int</span> childIndex = mSelectedPosition - mFirstPosition<span class="hljs-comment">;</span>
+            <span class="hljs-keyword">if</span> (childIndex &gt;= <span class="hljs-number">0</span> &amp;&amp; childIndex &lt; getChildCount()) {
+                positionSelector(mSelectedPosition, getChildAt(childIndex))<span class="hljs-comment">;</span>
+            }
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (mSelectorPosition != INVALID_POSITION) {
+            final <span class="hljs-keyword">int</span> childIndex = mSelectorPosition - mFirstPosition<span class="hljs-comment">;</span>
+            <span class="hljs-keyword">if</span> (childIndex &gt;= <span class="hljs-number">0</span> &amp;&amp; childIndex &lt; getChildCount()) {
+                positionSelector(INVALID_POSITION, getChildAt(childIndex))<span class="hljs-comment">;</span>
+            }
+        } <span class="hljs-keyword">else</span> {
+            mSelectorRect.setEmpty()<span class="hljs-comment">;</span>
+        }
+
+        <span style="color:#ff0000;"><strong>mBlockLayoutRequests = false<span class="hljs-comment">;</span></strong></span>
+
+        invokeOnItemScrollListener()<span class="hljs-comment">;</span>
+
+        <span class="hljs-keyword">return</span> false<span class="hljs-comment">;</span>
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;从上面的代码我们可以看到，ListView等控件中也是利用了这样的思路，通过mBlockLayoutRequests变量自己阻断了requestlayout函数来提升性能。滑动过程中，会不断的调用trackMotionScroll函数，该函数中有对mBlockLayoutRequests变量的控制，因为在这个过程中涉及到控件的动态增删等过程，会触发requestlayout请求，这个时候就可以通过该变量阻断了这些requestlayout请求，从而提高了性能。看到这里应该可以明白为什么在getView之外的对列表改动容易引发性能问题了，也可以理解为什么要这样去控制来提升界面的性能了。</p>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/46175/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">1人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/67983" title="书智"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_504a255c2773fa686f7f02afdbae63bb.png_80x80" width="26" height="26" alt="书智" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/46175#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (0)
+                  </a>
+        <a href="http://www.atatech.org/articles/46175/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          7
+        </a>
+        <a href="http://www.atatech.org/articles/46175/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          8
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="46175" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/46175/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          0
+        </a>
+        <a href="http://www.atatech.org/articles/46175/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          1
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/13776" title="元伤"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_avatar_20120719180826_13776_60.png_80x80" width="28" height="28" alt="元伤" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/28710">android 学习 - activity</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/45282">Android的硬件加速</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/45768">手淘安卓版性能优化12 - 界面性能之优...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/37481">[Android] 千牛旺旺联系人悬浮便...</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/41266">支付宝钱包客户端性能优化最佳实践分享--...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/47164">图形性能instruments中的core animation 工具</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/45999">上一篇：手淘安卓版性能优化14 - 界面性能之加快界面显示</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/46313">下一篇：手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+
+<div class="pages comment-tip">
+        
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="46175">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/pic.gif"></a></span><script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/pic.gif"></a></span><script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9615+-+%E7%95%8C%E9%9D%A2%E6%80%A7%E8%83%BD%E4%B9%8B%E5%87%8F%E5%B0%91%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E5%88%B7%E6%96%B0%E5%92%8CLayout%E8%AF%B7%E6%B1%82%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F46175%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求", "", "", 'article-46175']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/46175#" class="go-top" style="display: block;"><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/46175#0">&nbsp;一、注意可视区域</a></li><li><a href="http://www.atatech.org/articles/46175#1">&nbsp;二、注意控件的属性设置</a></li><ul><li><a href="http://www.atatech.org/articles/46175#2">2.1 发现和测试这这类问题</a></li><li><a href="http://www.atatech.org/articles/46175#3">2.2 如何避免这类问题</a></li><li><a href="http://www.atatech.org/articles/46175#4">2.3 为什么正常的getView等方法不会触发requestLayout</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

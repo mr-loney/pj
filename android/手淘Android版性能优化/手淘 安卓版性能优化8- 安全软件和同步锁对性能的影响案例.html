@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/45112 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化8- 安全软件和同步锁对性能的影响案例</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化8- 安全软件和同步锁对性能的影响案例
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 236</span>
+          <span class="info">
+                        <time class="" datetime="2015-11-26T15:25:45+08:00">2015-11-26 15:25:45</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/45112/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="性能优化 android " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="性能优化" class="item">性能优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="android" class="item">android<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">性能优化</a><a href="http://www.atatech.org/search?q=android&type=INSIDE_ARTICLE_TAG" class="label label-ata">android</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/45112/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 前面讲了主要的方法和思路，也通过这些工具优化了很多个性能点。但是在双十一的版本开发中，又不止一次的遇到启动慢的反馈。而我们自己测试的中低端机却并未出现问题，很多是用户和同事那边暴露出来的。在9月下旬的版本中，遇到了在同事手机上启动慢的问题。这是一个装有多个监控App的手机，启动时间差不多慢了一倍，杀掉进程再启动有时会有9-10秒钟的时间，比之前慢了接近一倍。问渠那得清如许，唯有源头活水来，看来还有一些隐患点未能发现，需要好好的挖掘一下。<br><h2 id="0">一、监控软件对性能的影响</h2>
+&nbsp; &nbsp; &nbsp;天下当然没有免费的午餐,就正如天上不会无故掉馅饼一样，以前在PC上装了杀毒安全软件，或多或少的对内存和性能产生了影响，杀毒软件免费后，我们更是可以每天欣赏到其带来的各种广告。 手机上的部分安全软件道理也一样，在检查后我们发现该手机装了好几个安全软件，卸载掉这些软件后启动就正常了。看来在用户环境中，这些监控软件也会妨碍软件的性能。作为APP开发人员，大多都对这些软件有所了解，很少会去安装这些软件。但是多数用户都是无感知的，往往会被其杀毒，一键提升性能等功能所吸引。<br>&nbsp; &nbsp; &nbsp;如360手机卫士等这些软件会在淘宝App进程启动的时候做支付安全环境扫描，这一刻其本身也会占用较多的资源。另外还会注入到系统函数和其他应用的App进程中，额外的检查导致速度的明显变慢，系统IO的读写这块也变得非常的耗时。通过百度，我们也不难发现，很多精明的用户已经发现了该问题。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/d88901f05acfd9ea310cd286cb8984208dbabcce.png" alt="" width="1202"><br><br>&nbsp; &nbsp; &nbsp; 纸上得来终觉浅,绝知此事要躬行。看来有必要继续对这个问题做一个更深入的追踪。通过TraceView工具，对手机淘宝做Trace的时候我们可以追踪到qihoo360的注入代码，如下图所示：<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/7070be6d571ccc00f67bc2342ce99492502431fd.png" alt="" width="1698"><br><br>&nbsp; &nbsp; 上面我们看到了较多的360软件的身影，这只是启动到首页显示时刻的跟踪，且这里只是一部分跟踪数据，因为刚启动Activity的时候还没点击Trace按钮。特别是在Activity的onStart和onResume中对启动时间的影响比较多，如下图所示，在启动淘宝的Activity的时候，中间注入了qihoo360对Activity生命周期的监控。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/24c5753d01c292f5a2c391f454220c75828ef9cb.png" alt="" width="1726"><br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/ff1f52361af7ae3b11258f897bfba8d2cc0fde60.png" alt="" width="1838"><br><br>&nbsp; &nbsp; &nbsp;除了对Activity本身的性能影响外，对IO的影响更为明显，我们从下图中就可以发现，排在前面CPU占比比较高的基本都是涉及到IO相关的，如SharedPreference的读写，类的加载，以及序列化操作。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/82afddb8a87087196c8998ceecaed4c1a19d023e.png" alt="" width="1720"><br><br>&nbsp; &nbsp; 下面我们通过cpu时间和实际运行时间的维度来看，下面2张图中可以看出，涉及到so库加载的nbcache等模块的实际运行时间与cpu时间相差悬殊，差不多100多倍的时间差。另外类的加载和Bundle的dex文件加载也颇为耗时，占用的CPU也比较多。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/c9a80ecc3e9e1e4978116f9ffdaaec28b20405fb.png" alt="" width="1632"><br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/4b78abe6dd1386237babb01dc62a62b8a5b4fb49.png" alt="" width="1652"><br><br>&nbsp; &nbsp; &nbsp;通过时间线面板，我们也发现在这种情况下，主线程很难分配到CPU资源，JSON解析，和序列化占了主要的CPU资源，导致Main线程经常分配不到时间片而导致cpu时间和实际运行的时间相差悬殊。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/b465f7184782f662ab2ce1ed1ef7ec8f5ccb3fc3.png" alt="" width="1756"><br><br><br>&nbsp; &nbsp; 接着卸载360的监控软件，启动就比较正常，通过Trace，我们看到，占用CPU的主要成了网络访问和Json解析这块，之前的IO这块明显减少了，已经排名很靠后了。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/2581e83b652b8c2e02d645da479da045d24e093d.png" alt="" width="1584"><br><br>&nbsp; &nbsp; &nbsp;我们通过加载类的数据也可以看出性能的提升，在卸载安全软件前大概占比16%的CPU时间，而卸载后大约占比4%左右，而且CPU时间和实际的执行时间都比之前有了明显的提升，大约在5倍以上，而SharedPreference线程下降的更为明显，基本不太耗时了。如下图：<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/0aa8c1dce23a74ac940973237f5292cbb442a5c7.png" alt="" width="1578"><br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/a04aa3a986f6d817fd17ebaf640ca39e2360764d.png" alt="" width="1586"><br><br>&nbsp; &nbsp; &nbsp;进一步查看onStart和onResume函数，这两个函数的性能也明显提升了。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/7f1f096c416a0d3d9997215a4abd52858c34f6f0.png" alt="" width="1616"><br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/734a019450db190ffed9cd898b5004ea08cb9eba.png" alt="" width="1628"><br><h2 id="1">二、主线程中的阻塞代码也会在不经意间引爆</h2>
+&nbsp; &nbsp; &nbsp; 多线程编程中离不开对竞争资源的访问，这其中大多都是通过同步锁来实现的。当在主线程中调用复杂的同步代码的时候我们应该慎之又慎，有时候就会因为等待某个资源而让主线程阻塞了较长时间。通过Trace工具，可以将这个隐患放大而更加容易暴露，因为Trace的时候会不断的让线程停顿来收集执行情况，人为的干扰了正常线程的调度和速度，线程的时序发生了变化，这样就更容易暴露出问题。在对9月下旬的这个版本的App做Trace的时候，如果trace的早，很容易发现难以进入主界面，有时候会有几分钟的时间等待。例如下面的图中，一个打开数据库的函数，27ms的cpu时间，却执行了70s的时间，2600倍的差距，有点离谱。上面谈到安全软件的监控会影响读写数据库和创建数据库的性能，粗略看来，如果用这个缘由去解释也不无道理。但是2600倍，如此悬殊，今天再回头看这个问题，即使是安全软件，也不应该导致这么大的差距才对，所以有必要再做进一步分析。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/8cd3244563e775b55ad3efecb44c8a09d97de644.jpeg" alt="" width="1730"><br>&nbsp; &nbsp;&nbsp;<br>&nbsp; &nbsp;&nbsp;从上面的Trace面板我们可以发现，Main线程有大量的空闲处，而点击这些空闲处后发现，第一个是ACDS中的打开数据库函数，而后面这张图的间断性空隙基本都是wait等待。为了查看这两处调用栈，我们可以在Trace过程中，通过Threads工具来实现。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/0671d516541c26a05ec9912b1a166643abd4f2dd.png" alt="" width="944"><br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/578a93af80235265adce383a678693fa10f5bf39.png" alt="" width="1026"><br><br>&nbsp; &nbsp; &nbsp;上面两个函数在主线程都被长时间的阻塞，不像是因为主线程分配不到时间片而造成的，因为这是必然现象，每次都在这行代码。所以，从上面我们可以看出，两处都是因为同步锁主线程被阻塞了，并且这里还发现了CountDownLatch的调用，这个一般用来同步多个任务。CountDownLatch的典型用法是将一个功能的实现分为n个互相独立的任务，并创建值为n的CountDownLatch。当每个任务完成时，都会在这个锁存器上调用countDown()。等待问题被解决的任务会在这个锁存器上调用await()，将自己阻塞，直至锁存器计数为0时结束。到这里我们就能明白第二处被wait频繁阻塞的原因了，因为在主函数中调用了CountDownLatch的await()方法。 第一处openDatabase函数被阻塞可以肯定的是用了同步锁，具体原因，还需要来进一步查看源代码。找到这个文件的源码，我们从代码层面来看一下为什么会导致阻塞，这里只截取了部分该文件的代码，如下：<br><br><pre><code class="hljs aspectj">   <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> IDatabase database;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> DbProcessResult lastDBErrorResult = <span class="hljs-keyword">new</span> DbProcessResult(<span class="hljs-keyword">null</span>);
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">static</span> <span class="hljs-function">IDatabase <span class="hljs-title">getInstance</span><span class="hljs-params">(Context context)</span> </span>{
+
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">null</span> == database) {
+
+            Soloader.loadSo(context);
+
+            <span class="hljs-keyword">if</span> (ACDSContext.isDatabaseInService) {
+                database = <span class="hljs-keyword">new</span> UnqliteDatabase();
+                String databaseName = UnqliteDbUtil.getDatabasePath(context);
+                <span class="hljs-keyword">try</span> {
+                    database.openDatabase(databaseName);
+                } <span class="hljs-keyword">catch</span> (Throwable e) {
+                    database = getErrorUnqlite();
+                }
+
+            } <span class="hljs-keyword">else</span> {
+                database = getErrorUnqlite();
+            }
+
+        }
+
+        <span class="hljs-keyword">return</span> database;
+    }
+
+<span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">openDatabase</span><span class="hljs-params">(String databaseName)</span> </span>{
+
+        <span class="hljs-keyword">if</span> (openedDB.contains(databaseName)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        }
+        Log.e(<span class="hljs-string">"DB.executeScriptSync"</span>, <span class="hljs-string">"try to open db "</span> + databaseName);
+        <span class="hljs-keyword">boolean</span> result = openUnqliteDatabase(databaseName, UNQLITE_OPEN_CREATE | UNQLITE_OPEN_READWRITE | UNQLITE_OPEN_MMAP);
+        <span class="hljs-keyword">if</span> (result) {
+            openedDB.add(databaseName);
+
+            <span class="hljs-keyword">if</span> (configEncryptEnableUnqliteDatabase(databaseName, <span class="hljs-keyword">true</span>)) {
+                Log.e(<span class="hljs-string">"DB.executeScriptSync"</span>, <span class="hljs-string">"encrypt db success"</span>);
+                <span class="hljs-keyword">boolean</span> encrypt = configEncryptSecretUnqliteDatabase(databaseName, <span class="hljs-string">"!@acds#楼"</span>);
+            } <span class="hljs-keyword">else</span> {
+                Log.e(<span class="hljs-string">"DB.executeScriptSync"</span>, <span class="hljs-string">"encrypt db failed"</span>);
+            }
+
+        } <span class="hljs-keyword">else</span> {
+            Log.e(<span class="hljs-string">"DB.executeScriptSync"</span>, <span class="hljs-string">"open db failed"</span>);
+        }
+        <span class="hljs-keyword">return</span> result;
+
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-function">DbProcessResult <span class="hljs-title">executeScriptSync</span><span class="hljs-params">(<span class="hljs-keyword">final</span> String databaseName, <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> rwFlag, <span class="hljs-keyword">final</span> String script,
+                                                          <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> priority)</span> </span>{
+
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> callbackId = getNextCallbackId();
+
+        SyncJob&lt;DbProcessResult&gt; syncJob = <span class="hljs-keyword">new</span> SyncJob&lt;DbProcessResult&gt;() {
+            <span class="hljs-meta">@Override</span>
+            <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">execute</span><span class="hljs-params">()</span> </span>{
+<span class="hljs-comment">//                Log.d("DB.executeScript", "callbackId:" + callbackId + ", script content:\r\n" + script);</span>
+                executeUnqliteScript(databaseName, rwFlag, script, priority, <span class="hljs-string">"nativeCallback"</span>,
+                        callbackId);
+            }
+        };
+
+        callbackMap.put(callbackId, <span class="hljs-keyword">new</span> SyncScriptCallback(callbackId, syncJob));
+
+        DbProcessResult dbProcessResult = getDbProcessResult(callbackId, syncJob);
+
+        <span class="hljs-keyword">if</span> (dbProcessResult.success) {
+<span class="hljs-comment">//            lastDBErrorResult = null;</span>
+           <span class="hljs-comment">// ACDSMonitor.addSuccessTrack(AlarmType.dbresult, databaseName, "");</span>
+        } <span class="hljs-keyword">else</span> {
+
+
+            String sql2 = script;
+            <span class="hljs-comment">/*
+            if( null != sql2 &amp;&amp; sql2.length() &gt; 100)
+            {
+                sql2 = script.substring(0,100);
+            }
+            */</span>
+            ACDSMonitor.monitorUndegree(MonitorConstants.MONITOR_POINT_UNDEGREED_DBO, <span class="hljs-string">"uql:"</span> + String.valueOf(dbProcessResult.code) + <span class="hljs-string">","</span> + dbProcessResult.msg + <span class="hljs-string">","</span>+ sql2);
+
+            <span class="hljs-keyword">if</span>(script.contains(<span class="hljs-string">"cybertron"</span>)) {
+                lastDBErrorResult = dbProcessResult;
+            }
+            <span class="hljs-comment">//ACDSMonitor.addFailTrack(AlarmType.dbresult, String.valueOf(dbProcessResult.code), dbProcessResult.msg);</span>
+        }
+
+        <span class="hljs-keyword">return</span> dbProcessResult;
+    }</code></pre>
+<p>&nbsp;</p>
+&nbsp; &nbsp; 从上面的代码我们可以看到，这是一个单例，而且单例中很多函数都用了synchronized同步锁，当然单例的getInstance加同步锁本身就对性能有影响，这里先忽略。在上面的调用栈我们也发现了主线程在执行完openDatabase后有再调用executeScriptSync函数而导致阻塞，那么可以肯定该时段该锁被其他线程持有了，在openDatabase的的过程中，我们继续追查其他线程的调用栈，在其他线程中果然发现了对executeScriptSync的调用，因为其他线程执行的时间比较长，导致长时间获取不到锁，如下图所示。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/acd6e9785c5991f19967561d4884ff66f1814c80.png" alt="" width="1182"><br><br>&nbsp; &nbsp; &nbsp;至此终于可以明白主线程在Trace下长时间阻塞的原因了，虽然数据库中的读写受到监控软件的影响会变慢和更加容易出现，但是Trace下长达70秒以上的执行时间并不是监控软件引起的，而是我们在多线程中同步锁使用不当引起的。openDatabase函数需要获得锁才能继续执行，而这个时候，获得该锁的其他线程因为执行其他的同步函数如executeScriptSync进入到CountDownLatch的await()方法而被阻塞，并没有释放主线程需要的锁，这样就导致了主线程的长时间等待。 除了上面这个同步锁的影响，我们还发现了另外一处同步锁的影响，这个影响会导致一直无法进入首页，在主线程中调用了getAppKey，而这个时候黑匣子还没初始化完成，在getAppKey的Native代码中用了同步锁，多个线程都调用了该函数，全部被挂起，如下图所示，后面把该代码从主线程移除，进入主界面就不会因为Trace而阻塞住了。<br><br><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/713f139c4e27cea9e08f7ffb3d8da572e1cf66b6.png" alt="" width="1196"><br><br>&nbsp; &nbsp; &nbsp; 所以在装有类似于360这种会影响整体性能的手机上，我们后续有必要优化IO的读写，通过优化文件的存取，SharedPreference的读写，数据的读写，资源文件的读写，和类的加载等过程来提升性能。启动界面的案例其实很多，有时候也是很复杂的。在用户环境以及Trace环境下都能暴露出不少问题，所以更多的模拟真实的用户环境以及细致的通过工具和源码分析问题，将问题搞明白才能防微杜渐，后面还将介绍一些另外的启动阶段的案例分析。
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/45112/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">5人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/67428" title="饮源"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_3ff00a469474bbe71a9218a7f0377518.png_80x80" width="26" height="26" alt="饮源" class="img-user"></a></li><li><a href="http://www.atatech.org/users/141868" title="唐送军"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_7a4c4d3272f153d7700d59c8ea0f1120.png_80x80" width="26" height="26" alt="唐送军" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="26" height="26" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/94793" title="芸墨"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20150712221724.jpg_80x80" width="26" height="26" alt="芸墨" class="img-user"></a></li><li><a href="http://www.atatech.org/users/9891" title="九重"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120725183035_9891_60.jpeg_80x80" width="26" height="26" alt="九重" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/45112#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (0)
+                  </a>
+        <a href="http://www.atatech.org/articles/45112/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          26
+        </a>
+        <a href="http://www.atatech.org/articles/45112/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          27
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="45112" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/45112/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          3
+        </a>
+        <a href="http://www.atatech.org/articles/45112/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          4
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/67428" title="饮源"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_3ff00a469474bbe71a9218a7f0377518.png_80x80" width="28" height="28" alt="饮源" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/22675" title="东淮"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20151223162007.jpg_80x80" width="28" height="28" alt="东淮" class="img-user"></a></li><li><a href="http://www.atatech.org/users/164080" title="狐忌"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_af16f5c4011aeb751eedec8b0ea4e6b8.png_80x80" width="28" height="28" alt="狐忌" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132816" title="皙华"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20150519171629.jpg_80x80" width="28" height="28" alt="皙华" class="img-user"></a></li><li><a href="http://www.atatech.org/users/16034" title="依函"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120719180908_16034_60.jpeg_80x80" width="28" height="28" alt="依函" class="img-user"></a></li><li><a href="http://www.atatech.org/users/72639" title="士恒"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20151203170952.jpg_80x80" width="28" height="28" alt="士恒" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/92067" title="翰波"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_01c0f89f3ea7c2485ce553cf06a3cfc9.png_80x80" width="28" height="28" alt="翰波" class="img-user"></a></li><li><a href="http://www.atatech.org/users/8447" title="老陛"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120725183027_8447_60.jpeg_80x80" width="28" height="28" alt="老陛" class="img-user"></a></li><li><a href="http://www.atatech.org/users/94793" title="芸墨"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20150712221724.jpg_80x80" width="28" height="28" alt="芸墨" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74379" title="曦宸"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_6f48fe98085d17ac767bdda795ab00f3.png_80x80" width="28" height="28" alt="曦宸" class="img-user"></a></li><li><a href="http://www.atatech.org/users/66624" title="澜清"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_eef222c790cc35af6406e8f9663e7574.png_80x80" width="28" height="28" alt="澜清" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81631" title="士昭"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_3a8beff9989bacc12f6d2e64412c3f93.png_80x80" width="28" height="28" alt="士昭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/9891" title="九重"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120725183035_9891_60.jpeg_80x80" width="28" height="28" alt="九重" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34964" title="丹琼"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_502c4afdfeedb869dd6c8c1496e7da0f.png_80x80" width="28" height="28" alt="丹琼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64157" title="如盐"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_652fca5e93b01f8e5bea89231142bd1e.png_80x80" width="28" height="28" alt="如盐" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13855" title="执明"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_32f84b597629f37d9ef53d714fce6fa1.png_80x80" width="28" height="28" alt="执明" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24643" title="仙翁"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_ce9fd3049217c508cdd7f963031dcc3d.png_80x80" width="28" height="28" alt="仙翁" class="img-user"></a></li><li><a href="http://www.atatech.org/users/7996" title="丝菱"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/img_20151124100907.JPG_80x80" width="28" height="28" alt="丝菱" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/11592" title="谢萱"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20120719180810_11592_60.jpeg_80x80" width="28" height="28" alt="谢萱" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23076" title="兰兰"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_avatar_20131230181137_23076_60.jpeg_80x80" width="28" height="28" alt="兰兰" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/38014">YunOS相册冷启动性能优化实践</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/41266">支付宝钱包客户端性能优化最佳实践分享--...</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/30208">Android开发，Activity生命周期</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/45333">手淘安卓版性能优化9- 其它因素对...</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/44028">手淘安卓版性能优化7- 启动阶段的问题...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/45366">StartActivity关键函数和流程理解</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/44028">上一篇：手淘安卓版性能优化7- 启动阶段的问题和主要优化思路</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/45333">下一篇：手淘安卓版性能优化9- 其它因素对启动性能的影响过程分析</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+
+<div class="pages comment-tip">
+        
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="45112">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/stat.php" type="text/javascript"></script><script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/stat(1).php" type="text/javascript"></script><script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%08%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%968-+%08%E5%AE%89%E5%85%A8%E8%BD%AF%E4%BB%B6%E5%92%8C%E5%90%8C%E6%AD%A5%E9%94%81%E5%AF%B9%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D%E6%A1%88%E4%BE%8B%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F45112%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化8- 安全软件和同步锁对性能的影响案例", "", "", 'article-45112']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/45112#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘 安卓版性能优化8- 安全软件和同步锁对性能的影响案例_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/45112#0">一、监控软件对性能的影响</a></li><li><a href="http://www.atatech.org/articles/45112#1">二、主线程中的阻塞代码也会在不经意间引爆</a></li></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

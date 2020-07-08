@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/47006 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化20 - 正确使用单例</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化20 - 正确使用单例_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化20 - 正确使用单例_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化20 - 正确使用单例
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 174</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-30T16:37:01+08:00">2015-12-30 16:37:01</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/47006/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="Android性能 JAVA单例模式 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="Android性能" class="item">Android性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="JAVA单例模式" class="item">JAVA单例模式<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=Android%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">Android性能</a><a href="http://www.atatech.org/search?q=JAVA%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F&type=INSIDE_ARTICLE_TAG" class="label label-ata">JAVA单例模式</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/47006/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 单例模式作为设计模式中最基础的模式之一，相信大部分人也都很熟悉。甚至我们在面试的时候也会经常拿来作为一个考题。单例模式可以控制实例的数量，节约内存资源，同时又可以作为共享资源的媒介，方便各个线程、模块之间共享数据。在手淘的几乎所有模块代码中，都能找到单例使用的身影。<br><br>&nbsp; &nbsp; 我们先来看下部分代码的单例写法：<br><br><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.taobao.acds.database;
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SqliteDatabase</span> </span>{
+
+    <span class="hljs-keyword">public</span> String DB_PATH;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> SqliteDatabase sqliteDatabase;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span>  isDatabaseOpen = <span class="hljs-keyword">false</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">SqliteDatabase</span><span class="hljs-params">()</span> </span>{
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> String OLD_DB_NAME = <span class="hljs-string">"acds.sqlite"</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> String DB32_NAME =   <span class="hljs-string">"acds32.sqlite"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> SqliteDatabase <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">null</span> == sqliteDatabase) {
+            sqliteDatabase = <span class="hljs-keyword">new</span> SqliteDatabase();
+   
+	……
+        <span class="hljs-keyword">return</span> sqliteDatabase;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> SqliteResult <span class="hljs-title">executeScriptSync</span><span class="hljs-params">(<span class="hljs-keyword">final</span> <span class="hljs-keyword">boolean</span> isRead, <span class="hljs-keyword">final</span> String sql, <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> trans)</span> </span>{
+
+        <span class="hljs-keyword">if</span> (!isDatabaseOpen) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SqliteResult(SqliteResult.ADSQL_NOTOPEN_ERR);
+        }
+	……
+    }
+
+
+}</code></pre>
+<p>&nbsp; &nbsp; 这个单例看起来基本正确，但是在getInstance()前面使用了synchronized关键字，这个会带来性能损耗。更为危险的是在该类的其他函数中也使用了synchronized关键字，这样如果有线程需要调用getInstance()的话，就可能需要等待锁资源了。如果executeScriptSync()函数耗时很长，那其他线程被阻塞的时间就会很长。<br><br>&nbsp; &nbsp; 下面再来看看其他单例的实现：</p>
+<pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">MotionStateMachine <span class="hljs-title">getMotionStateMachineInstance</span><span class="hljs-params">(IProcessor&lt;?&gt; ip, IContext ic, IQuery iq)</span></span>{
+       <span class="hljs-keyword">if</span>(msm == <span class="hljs-keyword">null</span>){
+            msm = <span class="hljs-keyword">new</span> MotionStateMachine(ip, ic, iq);
+       }<span class="hljs-keyword">else</span>{
+            msm.ic = ic;
+            msm.iq = iq;
+       }
+       <span class="hljs-keyword">return</span> msm;
+  }
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;该写法没有多线程保护，所以存在隐患。<br><br></p>
+<pre><code class="hljs smali"><span class="hljs-keyword">	private</span><span class="hljs-keyword"> static</span> <span class="hljs-class">LbsConfigAdapter instance = null;</span>
+   <span class="hljs-keyword">	public</span><span class="hljs-keyword"> static</span> LbsConfigAdapter getInstance() {
+       	   <span class="hljs-built_in"> if </span>(instance == null) {
+            	synchronized (LbsConfigAdapter.class) {
+                    <span class="hljs-built_in"> if </span>(instance == null)
+                      	<span class="hljs-built_in"> instance </span>=<span class="hljs-built_in"> new </span>LbsConfigAdapter();
+ 
+             	    }    
+            }
+       	   <span class="hljs-built_in"> return </span>instance;
+   	}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;这个单例用了双重锁检查，看似正确，但也是错误的写法。<br><br></p>
+<pre><code class="hljs haskell">     public static <span class="hljs-type">Config</span> getInstance(<span class="hljs-type">MergeCallback</span> mergeCallback) {
+          <span class="hljs-keyword">if</span> (<span class="hljs-keyword">instance</span> == null) {
+               synchronized (<span class="hljs-type">AuksConfigImpl</span>.<span class="hljs-keyword">class</span>) {
+                     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">instance</span> == null)
+<span class="hljs-class">                          <span class="hljs-keyword">instance</span> = new <span class="hljs-type">AuksConfigImpl</span>(<span class="hljs-title">mergeCallback</span>);
+ 
+               }
+          } else {
+               synchronized (<span class="hljs-type">AuksConfigImpl</span>.<span class="hljs-title">class</span>) {
+if (((<span class="hljs-type">AbstractConfigHandle</span>) <span class="hljs-keyword">instance</span>).getMergeCallback() == null) {
+((<span class="hljs-type">AbstractConfigHandle</span>) <span class="hljs-keyword">instance</span>).setMergeCallback(<span class="hljs-title">mergeCallback</span>);
+                     }
+               }
+          }
+          return <span class="hljs-keyword">instance</span>;
+ 
+   }</span></code></pre>
+&nbsp; &nbsp; 而上面这个单例写的就有点不清不楚，让人摸不着头脑。<br><br><h2 id="0">一、关于单例的几个写法</h2>
+&nbsp; &nbsp; 虽然单例是一个很普遍的设计模式，但是可见很多人并没有掌握它的正确写法，所以这里也有必要来进一步讨论下单例的写法。首先单例必须要有一个private访问级别的构造函数，只有这样，才能确保单例不会在系统中的其他代码内被实例化。其次instance成员变量必须要是static的。<br><h3 id="1">1、饿汉模式创建单例</h3>
+<pre><code class="hljs smali">public class Singleton {  
+    <span class="hljs-keyword"> private</span><span class="hljs-keyword"> static</span> Singleton<span class="hljs-built_in"> instance </span>=<span class="hljs-built_in"> new </span>Singleton();  
+
+    <span class="hljs-keyword"> private</span> Singleton (){
+     }<br>
+    <span class="hljs-keyword"> public</span><span class="hljs-keyword"> static</span> Singleton getInstance() {  
+     <span class="hljs-built_in">	return </span>instance;  
+     } 
+}
+</code></pre>
+&nbsp; &nbsp; 这种单例的实现方式非常简单也很可靠，instance成员变量的实例是在虚拟机加载类的时候就会被创建。唯一的不足的是无法对Singleton实例做延时实例化，一旦Singleton的构造过程很耗时，这将导致创建该单例的调用方遇到性能问题。所以该方式的单例适用于构造单例不耗时的场景。<br><br><h3 id="2">2、懒汉模式</h3>
+<pre><code class="hljs smali"><span class="hljs-keyword"> public</span> class Singleton {  
+     <span class="hljs-keyword"> private</span><span class="hljs-keyword"> static</span> Singleton instance;  
+     <span class="hljs-keyword"> private</span> Singleton (){}
+
+     <span class="hljs-keyword"> public</span><span class="hljs-keyword"> static</span> synchronized Singleton getInstance() {  
+     <span class="hljs-built_in"> if </span>(instance == null) {  
+         <span class="hljs-built_in"> instance </span>=<span class="hljs-built_in"> new </span>Singleton();  
+      }  
+     <span class="hljs-built_in"> return </span>instance; <br>     } 
+}
+</code></pre>
+<p>&nbsp; &nbsp; 这种写法可以避免在类加载的时候就初始化实例，但是getInstance()方法必须是同步的，否则在多线程环境下，实例就可能会不止一个的被创建。虽然懒汉模式实现了延迟加载功能，但和第一种方法相比，它引入了同步关键字，因此在多线程环境中，以及频繁调用的时候，性能损耗就会比较明显。即使在单线程环境下，synchronized关键字也会带来一定的性能损耗，我们不妨用简单的代码对上述单例做个测试，以下数据是10次的平均值。</p>
+<pre><code class="hljs autoit">	<span class="hljs-keyword">for</span> (<span class="hljs-built_in">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; 1000000; i++) {</span>
+		<span class="hljs-built_in">Singleton</span> s = <span class="hljs-built_in">Singleton</span>.getInstance()<span class="hljs-comment">;</span>
+	}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;100万次的调用该接口，<span style="color:#ff0000;"><strong>在只有一个线程的情况下，</strong></span>使用了synchronized关键字耗时106ms，没有加该关键字72ms，<strong><span style="color:#ff0000;">性能接近1.5倍的差值</span></strong>。<span style="color:#ff0000;"><strong>如果10个线程同时运行</strong></span>，synchronized的影响就很明显了，在有synchronized的情况下耗时4436ms，不使用的情况下只要192ms，<strong><span style="color:#ff0000;">相差有23倍</span></strong>。这还只是一个接口的调用，<strong><span style="color:#ff0000;">如果有代码逻辑等耗时函数，那synchronized对性能的影响就更大</span></strong>。所以该写法并不利于性能，还需要优化。</p>
+<h3 id="3">3、使用双重检查锁的懒汉模式</h3>
+<pre><code class="hljs smali">public class Singleton {  
+     <span class="hljs-keyword"> private</span> <strong><span style="color:#ff0000;">volatile</span></strong><span class="hljs-keyword"> static</span> Singleton instance;  
+     <span class="hljs-keyword"> private</span> Singleton (){}   
+
+     <span class="hljs-keyword"> public</span><span class="hljs-keyword"> static</span> Singleton getSingleton() {  
+     <span class="hljs-built_in"> if </span>(instance == null) {  
+          <strong><span style="color:#ff0000;">synchronized (Singleton.class)</span></strong> {  
+         <span class="hljs-built_in"> if </span>(instance == null) {  
+             <span class="hljs-built_in"> instance </span>=<span class="hljs-built_in"> new </span>Singleton();  
+          }  
+        }  
+     }  
+    <span class="hljs-built_in"> return </span>instance;  
+     }  
+ }</code></pre>
+<p>&nbsp; &nbsp; 该写法使用了双重检查锁，即在instance为空的时候，还需要加同步锁进行保护。注意这里有一个volatile的关键字。<strong><span style="color:#ff0000;">如果不加volatile关键字，双重检查就可能会失效</span></strong>，导致可能不止一个实例被创建。为什么需要加volatile，编译器会对代码做优化，CPU的高速缓存和内存速度相差也很大等等导致了指令重排序。例如：编译器可能会进行指令重排序；处理器可能会对语句所对应的机器指令进行重排序之后再执行，甚至并发地去执行；内存系统（由高速缓存控制单元组成）可能会对变量所对应的内存单元的写操作指令进行重排序；编译器、处理器以及内存系统可能会让两条语句的机器指令交错；编译器、处理器以及内存系统可能会导致代表两个变量的内存单元在连续的check调用之后的某个时刻才更新。<br><br>&nbsp; &nbsp; 在Java 1.5以后，volatile才开始真正的有效，它有两个主要的意义：</p>
+<p>&nbsp; &nbsp; 1）保证了不同线程对这个变量进行操作时的可见性，即一个线程修改了某个变量的值，这新值对其他线程来说是立即可见的。</p>
+<p>　 2）保证时序，禁止进行指令重排序。<br>&nbsp; &nbsp;&nbsp;<br>&nbsp; &nbsp; <strong><span style="color:#ff0000;">但是volatile并不能保证原子性，即不能起到同步关键字的作用。</span></strong></p>
+<p>&nbsp; &nbsp; 所以这里需要加入volatile关键词来保证单例的创建只有一份，对于指令重排等知识大家也可以参考网络上的其他文章进一步了解。</p>
+<h3 id="4">4、静态内部类</h3>
+<pre><code class="hljs smali">public class Singleton {
+<span class="hljs-keyword">	private</span> Singleton() {
+		
+	}
+
+<span class="hljs-keyword">	public</span><span class="hljs-keyword"> static</span>  Singleton getInstance() {
+	<span class="hljs-built_in">	return </span>SingletonHolder.instance;
+	}
+	
+<span class="hljs-keyword">	private</span><span class="hljs-keyword"> static</span> class SingletonHolder {
+
+	<span class="hljs-keyword">	private</span><span class="hljs-keyword"> static</span>  Singleton<span class="hljs-built_in"> instance </span>=<span class="hljs-built_in"> new </span>Singleton();
+	}
+
+}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;该写法使用了内部类的方式实现单例，即可以做到延迟加载，也不必使用同步关键字，因为静态内部里的实例化过程由虚拟机保证了线程的安全性，是一种比较好的实现方式。</p>
+<h3 id="5">5、枚举方式</h3>
+<pre><code class="hljs crystal"> public <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">Singleton</span> {  </span>
+     INSTANCE;  
+     public void getSingleton() {
+	<span class="hljs-keyword">return</span> INSTANCE;
+     }  
+ } </code></pre>
+<p>&nbsp; &nbsp; &nbsp;用枚举的方式实现单例在代码中很少见，因为只有Java 1.5以后才开始支持。这种写法比较简洁，还提供了序列化的机制，又能绝对防止多次的实例化，即使在序列化和反射攻击的时候，仍然能正常工作。<br><br>&nbsp; &nbsp; 上面列举了5种单例的写法，3、4、5写法在性能上都有不错的表现，枚举方式不常见但是安全性高。写法4、5的主要缺点就是该单例很难灵活来做到自身的销毁和重建。而写法3双重检查锁的模式，可以比较方便的释放和重建自身，例如在模块退出的时候，<strong><span style="color:#ff0000;">如果这个单例占用了大量的资源，可以使用&nbsp;instance = null 来释放资源，后面要使用的时候可以重新创建。在单例占据大量资源，而该模块又不是频繁调用的模块，不需要常驻内存的情况下，建议使用第3种写法。</span></strong></p>
+<h2 id="6">二、保证系统中单例的唯一性</h2>
+<p>&nbsp; &nbsp; 虽然前面的写法已经能够保证在普通情况下，系统中只有一个单例的实例，但是我们还是可以通过反序列化、反射的手段来生成多个单例实例。</p>
+<h3 id="7">1、防止反射机制破坏单例</h3>
+<p><br>&nbsp; &nbsp; 反射机制是通过调用私有的构造函数来创建实例的，这样就可以绕过单例私有构造函数的屏障。为了抵御这种创建实例的方法，可以修改构造函数，在被要求创建第二个实例的时候抛出异常。这样就不能通过反射创建实例了，这也是很多工具类防止实例化的做法，在构造函数中抛异常。<br><br></p>
+<h3 id="8">2、防止反序列化破坏单例</h3>
+<p><br>&nbsp; &nbsp;如果该单例能够被序列化，那么在反序列化的时候就会创建一个新的实例。为了防止序列化破坏单例的实现，可以在单例中增加一个如下的方法。</p>
+<pre><code class="hljs aspectj"><span class="hljs-keyword">private</span> <span class="hljs-function">Object <span class="hljs-title">readResolve</span><span class="hljs-params">()</span></span>{
+    <span class="hljs-keyword">return</span> instance;
+}</code></pre>
+<p>&nbsp; &nbsp; 反序列化的过程中会检测是否有一个私有的，返回类型是Object的readResolve，如果存在就会使用该方法来执行反序列化。从而防止序列化破坏单例的实现。&nbsp;</p>
+<p>&nbsp; &nbsp;&nbsp;<br>&nbsp; &nbsp; 上面谈了多种单例的写法和防止多个实例的手段，在我们写代码的过程中也尽量多考虑一下单例的写法，保证单例的正确性和性能上的优越性。<strong><span style="color:#ff0000;">当然，单例也不能随意的使用，毕竟单例泛滥容易导致内存的难以管理甚至泄露，过多的占用内存，特别是那些难得使用到的模块，如果大量的使用单例，又不注意销毁的话，就会浪费内存资源和产生内存碎片。</span></strong><br>&nbsp; &nbsp; 如果你的模块中存在单例特别是存在很多的单例，那么你就该好好的检查下是否有必要使用单例，以及单例的实现是否合理。<br><br><br><br></p>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/47006/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">3人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/172313" title="郑晓彬"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_ab612787efd5d5465c8a585efdda738d.png_80x80" width="26" height="26" alt="郑晓彬" class="img-user"></a></li><li><a href="http://www.atatech.org/users/30626" title="行直"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_8385583a61497aa5d15857e068482a65.png_80x80" width="26" height="26" alt="行直" class="img-user"></a></li><li><a href="http://www.atatech.org/users/67983" title="书智"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_504a255c2773fa686f7f02afdbae63bb.png_80x80" width="26" height="26" alt="书智" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/47006#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (0)
+                  </a>
+        <a href="http://www.atatech.org/articles/47006/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          7
+        </a>
+        <a href="http://www.atatech.org/articles/47006/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          8
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="47006" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/47006/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          2
+        </a>
+        <a href="http://www.atatech.org/articles/47006/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          3
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/172313" title="郑晓彬"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_ab612787efd5d5465c8a585efdda738d.png_80x80" width="28" height="28" alt="郑晓彬" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/157934" title="简燃"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_7d0de71cfd44806280ef83bcb88effee.png_80x80" width="28" height="28" alt="简燃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34964" title="丹琼"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_502c4afdfeedb869dd6c8c1496e7da0f.png_80x80" width="28" height="28" alt="丹琼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化20 - 正确使用单例_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/25746">【AQC】基于内存class实时替换技术...</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/29068">JDK设计模式（一）单例模式</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/30331">Android开发时注意的内存优化</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/41392">java中三种代理框架总结</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/31306">SimpleDateFormat探讨</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/27610">你是怎样将数组转化为列表的，asList么？</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/46997">上一篇：手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/47400">下一篇：手淘安卓版性能优化21 - 避免使用枚举</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+
+<div class="pages comment-tip">
+        
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="47006">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化20 - 正确使用单例_files/pic.gif"></a></span><script src="./手淘安卓版性能优化20 - 正确使用单例_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化20 - 正确使用单例_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化20 - 正确使用单例_files/pic.gif"></a></span><script src="./手淘安卓版性能优化20 - 正确使用单例_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化20 - 正确使用单例_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9620+-+%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%E5%8D%95%E4%BE%8B%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F47006%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化20 - 正确使用单例_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化20 - 正确使用单例", "", "", 'article-47006']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化20 - 正确使用单例_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/47006#" class="go-top" style="display:none"><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化20 - 正确使用单例_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: absolute; top: 150px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/47006#0">一、关于单例的几个写法</a></li><ul><li><a href="http://www.atatech.org/articles/47006#1">1、饿汉模式创建单例</a></li><li><a href="http://www.atatech.org/articles/47006#2">2、懒汉模式</a></li><li><a href="http://www.atatech.org/articles/47006#3">3、使用双重检查锁的懒汉模式</a></li><li><a href="http://www.atatech.org/articles/47006#4">4、静态内部类</a></li><li><a href="http://www.atatech.org/articles/47006#5">5、枚举方式</a></li></ul><li><a href="http://www.atatech.org/articles/47006#6">二、保证系统中单例的唯一性</a></li><ul><li><a href="http://www.atatech.org/articles/47006#7">1、防止反射机制破坏单例</a></li><li><a href="http://www.atatech.org/articles/47006#8">2、防止反序列化破坏单例</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

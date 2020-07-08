@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/44028 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化7- 启动阶段的问题和主要优化思路</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+                <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化7- 启动阶段的问题和主要优化思路
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 404</span>
+          <span class="info">
+                        <time class="" datetime="2015-11-09T17:55:36+08:00">2015-11-09 17:55:36</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/44028/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="性能优化 android " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="性能优化" class="item">性能优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="android" class="item">android<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">性能优化</a><a href="http://www.atatech.org/search?q=android&type=INSIDE_ARTICLE_TAG" class="label label-ata">android</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/44028/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; &nbsp;因为手淘的模块非常多，很多业务方都希望在启动的时候能把自己先初始化起来，加上手淘也是分了很多个dex文件的，这样在首次启动的时候不仅要dexpot这些业务模块的dex，另外主dex中的不少模块也有初始化动作。由于目前还缺少一些机制来合理管控这些模块的初始化以及它们初始化以后所做的事情。在CPU和内存以及IO的限制下，集中初始化的问题就显得非常的严重。6月份之前的版本，在中低端机上首次启动和滑动首页简直就是噩梦，有时会停住10秒多的时间，完全不响应滑动事件。<br><br>&nbsp; &nbsp; &nbsp; 所以在启动阶段我们主要遇到的问题有：<br><ul>
+<li><strong>启动界面停留太久</strong></li>
+<li><strong>到首页后卡住一段时间</strong></li>
+<li><strong>首页进入白屏一段时间</strong></li>
+<li><strong>优化以后的版本偶尔启动很慢</strong></li>
+</ul>
+&nbsp; &nbsp; &nbsp; 启动阶段的优化主要用到下面的一些方法：<br><h2 id="0">&nbsp; &nbsp; &nbsp;一、用TraceView分段并反复排查</h2>
+&nbsp; &nbsp; &nbsp; 首先使用TraceView工具分阶段排查，找出各个占用CPU资源较多的耗时点。我们要分段和多次的做Trace，因为时间太长会把当时很耗时占比很高的问题稀释掉，而且有些函数也不是每次都会执行，加上线程的启动时间差及网速等叠加因素都会对性能产生影响，即使同一时段的Trace也不会相同。所以要进行反复的分段Trace。当然，也要做比较时间长的Trace，来观察一整个时间段的情况，一个是查看线程的执行繁忙情况和起止时机，一个是查看整体耗时情况，特别是在优化的后期和用来验证某一个问题的时候，整个时间段的Trace会用的比较多一些。 <br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/75f627506aae8017ee5d8718b6003f7a60c9e014" alt="" width="1530"><br><br>&nbsp; &nbsp; &nbsp; 如上图所示，我们可以看到WindVane，配置中心，更新模块，统计模块等占用了大部分CPU时间，而且部分是主线程的时间。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/935424dcba12933c8d60f7cdd460de07ef2001a5" alt="" width="1234"><br><br>&nbsp; &nbsp; &nbsp; 另外一次Trace的结果，如上图，我们发现日志的输出和网络的访问占用了大部分的CPU时间，而且我们可以发现，日志中使用的日期格式化函数占比也很高。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/3e658fbef0eea1996d888fe043de2e033780c928" alt="" width="1519"><br>&nbsp; &nbsp;<br>&nbsp; &nbsp; &nbsp; &nbsp;第三次trace，又发现了地理围栏模块占用了大部分的CPU时间。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/3fac7649bbb9d965a8dd01a28a3b6fccd5b19ed8" alt="" width="1260"><br><br>&nbsp; &nbsp; &nbsp; &nbsp;从上图中，我们可以看到统计模块也比较占用的资源。<br><br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/1adca589694dce0d196863eba95a0294009c5a3b" alt="" width="1302"><br><br>&nbsp; &nbsp; &nbsp; &nbsp; 上图中，我们看到GC引起的问题，GC占用了较多CPU时间，也导致了主线程等线程的停顿。另外我们也可以发现，通过时间线面板中，除了main线程，其他线程也很繁忙。我们再看另外一次的trace的时间线面板。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/c422b359c40a80fcb28c9e95096b590c61ffe714" alt="" width="2000"><br><br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;上面列出了560ms的时间线面板，但是我们找不到Main线程的身影。前面很多线程都比较繁忙，main线程没有执行。<br>&nbsp; &nbsp; &nbsp; &nbsp;当然每次Trace的CPU百分比分布情况是不一样的，我们能发现的问题也会不一样。在修复一些主要问题后，其他次要的问题就会变成主要的耗时点，相对来说更容易暴露和发现，所以对启动过程的问题排查是一个比较耗时的过程，并不是简单几次跟踪就能解决问题。<br><br><h2 id="1">二、用Threads工具分析线程情况</h2>
+&nbsp; &nbsp; &nbsp; Threads工具会列出当前正在执行的线程情况，如下图所示：<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/ce712a9ce7eaf66421fcd9f347ca1522936709f9" alt="" width="668"><br><br>&nbsp; &nbsp; &nbsp;从上图我们可以看到，启动阶段超过了100个线程，另外还发现了很多线程名称混乱的问题，后面我们在线程治理的过程中也需要对线程名称做一些规范，方便后续的排查。除了查看线程的数量，我们还能在这里查看线程的耗时情况，排查哪些线程在启动阶段耗时最多。对于进入特别慢的时候，我们还可以通过查看该工具各个线程的调用栈情况来查看各个线程正在执行的代码。例如是否因为等待某个资源被挂起等等。<br><br><h2 id="2">三、搜集和分析GC情况</h2>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;从上面Trace过程中，我们也发现了GC的身影，它会造成主线程较长时间的停顿。如果GC越多，那停顿的时间就会越多。在三星的I9300设备上，我们启动阶段到首页加载和后台服务完成，89次左右的GC，从首页滑动到底部，也有将近85次的GC。<br>&nbsp; &nbsp; &nbsp; &nbsp;上一篇文章我们介绍了GC的相关知识点，即使是并行GC，也会有停顿的时间，而我们在I9300设备上几乎是看不到并行GC，都是GC_FOR_ALLOC类型的GC，因为我们太多的线程和模块，导致大量的小对象频繁的分配，引起了太多了内存碎片。这样多的GC次数对启动时间的影响也是很大的。所以我们有必要去优化和减少GC。<br>&nbsp; &nbsp; &nbsp; &nbsp;首先我们需要知道哪些模块GC特别多，可以通过SysTrace工具进行收集：<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/125348d68f04cdb18f56a8cb21523d992352cf1c" alt="" width="1978"><br><br>&nbsp;<img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/93e11dcb68e627660984d36bae1b6b1aea0bb1b1" alt="" width="1454">&nbsp; &nbsp; <br>&nbsp; &nbsp; &nbsp; &nbsp; 上图中可以看到在首页的预加载线程和网络访问相关线程中产生较多的GC。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/d356d19acf0dd786d39c2866748015505f2cba1c" alt="" width="1874"><br><br>&nbsp; &nbsp; &nbsp; 上图中，我们可以看到主线程和日志线程产生了较多的GC。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/91ea125e160fc4e16aeba485b03e14939ed53b70" alt="" width="2362"><br><br>&nbsp; &nbsp; &nbsp; 上面我们看到在网络相关的RepeaterThread中有频繁的GC，另外4个图片解码线程和UT统计线程也都会产生较多的GC。<br><br>&nbsp; &nbsp; &nbsp; 通过工具多次搜集和分析，我们可以大致锁定这些GC频繁的模块，然后再对这些模块分析原因。比如main线程中的字符串拼接和扩容，容器的遍历和扩容，infalte布局等都可能引起GC；网络线程和图片线程频繁的分配Byte接收内存，引起较多的GC，以及图片解码需要较大的内存块，很容易引起GC。在UT中，频繁的HashMap操作等也产生了较多的GC。<br><br></p>
+<h2 id="3">四、查看启动阶段的内存情况</h2>
+<p>&nbsp; &nbsp; &nbsp; 在启动后，我们通过Mat工具来分析启动后的内存情况，可以发现一些不必要的内存分配，通过引用对象占用的内存排序，或者通过以数量来排序，再查看容器等的使用比例，来确定内存的使用情况。如下图所示，可以发现占用内存的大户，也可以找出使用容器特别多的模块，并对这些模块做进一步的分析。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/f103ccabccc3062e4ec93991091aed8563a7870a" alt="" width="1024"><br><br>&nbsp; &nbsp; &nbsp; &nbsp;通过多种工具的配合，我们基本找出了那些占用CPU特别多的模块，引起GC频繁的模块，产生大量对象及无用对象的模块，以及各个模块的线程分布情况，找出问题后就可以对症下药了。<br><br></p>
+<h2 id="4">五、优化启动阶段</h2>
+<h3 id="5">5.1 线程治理</h3>
+&nbsp; &nbsp; &nbsp; 1）分析各个模块的线程数量，检查线程池的合理性。我们分析了网络库、MTOP、图片库、统计模块、地理定位模块等的线程和线程池使用情况。通过去掉不必要的线程和线程池，再控制线程池的并发数。<br>&nbsp; &nbsp; &nbsp; 2）减少启动阶段的线程以及控制线程的启动时机，对于很多启动就启动的线程需要分析是否有必要，比如一些模块拉配置和读写IO的操作是否合理等都需要做评估。<br>&nbsp; &nbsp; &nbsp; 3）线程太多，加上部分线程很繁忙会导致主线程很难分配到CPU，所以对于很繁忙的线程，分析原因和必要性，另外还可以分析是否有必要降低线程的优先级，例如设置为Android的Background优先级类型的线程。<br>&nbsp; &nbsp; &nbsp; 4）另外我们也需要对新的线程进行命名，这样方便后续的排查。<br>&nbsp; &nbsp; &nbsp; 5）架构组也做了统一线程池，这样可以减少业务方不必要的线程池数量，如果没有特别需求的可以统一使用框架提供的线程池。
+<h3 id="6">5.2 减少GC次数</h3>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;通过MAT等工具，找出那些分配过多的对象和数量特别多的对象，我们前面看到很多的容器，其实大部分都用不到，不需要在启动时就创建。我们也发现首页缓存的布局太多，也浪费了较多的资源，所以是需要合理减少缓存的数量。通过Systrace，我们可以发现在网络线程，统计，主线程等GC很多，所以对频繁创建的对象如网络库和图片库中的Byte数组，Buffer等做复用。对日志输出等做优化。后面在界面的优化过程中还会更详细的分析减少GC次数更详细的做法，这里就不展开太多。</p>
+<h3 id="7">5.3 主线程优化</h3>
+<p>&nbsp; &nbsp; 前面通过工具我们看到有较多的主线程中的耗时操作，所以需要将主线程中的耗时操作都异步处理或者移除。例如，我们发现，旺信的初始化在主线程中初始化，这样最简单的方法就是将该初始化异步线程处理，避免主线程长时间耗时。<br><br><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/5baee191b00d0bc80f0c2187312eec3af8ade980" alt="" width="2000"><br><br><br></p>
+<h3 id="8">5.4 减少IO操作、空间换时间</h3>
+<p>&nbsp; &nbsp; &nbsp; 通过TraceView可以发现SharedPreference有2个线程经常占用很多的CPU时间，还有几个下载文件的线程如update更新模块等以及数据库操作这些都是IO操作。我们的优化过程就是删除不必要的io操作，有些做延后处理。例如统计数据，我们减少了采样的频率，并且增加缓存数量，以空间换时间，减少数据库和SharedPreference的读写。<br>&nbsp; &nbsp; &nbsp; 对SharedPreference的文件大小和存放的数据做监控，避免文件太大和引起不必要的更新。SharedPreference这个后面将会更详细的介绍，这是一个容易忽略的性能点。<br>&nbsp; &nbsp; &nbsp; 在数据库的使用上也有较多的问题，在对ACCS和Appmonitor等模块中使用数据库的代码分析中也发现，每次执行SQL语句都会有个open数据库和close数据库的动作，这样完全没有必要。如果执行语句频繁，将会是一个比较大的IO性能点。数据库可以在需要的时候打开，不需要进行操作的时候比如退出模块的时候再去关闭。而且我们也发现在对多条SQL语句做操作的时候有些没有开启事务，这样性能会比较低。因为在对多条数据做insert和update等的时候，如果开启事务会减少IO操作，只会在最后事务执行完毕后才做IO写入。</p>
+<h3 id="9">5.5 懒加载、防止集中初始化</h3>
+<p>&nbsp; &nbsp; &nbsp;&nbsp;以前在启动阶段会安装主要模块的bundle，首页再启动后过3秒也会发送通知来唤起更多的模块进行初始化，像我们的WindVane，在初始化的时候会把线上活动资源都缓存到本地，这个过程涉及到json的解析，下载和解压缩等，非常耗资源。地理模块也会加载较多的地理数据解析，占用很多的CPU，等等，这些模块叠加在一起就导致了进入首页就会直接卡主及白屏很长一段时间，所以像windvane模块改为懒加载，并且后续要限制拉取活动的数量，毕竟用户不会每次都进入每个活动，拉取太多的活动实属浪费。还有像购物车，微淘，店铺，旺信等以前是首次启动就会安装，后来也是改为懒加载。因为首次Dexopt会比较费时，特别是安卓5.0以后会更久，所以将多个模块都改为懒加载，这样首次使用该模块的时候变慢一点，但是整体启动速度一下就提升了很多。</p>
+<h3 id="10">5.6 降级部分功能</h3>
+<p>&nbsp; &nbsp; &nbsp;像首页的摇一摇功能，平时并不会时刻用到，但是用了频率极高的游戏模式，这样会耗电和占用主线程的时间。所以对像摇一摇功能做了降级处理，降低检测频率。还有像地理位置信息，首页并没有需要用到精确的地理位置，没必要在这个过程中去使用精确的定位和获取太多的地理围栏信息，所以降级了地理围栏信息，首页粗略的地理信息改用服务端提供，防止该模块过多的资源占用。</p>
+<h3 id="11">5.7 首页预加载和退出不销毁</h3>
+<p>&nbsp; &nbsp; &nbsp; 以前首页在退出的时候整个Activity就退出了，重新启动会经过一个比较长的过程。为了加快后面的显示，首页也做了一部分改造，和微信类似，在退出的时候并不销毁Activity，只是退到后台，但是会释放图片等主要资源。在下次启动的时候就能更快的进入。另外，将欢迎页的界面从其他bundle转移到首页的模块，这样在欢迎页的时候就可以开始初始化首页的资源，做到加快展示。</p>
+<p>&nbsp; &nbsp; &nbsp;在经过一系列的优化后，启动方面已经有了明显的改善，在进入首页的时候也不会卡住一段时间不动了。启动到首页的GC次数也减少了一半以上，效果还是比较明显的。当然这只是我们在做优化的一个主要思路和部分优化过程，也没有解决掉全部的启动问题，即使双十一版本，我们也还遗留了不少的问题，目前也还是在进一步的优化中。比如在低内存环境下，装有很多APP和安全软件的用户手机上等等，都还有不少的问题，后面还需要进一步的优化。接下来也将通过几个案例来分析优化中遇到的一些具体问题和解决方法等。<br><br> &nbsp; &nbsp;&nbsp;</p>
+<p>&nbsp;</p>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/44028/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">4人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/70914" title="路竹"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_4f0e3dbb23a5d9a96eaa7d5ced36c4be.png_80x80" width="26" height="26" alt="路竹" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="26" height="26" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/97366" title="文生"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_7773bbc218aeb9ae80c0acf9733666c6.png_80x80" width="26" height="26" alt="文生" class="img-user"></a></li><li><a href="http://www.atatech.org/users/30626" title="行直"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_8385583a61497aa5d15857e068482a65.png_80x80" width="26" height="26" alt="行直" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/44028#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (3)
+                  </a>
+        <a href="http://www.atatech.org/articles/44028/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          9
+        </a>
+        <a href="http://www.atatech.org/articles/44028/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          10
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="44028" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/44028/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          2
+        </a>
+        <a href="http://www.atatech.org/articles/44028/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          3
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/141496" title="麦味"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_fd46ba0d4c0f4656fbad8c9c8a15253e.png_80x80" width="28" height="28" alt="麦味" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132816" title="皙华"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/img_20150519171629.jpg_80x80" width="28" height="28" alt="皙华" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150139" title="野崎"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_f278d48c403aed8c2375100ecc844ebe.png_80x80" width="28" height="28" alt="野崎" class="img-user"></a></li><li><a href="http://www.atatech.org/users/149611" title="无悬"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_identicon_e26dbcf1c01251e8be86c24c258969ca.png_80x80" width="28" height="28" alt="无悬" class="img-user"></a></li><li><a href="http://www.atatech.org/users/7896" title="达海"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_avatar_20120719180745_7896_60.jpeg_80x80" width="28" height="28" alt="达海" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23341" title="洛远"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/img_20141004153421.jpg_80x80" width="28" height="28" alt="洛远" class="img-user"></a></li><li><a href="http://www.atatech.org/users/7541" title="释然"><img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_avatar_20120719180742_7541_60.jpeg_80x80" width="28" height="28" alt="释然" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/29183">Android耗电量之WakeLock篇</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/42703">手淘安卓版性能优化1 - 性能相关概念介绍</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/31925">Android runtime resource overlay &amp; 性能调试工具</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/46313">手淘安卓版性能优化16 - 界面性能之帧...</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/42723">手淘安卓版性能优化2 - TraceView使用经验</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/30208">Android开发，Activity生命周期</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/43598">上一篇：手淘安卓版性能优化6 -  Dalvik虚拟机和ART运行时的介绍及对性能的影响</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/45112">下一篇：手淘安卓版性能优化8- 安全软件和同步锁对性能的影响案例</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-72071">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/7541" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_avatar_20120719180742_7541_60.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/7541" class="author">释然</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/44028#comment-72071" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-10T14:56:36+08:00">2015-11-10 14:56:36</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>不管再怎么优化，启动的时候你给我调神马支付宝、旅行等各种垃圾消息，都会被认为这是一个垃圾软件。</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/72071/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/72071/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-72071&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-72071">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-72071" style="display:none">
+      <div class="sub-comments media-list" id="comment-72071-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/72071/subcomments/" method="POST" data-remote="true" data-target="#comment-72071-sub" data-done="$(&#39;#sub-comments-count-72071&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-72138">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/72152" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/img_20150317095900.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/72152" class="author">桃六</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/44028#comment-72138" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-11T01:02:19+08:00">2015-11-11 01:02:19</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>关联的不要起太多哦～～</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/72138/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/72138/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-72138&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-72138">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-72138" style="display:none">
+      <div class="sub-comments media-list" id="comment-72138-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/72138/subcomments/" method="POST" data-remote="true" data-target="#comment-72138-sub" data-done="$(&#39;#sub-comments-count-72138&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-72330">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/67423" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/u_avatar_20130809071157_67423_60.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        3F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/67423" class="author">尽言</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/44028#comment-72330" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-12T21:27:36+08:00">2015-11-12 21:27:36</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>什么时候我厂的淘宝支付宝apk不用用来作为安卓手机性能评测软件，才是真的成功。</p>
+
+    </div>
+    
+        <div class="voters voters-p">
+  <span>文生</span>    <span>赞同</span>
+  </div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/72330/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <a href="http://www.atatech.org/comments/72330/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        2
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-72330&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-72330">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-72330" style="display:none">
+      <div class="sub-comments media-list" id="comment-72330-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/72330/subcomments/" method="POST" data-remote="true" data-target="#comment-72330-sub" data-done="$(&#39;#sub-comments-count-72330&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="44028">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/stat.php" type="text/javascript"></script><script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/stat(1).php" type="text/javascript"></script><script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%08%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%967-+%E5%90%AF%E5%8A%A8%E9%98%B6%E6%AE%B5%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E4%B8%BB%E8%A6%81%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F44028%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化7- 启动阶段的问题和主要优化思路", "", "", 'article-44028']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/44028#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘 安卓版性能优化7- 启动阶段的问题和主要优化思路_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: absolute; top: 9657px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/44028#0">&nbsp; &nbsp; &nbsp;一、用TraceView分段并反复排查</a></li><li><a href="http://www.atatech.org/articles/44028#1">二、用Threads工具分析线程情况</a></li><li><a href="http://www.atatech.org/articles/44028#2">三、搜集和分析GC情况</a></li><li><a href="http://www.atatech.org/articles/44028#3">四、查看启动阶段的内存情况</a></li><li><a href="http://www.atatech.org/articles/44028#4">五、优化启动阶段</a></li><ul><li><a href="http://www.atatech.org/articles/44028#5">5.1 线程治理</a></li><li><a href="http://www.atatech.org/articles/44028#6">5.2 减少GC次数</a></li><li><a href="http://www.atatech.org/articles/44028#7">5.3 主线程优化</a></li><li><a href="http://www.atatech.org/articles/44028#8">5.4 减少IO操作、空间换时间</a></li><li><a href="http://www.atatech.org/articles/44028#9">5.5 懒加载、防止集中初始化</a></li><li><a href="http://www.atatech.org/articles/44028#10">5.6 降级部分功能</a></li><li><a href="http://www.atatech.org/articles/44028#11">5.7 首页预加载和退出不销毁</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

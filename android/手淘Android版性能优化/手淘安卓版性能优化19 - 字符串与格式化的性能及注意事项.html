@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/46997 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 341</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-30T12:36:11+08:00">2015-12-30 12:36:11</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/46997/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="Android性能 java字符串 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="Android性能" class="item">Android性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="java字符串" class="item">java字符串<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=Android%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">Android性能</a><a href="http://www.atatech.org/search?q=java%E5%AD%97%E7%AC%A6%E4%B8%B2&type=INSIDE_ARTICLE_TAG" class="label label-ata">java字符串</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/46997/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 字符串是我们在开发过程中最为重要的对象之一。几乎每个模块中都有大量的字符串和对应的处理代码，而且占用了较多的内存。所以高效率的使用好字符串也是提升性能的一个关键因素之一。在对手淘的优化过程中，发现不少性能问题都是因为字符串使用不当的原因导致的。<br><h2 id="0">一、String的特点</h2>
+&nbsp; &nbsp; &nbsp;Java中字符串的创建主要有两种方法，new和直接赋值。如下所示：<br><br>&nbsp; &nbsp; &nbsp;String str1 = "test";<br>&nbsp; &nbsp; &nbsp;String str2 =&nbsp;"test";<br>&nbsp; &nbsp; &nbsp;String str3 = new String("test");<br><br>&nbsp; &nbsp; &nbsp;这里使用了3个String复制语句，str3采用new的方式创建。但是字符串在使用过程中<span style="color:#ff0000;">推荐使用直接赋值的方式创建</span>。因为Java为了避免系统中产生大量的字符串对象，系统对String做了优化，设计了一个字符串常量池，创建一个字符串时，会首先检查常量池中是否有相等的字符串，如果存在则不再创建，直接使用池中的引用。如果不存在，再创建并返回该对象的引用。所以，对于上面的创建方式中，str1&nbsp;==&nbsp;str2是返回true的。<br>&nbsp; &nbsp; 对于new String("test")的创建方式，str1 == str3是返回false的。直接new一个String对象是不会检查字符串常量池，也不会将字符串放到常量池，不过在这个用例中参数"test"本身就是一个常量。从设计的角度这个做法也是合乎常理的，我们在代码中用到字符串解析或者不确定的字符串的时候，一般都是通过+号或者通过Object的toString方法，最终也都是通过new String()来实现的，如果new String()需要操作常量池，并放到常量池的话，效率上肯定会有较大的影响，而且也会大大增加常量池的内存使用。我们来看一下String的源码，这样便于理解：<br><pre><code class="hljs applescript">    /**
+     * Initializes this <span class="hljs-built_in">string</span> <span class="hljs-keyword">to</span> <span class="hljs-keyword">contain</span> <span class="hljs-keyword">the</span> <span class="hljs-built_in">characters</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">the</span> specified
+     * <span class="hljs-built_in">character</span> array. Modifying <span class="hljs-keyword">the</span> <span class="hljs-built_in">character</span> array <span class="hljs-keyword">after</span> creating <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span>
+     * has no effect <span class="hljs-keyword">on</span> <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span>.
+     *
+     * @throws NullPointerException <span class="hljs-keyword">if</span> {@code data == null}
+     */
+    public String(char[] data) {
+        this(data, <span class="hljs-number">0</span>, data.<span class="hljs-built_in">length</span>);
+    }
+
+    /**
+     * Initializes this <span class="hljs-built_in">string</span> <span class="hljs-keyword">to</span> <span class="hljs-keyword">contain</span> <span class="hljs-keyword">the</span> specified <span class="hljs-built_in">characters</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">the</span>
+     * <span class="hljs-built_in">character</span> array. Modifying <span class="hljs-keyword">the</span> <span class="hljs-built_in">character</span> array <span class="hljs-keyword">after</span> creating <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span>
+     * has no effect <span class="hljs-keyword">on</span> <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span>.
+     *
+     * @throws NullPointerException
+     *             <span class="hljs-keyword">if</span> {@code data == null}.
+     * @throws IndexOutOfBoundsException
+     *             <span class="hljs-keyword">if</span> {@code charCount &lt; <span class="hljs-number">0</span> || <span class="hljs-built_in">offset</span> &lt; <span class="hljs-number">0</span> || <span class="hljs-built_in">offset</span> + charCount &gt; data.<span class="hljs-built_in">length</span>}
+     */
+    public String(char[] data, int <span class="hljs-built_in">offset</span>, int charCount) {
+        <span class="hljs-keyword">if</span> ((<span class="hljs-built_in">offset</span> | charCount) &lt; <span class="hljs-number">0</span> || charCount &gt; data.<span class="hljs-built_in">length</span> - <span class="hljs-built_in">offset</span>) {
+            throw failedBoundsCheck(data.<span class="hljs-built_in">length</span>, <span class="hljs-built_in">offset</span>, charCount);
+        }
+        this.<span class="hljs-built_in">offset</span> = <span class="hljs-number">0</span>;
+        this.value = new char[charCount];
+        this.<span class="hljs-built_in">count</span> = charCount;
+        System.arraycopy(data, <span class="hljs-built_in">offset</span>, value, <span class="hljs-number">0</span>, <span class="hljs-built_in">count</span>);
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;从源码中，我们也可以看到，new String("test")这样的写法会创建一个新的String对象，并分配一个new char数组用来拷贝传入的字符串数据。不过String类有一个intern()方法，它会检查字符串常量池，如果有会返回常量池中的引用，如果没有则会存入常量池并返回该引用。这是一个native方法，代码如下所示：</p>
+<pre><code class="hljs applescript">    /**
+     * Returns an interned <span class="hljs-built_in">string</span> <span class="hljs-keyword">equal</span> <span class="hljs-keyword">to</span> this <span class="hljs-built_in">string</span>. The VM maintains an internal <span class="hljs-keyword">set</span> <span class="hljs-keyword">of</span>
+     * unique strings. All <span class="hljs-built_in">string</span> literals found <span class="hljs-keyword">in</span> loaded classes'
+     * <span class="hljs-built_in">constant</span> pools are automatically interned. Manually-interned strings are only weakly
+     * referenced, so calling {@code intern} won't lead <span class="hljs-keyword">to</span> unwanted retention.
+     *
+     * &lt;p&gt;Interning <span class="hljs-keyword">is</span> typically used because <span class="hljs-keyword">it</span> guarantees <span class="hljs-keyword">that</span> <span class="hljs-keyword">for</span> interned strings
+     * {@code a} <span class="hljs-keyword">and</span> {@code b}, {@code a.<span class="hljs-keyword">equals</span>(b)} can be simplified <span class="hljs-keyword">to</span>
+     * {@code a == b}. (This <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">of</span> non-interned strings.)
+     *
+     * &lt;p&gt;Many applications find <span class="hljs-keyword">it</span> simpler <span class="hljs-keyword">and</span> more convenient <span class="hljs-keyword">to</span> use an explicit
+     * {@link java.util.HashMap} <span class="hljs-keyword">to</span> implement their own pools.
+     */
+    public native String intern();
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;如果我们调用str1 == str3.intern()方法的话，也会返回true。<span style="color:#ff0000;">对于intern()的方法的用处，可以在代码中将后面预见到会反复用到的String添加到常量池中，以便后续使用该字符串的时候可以节约存储空间和提升效率。例如，我们先把s字符串加入到常量池，后续的字符串可以通过new String(s.intern());的方式来创建，这样就能减少内部char[] value的重新分配。</span></p>
+&nbsp; &nbsp; <span style="color:#ff0000;">String在性能的提升上还做了另一个优化，那就是不变模式，这也是前面能够使用常量池来优化的基础</span>，String类中所有修改并返回String时都不会修改源对象，在多线程中不需要对String变量进行同步，保证了多线程的安全性也可以提升多线程下的效率。<br><h2 id="1">二、正确使用字符串拼接</h2>
+&nbsp; &nbsp; 字符串拼接常见的有+号，String类的方法，StringBuilder和StringBuffer等几个方式。
+<h3 id="2">1) +号拼接字符串</h3>
+&nbsp; &nbsp; 例如：str += "test";<br><br>&nbsp; &nbsp; 对于这样的字符串拼接方法我们可谓信手拈来，其本身也便于使用。在Log打印、Sql语句、toString()方法中也是随处可见。不是经常调用的代码中这样的写法当然不会有什么问题，但是在频率较高的情况下，+号的性能问题就会暴露出来，这是几种字符串拼接中性能最差的一个，与其简单易懂的写法刚好相反。好事多磨，即使在写代码过程中，也一样适用。<br>&nbsp; &nbsp; 为什么这个写法性能会最差？虽然编译器会对字符串+号做优化，但是它毕竟没有那么智能。我们来看一下上面用例优化后的代码：<br><br>&nbsp; &nbsp; str = new StringBuilder(str).append("test").toString();<br><br>&nbsp; &nbsp; 在每次字符串变量相加的时候，编译器会先创建一个StringBuilder对象，然后用append方法追加后面的其他字符串，最后通过toString()方法，生成新的String对象。对于追加的字符串如果比较多的话，还会触发StringBuilder的扩容。所以在较高频率的代码中，使用+号拼接字符串，即使编译器做了优化，还是会很频繁的产生对象，给性能和GC带来影响。<br><h3 id="3">2) String.concat方法拼接字符串</h3>
+&nbsp; &nbsp;&nbsp;concat方法在代码中我们使用的不多，很多人并不熟悉。因为其性能也不好，所以这里也不建议大家使用。我们看下该函数的源码：<br><pre><code class="hljs applescript">    /**
+     * Concatenates this <span class="hljs-built_in">string</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">the</span> specified <span class="hljs-built_in">string</span>.
+     *
+     * @param <span class="hljs-built_in">string</span>
+     *            <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">to</span> concatenate
+     * @<span class="hljs-literal">return</span> a new <span class="hljs-built_in">string</span> which <span class="hljs-keyword">is</span> <span class="hljs-keyword">the</span> concatenation <span class="hljs-keyword">of</span> this <span class="hljs-built_in">string</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">the</span>
+     *         specified <span class="hljs-built_in">string</span>.
+     */
+    public String concat(String <span class="hljs-built_in">string</span>) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.<span class="hljs-built_in">count</span> &gt; <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">count</span> &gt; <span class="hljs-number">0</span>) {
+            char[] buffer = new char[<span class="hljs-built_in">count</span> + <span class="hljs-built_in">string</span>.<span class="hljs-built_in">count</span>];
+            System.arraycopy(value, <span class="hljs-built_in">offset</span>, buffer, <span class="hljs-number">0</span>, <span class="hljs-built_in">count</span>);
+            System.arraycopy(<span class="hljs-built_in">string</span>.value, <span class="hljs-built_in">string</span>.<span class="hljs-built_in">offset</span>, buffer, <span class="hljs-built_in">count</span>, <span class="hljs-built_in">string</span>.<span class="hljs-built_in">count</span>);
+<span class="hljs-built_in">            return</span> new String(<span class="hljs-number">0</span>, buffer.<span class="hljs-built_in">length</span>, buffer);
+        }
+<span class="hljs-built_in">        return</span> <span class="hljs-built_in">count</span> == <span class="hljs-number">0</span> ? <span class="hljs-built_in">string</span> : this;
+    }</code></pre>
+&nbsp; &nbsp; &nbsp;虽然内部都使用了系统的数组拷贝，但是每次调用该函数都会new一个String对象，所以在较高频率情况下使用，也会遇到与“+”号一样的性能问题。<br><br><h3 id="4">3) StringBuilder/StringBuffer的append方法拼接字符串</h3>
+&nbsp; &nbsp; StringBuilder/StringBuffer的append方法直接由AbstractStringBuilder方法的append0(String string)实现。我们可以看下代码的实现，首先是StringBuilder和StringBuffer中该函数的代码：
+<pre><code class="hljs applescript">    /**
+     * Appends <span class="hljs-keyword">the</span> <span class="hljs-built_in">contents</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> specified <span class="hljs-built_in">string</span>. If <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">is</span> {@code
+     * null}, <span class="hljs-keyword">then</span> <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span> {@code <span class="hljs-string">"null"</span>} <span class="hljs-keyword">is</span> appended.
+     *
+     * @param str
+     *            <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">to</span> append.
+     * @<span class="hljs-literal">return</span> this builder.
+     */
+    public StringBuilder append(String str) {
+        append0(str);
+<span class="hljs-built_in">        return</span> this;
+    }
+<span class="hljs-comment">---------------------------------------------------------------------------------------------------------</span>
+    /**
+     * Adds <span class="hljs-keyword">the</span> specified <span class="hljs-built_in">string</span> <span class="hljs-keyword">to</span> <span class="hljs-keyword">the</span> <span class="hljs-keyword">end</span> <span class="hljs-keyword">of</span> this buffer.
+     * &lt;p&gt;
+     * If <span class="hljs-keyword">the</span> specified <span class="hljs-built_in">string</span> <span class="hljs-keyword">is</span> {@code null} <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span> {@code <span class="hljs-string">"null"</span>} <span class="hljs-keyword">is</span>
+     * appended, otherwise <span class="hljs-keyword">the</span> <span class="hljs-built_in">contents</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> specified <span class="hljs-built_in">string</span> <span class="hljs-keyword">is</span> appended.
+     *
+     * @param <span class="hljs-built_in">string</span>
+     *            <span class="hljs-keyword">the</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">to</span> append (may be null).
+     * @<span class="hljs-literal">return</span> this StringBuffer.
+     */
+    public synchronized StringBuffer append(String <span class="hljs-built_in">string</span>) {
+        append0(<span class="hljs-built_in">string</span>);
+<span class="hljs-built_in">        return</span> this;
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp; 他们都是直接调用父类AbstractStringBuilder的拼接的字符串函数实现的，代码如下所示：<br>&nbsp;</p>
+<pre><code class="hljs hsp">    final void append0(String string) {
+        <span class="hljs-keyword">if</span> (string == null) {
+            appendNull()<span class="hljs-comment">;</span>
+            <span class="hljs-keyword">return</span><span class="hljs-comment">;</span>
+        }
+        <span class="hljs-keyword">int</span> <span class="hljs-keyword">length</span> = string.<span class="hljs-keyword">length</span>()<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">int</span> newCount = count + <span class="hljs-keyword">length</span><span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> (newCount &gt; value.<span class="hljs-keyword">length</span>) {
+            enlargeBuffer(newCount)<span class="hljs-comment">;</span>
+        }
+        string._getChars(<span class="hljs-number">0</span>, <span class="hljs-keyword">length</span>, value, count)<span class="hljs-comment">;</span>
+        count = newCount<span class="hljs-comment">;</span>
+    }</code></pre>
+<p>&nbsp; &nbsp; 在append方法中都是字符数组的操作，如果不需要扩容就没有涉及到对象的分配，只有在toString()方法调用的时候才会生成一个新的String对象，所以采用StringBuilder/StringBuffer的append方法拼接字符串性能是最好的。<br>&nbsp; &nbsp; 在StringBuffer的append代码中，我们前面也看到了synchronized关键字，所以StringBuffer是线程安全的，而StringBuilder是线程不安全的。在单线程环境下，使用StringBuilder性能会更好。<br>&nbsp; &nbsp; 我们使用两段简单的代码来测试一下性能的差别（在三星I9300设备上），10000次的字符串拼接：</p>
+<pre><code class="hljs hsp">	private void testStringPlus() {
+		String <span class="hljs-keyword">str</span> = <span class="hljs-string">"test"</span><span class="hljs-comment">;</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; 10000; i++) {</span>
+			<span class="hljs-keyword">str</span> = <span class="hljs-keyword">str</span> + i<span class="hljs-comment">;</span>
+		}
+	}
+	
+	private void StringBuilder() {
+		StringBuffer builder = new StringBuilder()<span class="hljs-comment">;</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; 10000; i++) {</span>
+			builder.append(i)<span class="hljs-comment">;</span>
+		}
+	}</code></pre>
+&nbsp; &nbsp; &nbsp;通过+号的平均耗时4300ms，而通过StringBuilder的只要15ms，两者性能相差悬殊。<br><br><h3 id="5">4）StringBuilder/StringBuffer初始容量对性能的影响</h3>
+&nbsp; &nbsp;在创建StringBuilder/StringBuffer的时候，可以和其他容器一样，指定好初始容量，一方面可以减少内存的占用，同时也能提升性能。在拼接字符串的过程中，如果容量不够，AbstractStringBuilder就会进行扩容，我们看下AbstractStringBuilder类中关于扩容的函数。
+<pre><code class="hljs fortran">    <span class="hljs-keyword">public</span> void ensureCapacity(<span class="hljs-built_in">int</span> <span class="hljs-built_in">min</span>) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">min</span> &gt; <span class="hljs-keyword">value</span>.length) {
+            <span class="hljs-built_in">int</span> ourMin = <span class="hljs-keyword">value</span>.length*<span class="hljs-number">2</span> + <span class="hljs-number">2</span>;
+            enlargeBuffer(Math.<span class="hljs-built_in">max</span>(ourMin, <span class="hljs-built_in">min</span>));
+        }
+    }
+
+    <span class="hljs-keyword">private</span> void enlargeBuffer(<span class="hljs-built_in">int</span> <span class="hljs-built_in">min</span>) {
+        <span class="hljs-built_in">int</span> newCount = ((<span class="hljs-keyword">value</span>.length &gt;&gt; <span class="hljs-number">1</span>) + <span class="hljs-keyword">value</span>.length) + <span class="hljs-number">2</span>;
+        <span class="hljs-built_in">char</span>[] newData = new <span class="hljs-built_in">char</span>[<span class="hljs-built_in">min</span> &gt; newCount ? <span class="hljs-built_in">min</span> : newCount];
+        System.arraycopy(<span class="hljs-keyword">value</span>, <span class="hljs-number">0</span>, newData, <span class="hljs-number">0</span>, <span class="hljs-built_in">count</span>);
+        <span class="hljs-keyword">value</span> = newData;
+        shared = false;
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;可以看到AbstractStringBuilder是接近1.5倍的容量来扩容，所以在字符串越长的情况下，不指定初始值浪费的空间可能会越多。另外由于每次扩容需要重新分配new char数组和做一次数组的拷贝，所以性能上有额外的损耗。虽然这里采用的都是系统库的函数，在分配和数组操作上性能很快，但是频繁的扩容会产生额外的小对象数组的分配，这部分对性能的影响会更大。例如，我们使用以下代码进行测试，为了放大小对象分配对性能的影响，我们分别同时启动10个Thread来运行如下的代码：</p>
+<pre><code class="hljs hsp">	private void testStringBuilder1() {
+		StringBuilder builder = new StringBuilder()<span class="hljs-comment">;</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt;= 100000; i++) {</span>
+			builder.append(i)<span class="hljs-comment">;</span>
+		}
+	}
+
+	private void testStringBuilder2() {
+		StringBuilder builder = new StringBuilder(<span class="hljs-number">500000</span>)<span class="hljs-comment">;</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt;= 100000; i++) {</span>
+			builder.append(i)<span class="hljs-comment">;</span>
+		}
+	}</code></pre>
+<p>&nbsp; &nbsp; 测试的结果如下，我们可以看到，两者运行CPU的时间差别不大，但是实际运行时间有比较多的差别，在没有指定初始值的时候是6341ms，在指定初始值的情况下是4503ms。<br><br>&nbsp; &nbsp; 在没有初值情况下：<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/91e154f79aa5e4087bd96e1e925bf1d119438d4d.png" alt="" width="1356"><br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/205c7201cbfa2e95429f417d5f4b1dc880a9d11b.png" alt="" width="1258"><br><br>&nbsp; &nbsp; 在指定了初始值的情况下：<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/e5e2b78e93a19f4e7f3f88374fbeef56f72564e0.png" alt="" width="1370"></p>
+<img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/3d85be059fe4b14fd2cce7c2c4269de4b41f44d4.png" alt="" width="1254"><br><br>&nbsp; &nbsp; 通过上面，不难发现两者在GC的次数和执行时间上有较大的差别，导致了两者在实际运行时间上的性能差别较大。而在手淘这样的大型App中，字符串的使用是相当的频繁的，扩容带来的性能开销也不能忽略，特别是在高频率的函数中，我们应该尽量指定合理的初始容量。<br><h2 id="6">三、字符串的拆分性能</h2>
+&nbsp; &nbsp; 字符串的拆分主要有split方法、StringTokenizer、indexOf+substring等方法来实现。在这几个方法中StringTokenizer的性能是最快的，indexOf+substring其次，而split方法最慢。通过一段程序，我们可以大致了解这几种方式的性能差别：<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/ef03dbfe1ef113e91e4aa0341446075a151bf208.jpeg" alt="" width="915"><br><br>&nbsp; &nbsp; 通过上面的测试我们可以看到，split和StringTokenizer相差十分的悬殊。StringTokenizer和indexOf+substring的方式相差并不大。为什么会这样？我们可以查看一下相关的代码，首先看StringTokenizer的拆分代码：<br><br><pre><code class="hljs hsp">  <span class="hljs-comment">/**
+     * Returns the next token in the string as a {@code String}.
+     *
+     * @return next token in the string as a {@code String}.
+     * @throws NoSuchElementException
+     *                if no tokens remain.
+     */</span>
+    public String nextToken() {
+        <span class="hljs-keyword">if</span> (delimiters == null) {
+            throw new NullPointerException()<span class="hljs-comment">;</span>
+        }
+        <span class="hljs-keyword">int</span> i = position<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">int</span> <span class="hljs-keyword">length</span> = string.<span class="hljs-keyword">length</span>()<span class="hljs-comment">;</span>
+
+        <span class="hljs-keyword">if</span> (i &lt; <span class="hljs-keyword">length</span>) {
+            <span class="hljs-keyword">if</span> (returnDelimiters) {
+                <span class="hljs-keyword">if</span> (delimiters.indexOf(string.charAt(position), <span class="hljs-number">0</span>) &gt;= <span class="hljs-number">0</span>)
+                    <span class="hljs-keyword">return</span> String.valueOf(string.charAt(position++))<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">for</span> (position++<span class="hljs-comment">; position &lt; length; position++)</span>
+                    <span class="hljs-keyword">if</span> (delimiters.indexOf(string.charAt(position), <span class="hljs-number">0</span>) &gt;= <span class="hljs-number">0</span>)
+                        <span class="hljs-keyword">return</span> string.substring(i, position)<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">return</span> string.substring(i)<span class="hljs-comment">;</span>
+            }
+
+            <span class="hljs-keyword">while</span> (i &lt; <span class="hljs-keyword">length</span> &amp;&amp; delimiters.indexOf(string.charAt(i), <span class="hljs-number">0</span>) &gt;= <span class="hljs-number">0</span>)
+                i++<span class="hljs-comment">;</span>
+            position = i<span class="hljs-comment">;</span>
+            <span class="hljs-keyword">if</span> (i &lt; <span class="hljs-keyword">length</span>) {
+                <span class="hljs-keyword">for</span> (position++<span class="hljs-comment">; position &lt; length; position++)</span>
+                    <span class="hljs-keyword">if</span> (delimiters.indexOf(string.charAt(position), <span class="hljs-number">0</span>) &gt;= <span class="hljs-number">0</span>)
+                        <span class="hljs-keyword">return</span> string.substring(i, position)<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">return</span> string.substring(i)<span class="hljs-comment">;</span>
+            }
+        }
+        throw new NoSuchElementException()<span class="hljs-comment">;</span>
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;其整体思路和indexOf+substring类似，但是在算法上还用了char的一些操作，性能会更优。而split的代码我们可以看下：</p>
+<pre><code class="hljs gherkin">
+    /<span class="hljs-keyword">*</span><span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> Splits this string using the supplied {<span class="hljs-meta">@code</span> regularExpression}.
+     <span class="hljs-keyword">*</span> Equivalent to {<span class="hljs-meta">@code</span> split(regularExpression, 0)}.
+     <span class="hljs-keyword">*</span> See {<span class="hljs-meta">@link</span> Pattern<span class="hljs-comment">#split(CharSequence, int)} for an explanation of {@code limit}.</span>
+     <span class="hljs-keyword">*</span> See {<span class="hljs-meta">@link</span> Pattern} for regular expression syntax.
+     <span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> <span class="hljs-variable">&lt;p&gt;</span>If the same regular expression is to be used for multiple operations, it may be more
+     <span class="hljs-keyword">*</span> efficient to reuse a compiled {<span class="hljs-meta">@code</span> Pattern}.
+     <span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@throws</span> NullPointerException if {<span class="hljs-meta">@code</span> regularExpression ==  null}
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@throws</span> PatternSyntaxException
+     <span class="hljs-keyword">*</span>             if the syntax of the supplied regular expression is not
+     <span class="hljs-keyword">*</span>             valid.
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@see</span> Pattern
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@since</span> 1.4
+     <span class="hljs-keyword">*</span>/
+    public String[] split(String regularExpression) {
+        return split(regularExpression, 0);
+    }
+
+    /<span class="hljs-keyword">*</span><span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> Splits this string using the supplied {<span class="hljs-meta">@code</span> regularExpression}.
+     <span class="hljs-keyword">*</span> See {<span class="hljs-meta">@link</span> Pattern<span class="hljs-comment">#split(CharSequence, int)} for an explanation of {@code limit}.</span>
+     <span class="hljs-keyword">*</span> See {<span class="hljs-meta">@link</span> Pattern} for regular expression syntax.
+     <span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> <span class="hljs-variable">&lt;p&gt;</span>If the same regular expression is to be used for multiple operations, it may be more
+     <span class="hljs-keyword">*</span> efficient to reuse a compiled {<span class="hljs-meta">@code</span> Pattern}.
+     <span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@throws</span> NullPointerException if {<span class="hljs-meta">@code</span> regularExpression ==  null}
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@throws</span> PatternSyntaxException
+     <span class="hljs-keyword">*</span>             if the syntax of the supplied regular expression is not
+     <span class="hljs-keyword">*</span>             valid.
+     <span class="hljs-keyword">*</span> <span class="hljs-meta">@since</span> 1.4
+     <span class="hljs-keyword">*</span>/
+    public String[] split(String regularExpression, int limit) {
+        String[] result = java.util.regex.Splitter.fastSplit(regularExpression, this, limit);
+        return result != null ? result : Pattern.compile(regularExpression).split(this, limit);
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;通过源码，我们可以看到，split函数用了正则表达式来拆分，这个过程中需要分配正则表达式相关的对象，性能上就会明显下降。在高频率下还会更加明显，因为上一篇文章中，提到正则表达式相关的几个类重写了finalize方法，而该方法会影响GC的性能，导致性能上更慢。<br>&nbsp; &nbsp; &nbsp;<strong><span style="color:#ff0000;">所以我们在做字符串拆分的时候请使用StringTokenizer来实现，避免使用String类的split方法。</span></strong></p>
+<h2 id="7">四、字符串的查找性能</h2>
+&nbsp; &nbsp; 我们常用的字符串查找使用的是String类的indexOf/startsWith/endsWith/matches等方法。indexOf使用的是native方法及字符数组的操作，用于查找字符串的位置很性能很高。startsWith和endsWith使用的是数组操作和字符比较，在比较前后几位的时候性能也很高。但是<span style="color:#ff0000;">matches方法使用的是正则表达式，所以性能上会差很多</span>。通过源码我们就可以比较清晰的了解：<br><br><pre><code class="hljs aspectj">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">startsWith</span><span class="hljs-params">(String prefix)</span> </span>{
+        <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">startsWith</span><span class="hljs-params">(prefix, <span class="hljs-number">0</span>)</span></span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">startsWith</span><span class="hljs-params">(String prefix, <span class="hljs-keyword">int</span> start)</span> </span>{
+        <span class="hljs-function"><span class="hljs-keyword">return</span> <span class="hljs-title">regionMatches</span><span class="hljs-params">(start, prefix, <span class="hljs-number">0</span>, prefix.count)</span></span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">regionMatches</span><span class="hljs-params">(<span class="hljs-keyword">int</span> thisStart, String string, <span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> length)</span> </span>{
+        <span class="hljs-keyword">if</span> (string == <span class="hljs-keyword">null</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+        }
+        <span class="hljs-keyword">if</span> (start &lt; <span class="hljs-number">0</span> || string.count - start &lt; length) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        }
+        <span class="hljs-keyword">if</span> (thisStart &lt; <span class="hljs-number">0</span> || count - thisStart &lt; length) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        }
+        <span class="hljs-keyword">if</span> (length &lt;= <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        }
+        <span class="hljs-keyword">int</span> o1 = offset + thisStart, o2 = string.offset + start;
+        <span class="hljs-keyword">char</span>[] value1 = value;
+        <span class="hljs-keyword">char</span>[] value2 = string.value;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; length; ++i) {
+            <span class="hljs-keyword">if</span> (value1[o1 + i] != value2[o2 + i]) {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            }
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">matches</span><span class="hljs-params">(String regularExpression)</span> </span>{
+        <span class="hljs-function"><span class="hljs-keyword">return</span> Pattern.<span class="hljs-title">matches</span><span class="hljs-params">(regularExpression, <span class="hljs-keyword">this</span>)</span></span>;
+    }
+</code></pre>
+<p>&nbsp; &nbsp; 所以在对于字符串查找的过程中，我们<span style="color:#ff0000;">尽可能不要使用matches方法，用其他方式代替</span>。</p>
+<h2 id="8">五、字符串格式化性能</h2>
+&nbsp; &nbsp; 想到字符串的格式化，相信很多人会马上想到String.format()方法，String内置了字符串格式化的方法，不仅功能强大，使用也很方便。只是该方法的性能十分的糟糕，在高频函数中，使用该方法将直接导致卡顿等性能问题，比如我们看到在trace的过程中，发现该函数占了23%以上的CPU时间。<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/4e41d85484288dd30074d04d93f67bdc52d4d3ae.jpeg" alt="" width="889"><br><br>&nbsp; &nbsp; 我们不妨看下String.format()方法的源码：<br><pre><code class="hljs stata">    public static String <span class="hljs-keyword">format</span>(String <span class="hljs-keyword">format</span>, Object... <span class="hljs-keyword">args</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">format</span>(Locale.getDefault(), <span class="hljs-keyword">format</span>, <span class="hljs-keyword">args</span>);
+    }
+
+    public static String <span class="hljs-keyword">format</span>(Locale locale, String <span class="hljs-keyword">format</span>, Object... <span class="hljs-keyword">args</span>) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">format</span> == null) {
+            throw new NullPointerException(<span class="hljs-string">"null format argument"</span>);
+        }
+        int bufferSize = <span class="hljs-keyword">format</span>.<span class="hljs-built_in">length</span>() + (<span class="hljs-keyword">args</span> == null ? 0 : <span class="hljs-keyword">args</span>.length * 10);
+        Formatter f = new Formatter(new StringBuilder(bufferSize), locale);
+        <span class="hljs-keyword">return</span> f.<span class="hljs-keyword">format</span>(<span class="hljs-keyword">format</span>, <span class="hljs-keyword">args</span>).<span class="hljs-keyword">toString</span>();
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;从源码我们就能发现每次调用format方法就会生成一个Formatter对象、StringBuilder对象和String对象，这也是在高频率函数中导致性能下降的主要原因。<br><br>&nbsp; &nbsp; 因为format性能低下，所以我们在使用字符串的时候，尽量要避免用Formatter来格式化，在大部分时候我们都可以通过StringBuilder的字符串拼接来完成，虽然实现上繁琐了一点，但是性能却能提升很多。如果实在复杂到没法拼接，比如复杂的浮点数控制等，也应该直接使用Formatter类来实现，并需要复用Formatter和StringBuilder。我们通过以下几段代码来测试大致的性能，在三星的I9300设备上，运行10万次的平均时间：<br><br></p>
+<pre><code class="hljs hsp">	private void testformat1() {
+		String <span class="hljs-keyword">str</span> = <span class="hljs-string">"abcdefg11111 %d %s %f"</span><span class="hljs-comment">;</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; 100000; i++) {</span>
+                        Formatter formatter = new Formatter(strBuilder)<span class="hljs-comment">;</span>
+			formatter.format(<span class="hljs-keyword">str</span>, i, <span class="hljs-string">"aaa"</span>, <span class="hljs-number">1.2345554</span>f)<span class="hljs-comment">;</span>
+			strBuilder.substring(<span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+			strBuilder.setLength(<span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+		}
+	}
+
+	private void testformat2() {
+		String floatStr = String.valueOf(<span class="hljs-number">1.2345554</span>f)<span class="hljs-comment">;</span>
+		String <span class="hljs-keyword">str</span> = <span class="hljs-string">"abcdefg11111 %d %s %f"</span><span class="hljs-comment">;</span>
+		StringBuilder strBuilder = new StringBuilder(<span class="hljs-number">150</span>)<span class="hljs-comment">;</span>
+		Formatter formatter = new Formatter(strBuilder)<span class="hljs-comment">;</span>
+
+		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; 100000; i++) {</span>
+			formatter.format(str2, i, <span class="hljs-string">"aaa"</span>)<span class="hljs-comment">;</span>
+			strBuilder.append(floatStr)<span class="hljs-comment">;</span>
+			strBuilder.substring(<span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+			strBuilder.setLength(<span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+		}
+	}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;通过上面的测试结果，testformat1()因为没有复用Formatter对象，耗时与String.format耗时相差不大，耗时在12000ms左右；testformat2()复用了Formatter和StringBuilder对象，并且复用了float的String，耗时在4100ms左右；如果直接使用StringBuilder拼接并且复用的话，耗时只要585ms，几种做法在耗时上相差悬殊。<br>&nbsp; &nbsp; 另外，Formatter对象在格式化的时候，和被格式化的参数有关。参数是String的性能较快，而参数是浮点数float等就会慢很多，这个与其他类型转换为字符串类型时候的性能有关。</p>
+<h3 id="9">1）Formatter对象的复用</h3>
+&nbsp; &nbsp; 前面的用例中已经演示了Formatter对象的复用，只要创建一个Formatter对象，然后在构造函数中传入StringBuilder对象。通过StringBuilder的反复使用，就可以复用这个Formatter对象。虽然复用Formatter对性能有提升，但是Formatter过程中还是会分配其他内部类对象，格式化的功能强大，代码也比较复杂，所以尽量应该使用StringBuilder做字符串的拼接来代替格式化。当格式化多个参数的时候，即使是遇到浮点数，也可以只是对浮点数部分做format，其他部分仍然使用StringBuilder字符串拼接，这样性能仍然好于全部使用Formatter对象来格式化。<br><h3 id="10">2）SimpleDateFormatd的复用</h3>
+&nbsp; &nbsp; SimpleDateFormatd也是一个较为耗时的函数，在高频率函数中也是需要复用并尽可能不使用。<br>&nbsp; &nbsp; 通过SimpleDateFormatd.applyPattern(“yyyy-MM-dd HH:mm:ss”) 可以重新设置格式<br>&nbsp; &nbsp; 通过 SimpleDateFormatd.format(data, buffer, fieldPos) 可以把格式化结果输出到指定的buffer中，该buffer可以通过StingBuilder做复用。<br><br>&nbsp; &nbsp; <strong><span style="color:#ff0000;">上面是通过每次格式化实现日期的格式化，另外我们还可以通过只格式化一次当前的字符串，拿到年月日等，后续通过时间的差值，自己来计算和拼接日期的格式，这样实现虽然有点复杂，但是性能就会很高。</span></strong><br><h3 id="11">3）StringBuilder的复用</h3>
+&nbsp; &nbsp;&nbsp;StringBuilder的复用主要通过substring、setLength、delete三个方法来实现。我们可以通过setLength(0)或者delete(0,StringBuilder.length())方法将StringBuilder的内容清空以便复用。<span style="color:#ff0000;">而要获得StringBuilder的内容，则需要通过substring(0)来实现，并非toString()方法。</span>我们可以看下相关的源码，<br><br><pre><code class="hljs hsp">    <span class="hljs-comment">/**
+     * Returns the String value of the subsequence from the {@code start} index
+     * to the current end.
+     *
+     * @param start
+     *            the inclusive start index to begin the subsequence.
+     * @return a String containing the subsequence.
+     * @throws StringIndexOutOfBoundsException
+     *             if {@code start} is negative or greater than the current
+     *             {@link #length()}.
+     */</span>
+    public String substring(<span class="hljs-keyword">int</span> start) {
+        <span class="hljs-keyword">if</span> (start &gt;= <span class="hljs-number">0</span> &amp;&amp; start &lt;= count) {
+            <span class="hljs-keyword">if</span> (start == count) {
+                <span class="hljs-keyword">return</span> <span class="hljs-string">""</span><span class="hljs-comment">;</span>
+            }
+
+            <span class="hljs-comment">// Remove String sharing for more performance</span>
+            <span class="hljs-keyword">return</span> new String(value, start, count - start)<span class="hljs-comment">;</span>
+        }
+        throw indexAndLength(start)<span class="hljs-comment">;</span>
+    }
+
+    @Override
+    public String toString() {
+        <span class="hljs-keyword">if</span> (count == <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-string">""</span><span class="hljs-comment">;</span>
+        }
+        <span class="hljs-comment">// Optimize String sharing for more performance</span>
+        <span class="hljs-keyword">int</span> wasted = value.<span class="hljs-keyword">length</span> - count<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">if</span> (wasted &gt;= <span class="hljs-number">256</span>
+                || (wasted &gt;= INITIAL_CAPACITY &amp;&amp; wasted &gt;= (count &gt;&gt; <span class="hljs-number">1</span>))) {
+            <span class="hljs-keyword">return</span> new String(value, <span class="hljs-number">0</span>, count)<span class="hljs-comment">;</span>
+        }
+        shared = true<span class="hljs-comment">;</span>
+        <span class="hljs-keyword">return</span> new String(<span class="hljs-number">0</span>, count, value)<span class="hljs-comment">;</span>
+    }
+
+    <span class="hljs-comment">/**
+     * Sets the current length to a new value. If the new length is larger than
+     * the current length, then the new characters at the end of this object
+     * will contain the {@code char} value of {@code \u0000}.
+     *
+     * @param length
+     *            the new length of this StringBuffer.
+     * @exception IndexOutOfBoundsException
+     *                if {@code length &lt; 0}.
+     * @see #length
+     */</span>
+    public void setLength(<span class="hljs-keyword">int</span> <span class="hljs-keyword">length</span>) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">length</span> &lt; <span class="hljs-number">0</span>) {
+            throw new StringIndexOutOfBoundsException(<span class="hljs-string">"length &lt; 0: "</span> + <span class="hljs-keyword">length</span>)<span class="hljs-comment">;</span>
+        }
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">length</span> &gt; value.<span class="hljs-keyword">length</span>) {
+            enlargeBuffer(<span class="hljs-keyword">length</span>)<span class="hljs-comment">;</span>
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">if</span> (shared) {
+                char[] newData = new char[value.<span class="hljs-keyword">length</span>]<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">System</span>.arraycopy(value, <span class="hljs-number">0</span>, newData, <span class="hljs-number">0</span>, count)<span class="hljs-comment">;</span>
+                value = newData<span class="hljs-comment">;</span>
+                shared = false<span class="hljs-comment">;</span>
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">if</span> (count &lt; <span class="hljs-keyword">length</span>) {
+                    Arrays.fill(value, count, <span class="hljs-keyword">length</span>, (char) <span class="hljs-number">0</span>)<span class="hljs-comment">;</span>
+                }
+            }
+        }
+        count = <span class="hljs-keyword">length</span><span class="hljs-comment">;</span>
+    }
+
+  final void delete0(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> <span class="hljs-keyword">end</span>) {
+        <span class="hljs-keyword">if</span> (start &gt;= <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">end</span> &gt; count) {
+                <span class="hljs-keyword">end</span> = count<span class="hljs-comment">;</span>
+            }
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">end</span> == start) {
+                <span class="hljs-keyword">return</span><span class="hljs-comment">;</span>
+            }
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">end</span> &gt; start) {
+                <span class="hljs-keyword">int</span> <span class="hljs-keyword">length</span> = count - <span class="hljs-keyword">end</span><span class="hljs-comment">;</span>
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">length</span> &gt;= <span class="hljs-number">0</span>) {
+                    <span class="hljs-keyword">if</span> (!shared) {
+                        <span class="hljs-keyword">System</span>.arraycopy(value, <span class="hljs-keyword">end</span>, value, start, <span class="hljs-keyword">length</span>)<span class="hljs-comment">;</span>
+                    } <span class="hljs-keyword">else</span> {
+                        char[] newData = new char[value.<span class="hljs-keyword">length</span>]<span class="hljs-comment">;</span>
+                        <span class="hljs-keyword">System</span>.arraycopy(value, <span class="hljs-number">0</span>, newData, <span class="hljs-number">0</span>, start)<span class="hljs-comment">;</span>
+                        <span class="hljs-keyword">System</span>.arraycopy(value, <span class="hljs-keyword">end</span>, newData, start, <span class="hljs-keyword">length</span>)<span class="hljs-comment">;</span>
+                        value = newData<span class="hljs-comment">;</span>
+                        shared = false<span class="hljs-comment">;</span>
+                    }
+                }
+                count -= <span class="hljs-keyword">end</span> - start<span class="hljs-comment">;</span>
+                <span class="hljs-keyword">return</span><span class="hljs-comment">;</span>
+            }
+        }
+        throw startEndAndLength(start, <span class="hljs-keyword">end</span>)<span class="hljs-comment">;</span>
+    }</code></pre>
+<p>&nbsp; &nbsp; &nbsp;通过源码，我们可以发现toString()方法中会设置shared为true，在setLength和delete0方法中，只要是shared为true的情况，就会重新分配字符串数组char[] newData，这样就多余了一次对象分配，在高频率函数中会对GC产生影响。而substring(0)会new一个包含StingBuilder内容的新的String对象，而且没有操作shared值，所以后续不会有多余的字符串数组的分配，可以提升性能。</p>
+<h3 id="12">4）StringBuilder的拼接注意事项</h3>
+&nbsp; &nbsp;<span style="color:#ff0000;"><strong> 在append的时候，我们不能将变量和常量写在一个append中来做拼接</strong></span>，变量和常量的拼接要分开在不同的append中进行。如<span style="color:#0000ff;"><strong>append(size + "X" + size);</strong></span>这样的写法，这里编译器又会自动生成一个StringBuilder对象，造成多余的性能损耗。<br><h2 id="13">六、优化程序中的字符串等问题</h2>
+<h3 id="14">&nbsp;1）日志泛滥是不少性能问题的罪魁祸首</h3>
+&nbsp; &nbsp; &nbsp;开发过程中避免不了调试和输出，Android中很方便的就是使用Log进行日志的输出。而我们在日志输出的时候，大多数情况下就会涉及到字符串的拼接。在较多函数中，一旦使用+号拼接来处理日志就会导致比较多的性能问题。特别是在高频率函数中，日志会引起明显的GC和卡顿。即使是debug状态，也不应该随意输出日志，开发完毕后，稳定的模块应该及时清理或者注释掉对应的日志。我们手淘1218迭代的店铺首页中，发现日志输出在该函数中已经比实际执行的逻辑代码更加耗时，可以通过TraceView查看，如下所示：<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/be3d38d9034a5b9a397c95b40256a2a1c5b3ea57.png" alt="" width="1564"><br><br>&nbsp; &nbsp; 上图中我们看到有2个日志打印函数，已经占据了40%以上的CPU时间，高于实际需要运行的代码逻辑的时间。而且大量的StringBuilder对象的分配也必然会导致GC方面的性能问题。<br><br>&nbsp; &nbsp; <strong><span style="color:#ff0000;">为了便于日志统一管理，架构组的 @风临 已经对TLog做了诸多优化，增加了不少接口方便接管日志打印。各个业务方后续可以联系@风临统一接入TLog处理日志，减少在这方面引起的性能问题。</span></strong><br><h3 id="15">2）Release版本中关闭除Error级别的日志输出</h3>
+&nbsp; &nbsp; 在混淆的时候我们可以通过指令来屏蔽日志的输出，例如：<br><pre><code class="hljs cpp">在proguard.cfg文件中加入
+-assumenosideeffects <span class="hljs-keyword">class</span> android.util.Log{ <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> *** <span class="hljs-title">d</span><span class="hljs-params">(...)</span></span>; <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> *** <span class="hljs-title">i</span><span class="hljs-params">(...)</span></span>; <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> *** <span class="hljs-title">v</span><span class="hljs-params">(...)</span></span>; }</code>&nbsp;</pre>
+&nbsp; &nbsp; 虽然这些日志不会输出，但是字符串的拼接代码仍然存在，这些StringBuilder仍然在创建，append函数仍然在调用，依然会对性能带来较大的影响。特别是在输出较大的字符串，如2k长度的字符串或者StringBuilder，在三星I9300手机上，2000多次分配就能引发一次GC_FOR_ALLOC。而我们之前的很多底层库，如网络库等的日志调试会打印接收到的数据，这些数据往往有好几k，频繁输出就会对性能带来较大的影响。所以在非Debug状态下，不要调用日志输出函数，正确的做法应该如下代码所示：<br><pre><code class="hljs aspectj">   <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">boolean</span> <span class="hljs-title">isApkDebugable</span><span class="hljs-params">(Context context)</span> </span>{
+        <span class="hljs-keyword">try</span> {
+            ApplicationInfo info= context.getApplicationInfo();
+                <span class="hljs-keyword">return</span> (info.flags&amp;ApplicationInfo.FLAG_DEBUGGABLE)!=<span class="hljs-number">0</span>;
+        } <span class="hljs-keyword">catch</span> (Exception e) {
+            
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    }
+   <span class="hljs-comment">//在日志输出的代码前就应该要加上判断</span>
+    <span class="hljs-keyword">if</span>(isApkDebugable()){
+
+        Log.i(TAG,a + i);
+
+    }</code></pre>
+<h3 id="16">3）通过LogCat查看多余日志</h3>
+<p>&nbsp; &nbsp; &nbsp;我们可以通过LogCat的日志输出查看多余的日志输出，找出并清理掉那些多余的日志输出。</p>
+<h3 id="17">4）通过TraceView排查日志输出</h3>
+<p>&nbsp; &nbsp;通过TraceView工具，我们可以找出程序中的字符串拼接以及格式化的函数调用，如果太多了。也能够找到这些调用的函数，从而进行优化，如下图所示：<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/29672736914ef4fcab663ce127ce9f3eea35e5ba.png" alt="" width="1586"><br><br></p>
+<h3 id="18">5）AlloCation Tracker检查</h3>
+<p>&nbsp; &nbsp; &nbsp;前面在GC的文章中也提到了该函数，在检查日志输出的时候，我们也要使用该函数来进行优化，可以在滑动等过程中查看对象的分配情况，找出那些多余的字符串拼接问题。如下图所示，可以方便的定位到那些代码有多余的字符串对象分配和扩容：<br><br><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/5b8053342e0ba9de534ad64ca0db9c901bfc0e8a.png" alt="" width="1494"><br><br><br>&nbsp; &nbsp; 字符串问题是程序优化过程中遇到较多的问题，也是我们写代码中容易忽视的问题，希望在后续的开发过程中，能够对字符串和格式化问题引起较多的重视。<br><br><br></p>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/46997/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">1人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/23183" title="万思"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_88e6967421e9586bafe31e2927b59c25.png_80x80" width="26" height="26" alt="万思" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/46997#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (2)
+                  </a>
+        <a href="http://www.atatech.org/articles/46997/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          16
+        </a>
+        <a href="http://www.atatech.org/articles/46997/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          17
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="46997" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">1</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/46997/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          3
+        </a>
+        <a href="http://www.atatech.org/articles/46997/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          4
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/66337" title="大泡"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/img_20141204110709.jpg_80x80" width="28" height="28" alt="大泡" class="img-user"></a></li><li><a href="http://www.atatech.org/users/109994" title="真禅"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_8ef09ed6f8785c20c9624243e1c37fda.png_80x80" width="28" height="28" alt="真禅" class="img-user"></a></li><li><a href="http://www.atatech.org/users/79089" title="伯函"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/img_20150316105556.JPG_80x80" width="28" height="28" alt="伯函" class="img-user"></a></li><li><a href="http://www.atatech.org/users/70874" title="兰昊"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/img_20141225101925.jpg_80x80" width="28" height="28" alt="兰昊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/7541" title="释然"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_avatar_20120719180742_7541_60.jpeg_80x80" width="28" height="28" alt="释然" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/33361" title="飞珏"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_b5bde7db296c1837f75b77a2e4e6013b.png_80x80" width="28" height="28" alt="飞珏" class="img-user"></a></li><li><a href="http://www.atatech.org/users/157934" title="简燃"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_7d0de71cfd44806280ef83bcb88effee.png_80x80" width="28" height="28" alt="简燃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/69607" title="肖月"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_8bb3fb5ce00e8affb83f367f06dae31b.png_80x80" width="28" height="28" alt="肖月" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/33335" title="许凡"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_dda4bdea15022bac2479280f775d1fb7.png_80x80" width="28" height="28" alt="许凡" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23076" title="兰兰"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_avatar_20131230181137_23076_60.jpeg_80x80" width="28" height="28" alt="兰兰" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64157" title="如盐"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_652fca5e93b01f8e5bea89231142bd1e.png_80x80" width="28" height="28" alt="如盐" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/46151">Android App 学习笔记——在A...</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/41392">java中三种代理框架总结</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/18550">android basic chapter 2</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/35748">【Android】读取过度绘制计数器数值...</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/44196">Android Closeable的坑</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/23926">利用 Profiler 通过spring AOP 方式做性能监控</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/46717">上一篇：手淘安卓版性能优化18 - 减少GC，提升性能（下）</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/47006">下一篇：手淘安卓版性能优化20 - 正确使用单例</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-78171">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33361" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_b5bde7db296c1837f75b77a2e4e6013b.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33361" class="author">飞珏</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46997#comment-78171" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-31T11:04:33+08:00">2015-12-31 11:04:33</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>突然想到自己以前写嵌入式代码时还需要自己写一个内存管理器；现在用java有一种幸福的感觉！</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/78171/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78171/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-78171&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-78171">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-78171">
+      <div class="sub-comments media-list" id="comment-78171-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2016-01-06T17:37:15+08:00">2016-01-06 17:37:15</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>那你就转java吧。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/78171/subcomments/24139/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78171/subcomments/24139/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-24139&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-24139" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/78171/subcomments/" method="POST" data-remote="true" data-target="#comment-78171-sub" data-done="$(&#39;#sub-comments-count-78171&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/78171/subcomments/" method="POST" data-remote="true" data-target="#comment-78171-sub" data-done="$(&#39;#sub-comments-count-78171&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-78260">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/102109" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/u_identicon_cbcc6d2e0405e48a4c6d47eb48e162e9.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/102109" class="author">演本</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46997#comment-78260" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-31T18:01:48+08:00">2015-12-31 18:01:48</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>很实用！有两点疑问<br>
+1. “对于intern()的方法的用处，可以在代码中将反复用到的String添加到常量池中”， 这句话怎么理解？平时常用的字符串，要经常显示的调用这个接口么？<br>
+2. 类似TLog这样的通用的工具类，有没有开放出来给阿里内部其他部门使用的呢？</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/78260/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78260/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-78260&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-78260">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-78260">
+      <div class="sub-comments media-list" id="comment-78260-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2016-01-06T17:37:06+08:00">2016-01-06 17:37:06</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>1、普通的字符串常量，以及参数中的那些字符串常量，都会编译期自动加入到常量池中。intern()主要是针对非编译阶段的字符串变量而言，如果后期预见到会频繁用到这个字符串，可以考虑调用该方法加入到常量池中，后续创建String的时候，使用new String(a.intern());这样可以节约内存，虽然对象会重新创建，但是里面的value会使用常量池中的值。<br>
+2、TLog这样的工具类，可以开发给其他部门用的，你可以联系风临。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/78260/subcomments/24138/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78260/subcomments/24138/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-24138&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-24138" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/78260/subcomments/" method="POST" data-remote="true" data-target="#comment-78260-sub" data-done="$(&#39;#sub-comments-count-78260&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/78260/subcomments/" method="POST" data-remote="true" data-target="#comment-78260-sub" data-done="$(&#39;#sub-comments-count-78260&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="46997">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/pic.gif"></a></span><script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/pic.gif"></a></span><script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9619+-+%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%8E%E6%A0%BC%E5%BC%8F%E5%8C%96%E7%9A%84%E6%80%A7%E8%83%BD%E5%8F%8A%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F46997%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项", "", "", 'article-46997']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/46997#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: absolute; top: 16082px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/46997#0">一、String的特点</a></li><li><a href="http://www.atatech.org/articles/46997#1">二、正确使用字符串拼接</a></li><ul><li><a href="http://www.atatech.org/articles/46997#2">1) +号拼接字符串</a></li><li><a href="http://www.atatech.org/articles/46997#3">2) String.concat方法拼接字符串</a></li><li><a href="http://www.atatech.org/articles/46997#4">3) StringBuilder/StringBuffer的append方法拼接字符串</a></li><li><a href="http://www.atatech.org/articles/46997#5">4）StringBuilder/StringBuffer初始容量对性能的影响</a></li></ul><li><a href="http://www.atatech.org/articles/46997#6">三、字符串的拆分性能</a></li><li><a href="http://www.atatech.org/articles/46997#7">四、字符串的查找性能</a></li><li><a href="http://www.atatech.org/articles/46997#8">五、字符串格式化性能</a></li><ul><li><a href="http://www.atatech.org/articles/46997#9">1）Formatter对象的复用</a></li><li><a href="http://www.atatech.org/articles/46997#10">2）SimpleDateFormatd的复用</a></li><li><a href="http://www.atatech.org/articles/46997#11">3）StringBuilder的复用</a></li><li><a href="http://www.atatech.org/articles/46997#12">4）StringBuilder的拼接注意事项</a></li></ul><li><a href="http://www.atatech.org/articles/46997#13">六、优化程序中的字符串等问题</a></li><ul><li><a href="http://www.atatech.org/articles/46997#14">&nbsp;1）日志泛滥是不少性能问题的罪魁祸首</a></li><li><a href="http://www.atatech.org/articles/46997#15">2）Release版本中关闭除Error级别的日志输出</a></li><li><a href="http://www.atatech.org/articles/46997#16">3）通过LogCat查看多余日志</a></li><li><a href="http://www.atatech.org/articles/46997#17">4）通过TraceView排查日志输出</a></li><li><a href="http://www.atatech.org/articles/46997#18">5）AlloCation Tracker检查</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

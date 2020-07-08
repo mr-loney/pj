@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/46313 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 337</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-17T13:03:25+08:00">2015-12-17 13:03:25</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/46313/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="Android性能 帧率优化 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="Android性能" class="item">Android性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="帧率优化" class="item">帧率优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=Android%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">Android性能</a><a href="http://www.atatech.org/search?q=%E5%B8%A7%E7%8E%87%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">帧率优化</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/46313/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 在我们优化的过程中，帧率(FPS)问题一直是优化的重点和难点。界面帧率也是衡量流畅度的主要指标，但是帧率又受到很多因素的影响，如硬件加速、GC、布局性能、CPU占比、过度绘制、主线程耗时等，排查和优化有些时候是一个复杂的过程。部分因素，前面已经做了较多的分析，本文将结合测试工具和案例来分析解决帧率问题的过程。<br><h2 id="0">一、硬件加速引起的性能问题</h2>
+&nbsp; &nbsp; 硬件加速的选项对滑动界面的性能影响是立竿见影的，开启硬件加速后，明显可以提升帧率。当界面帧率很低的时候，可以先检测下是否开启了硬件加速。可以通过TraceView来检测，当发现通过drawSoftware函数绘制的时候就可以判断是没有开启硬件加速，另外通过GPU配置文件的显示也是可以判断出是否开启了硬件加速，后面会谈到，如下图所示：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/ebdc0285f4b799261e8f395ac537817cb78011ba.png" alt="" width="1334"><br><br>&nbsp; &nbsp; &nbsp;Activity的硬件加速比较简单，开启后对帧率的影响也很明显，比如聚划算界面，双十一版本之前没有开启硬件加速，整个滑动帧率明显比较卡顿，平均FPS只有30多，开启硬件加速后FPS就可以提升到40多。<br>&nbsp; &nbsp; &nbsp;<span style="color:#ff0000;"><strong>在PopupWindow的使用上有点特别，需要注意。</strong></span>PopupWindow创建的时候，PopupWindow(Context context)的构造函数传入的Context可以是Activity也可以是ApplicationContext。如果传入的是Activity则会沿用Activity的硬件加速。如果传入的是ApplicationContext则不会沿用当前Activity的硬件加速，依赖于Application的配置。<br><h2 id="1">二、布局的性能测试</h2>
+&nbsp; &nbsp; 在滑动列表等界面上，布局性能对帧率对性能的影响是比较多的，前面谈到了布局的性能数据和使用原则，在低端机上卡顿的布局在高端机上，可能并不会导致卡顿问题。在高端机上，优化的时候会遇到不好判断有多少改进的问题。如果代码中<strong><span style="color:#ff0000;">自己通过插入System.currentTimeMillis()来判断的话</span></strong>，因为受到线程、进程及其它应用的进程调度影响，干扰会比较多，每次的值可能相差比较多，不能很好的反应问题。这个时候可以<span style="color:#ff0000;"><strong>借助SysTrace、TraceView等来工具</strong></span>。SysTrace工具可以比较准确的拿到每一帧的绘制，可以测量到每一帧的耗时，通过前后对比，可以反映出优化带来的性能提升。TraceView的Cpu时间和平均每一次的cpu执行时间，也能比较好的反映出前后优化的性能对比。<br><h2 id="2">三、复杂控件带来的性能问题</h2>
+&nbsp; &nbsp; 除了布局性能外，有时候复杂的自定义控件也是一个引起帧率却又难以察觉的隐患点。这时候就需要利用多种工具配合来定位性能问题了。我们通过一些用例来讲解排查的这个过程，当时在微淘、我的淘宝等界面都遇到有帧率低的问题。<br><br>&nbsp; &nbsp; 当时在【微淘】界面测试过程中，发现帧率很低，特别是在首屏滚动是，大大高于16ms的绘制时间，如下图所示：<br><br><div><img style="display:block;margin-left:auto;margin-right:auto;" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/fe4f04ac4483d6eaa6d6a3afa0113434d95aec9d.png" alt="" width="360"></div>
+<br>&nbsp; &nbsp; 有很多帧蓝色线条比较长，说明在buildDisplayList过程中也有较为复杂的函数执行，可能是某些控件的onDraw方法执行比较耗时。这里更多的是红色线条很长，表明了drawDisplayList的时间特别长，界面本身看来并没有太复杂的地方，首页的内容比这个页面要复杂的多，而首页却没有那么长的执行时间，说明这个界面有部分控件的绘制命令特别耗时。<br>&nbsp; &nbsp; 通过TraceView也能发现，在这种情况下，draw方法占用CPU相当高，CPU占比达到了55%，特别是里面的drawDisplayList方法。<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/8d6b9b9ffc7bbc6ba3b22c3b9519dc422d8cbde0.png" alt="" width="1632"><br><br>&nbsp; &nbsp; &nbsp;继续测试会发现，“达人淘”区域不在可视区域后，帧率就基本趋于正常，所以可以锁定在该内容区域的控件绘制上。在【我的淘宝】、【旺信】等界面也同样可以发现这样的问题。下面以【我的淘宝】为例，更详细的说一下排查过程。<br><h3 id="3">1）大致锁定性能问题区域</h3>
+&nbsp; &nbsp; &nbsp;在我的淘宝界面，可以明显的看到在我的头像存在情况下，帧率明显下降，如下图所示：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/09a69fbca22c2962007f705b0a1b95ec9dc1fb3a.jpeg" alt="" width="710"><br><br>&nbsp; &nbsp; &nbsp;上图中，左边的红色线条明显比右边的红色线条长很多，说明左边的绘制执行时间长很多，而区别主要就是头像区域的一整条。所以可以基本锁定在顶部头像所在的一长条的控件上。<br><h3 id="4">2）用TraceView工具分析</h3>
+&nbsp; &nbsp; 锁定了大概区域，接着通过性能分析工具来排查，试图找到问题所在。通过TraceView，得到下面的结果：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/162aecc90366bbaa2927479404a82cfb7dc23b76.jpeg" alt="" width="947" height="365"><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/4e50d12e8cc3c9b1c84c3e3a172ca768060d983b.jpeg" alt="" width="955"><br><br>&nbsp; &nbsp; 通过TraceView查看到耗时的函数，但是继续再向下跟踪，发现函数本身的运行（self）占据了99.9%的时间，已经没有办法向下追踪。此路不通，看来只能另辟蹊径。<br><h3 id="5">3）用SysTrace工具分析</h3>
+&nbsp; &nbsp; 尝试用该工具对界面的帧率进行分析，我们得到如下的结果：<br><br><div><img style="display:block;margin-left:auto;margin-right:auto;" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/6d86ed36e30c3e66e7fb8a6ec702c0700f174b37.jpeg" alt="" width="582"></div>
+<br>&nbsp; &nbsp; 上图只能看到drawDisplayList花了最长的时间，OpenGL的命令非常耗时，也没法看到到底是谁引起的。难道真的要穷途末路了？还是继续尝试用其他工具分析。<br><h3 id="6">3）用Dump View Hierarchy检查布局</h3>
+&nbsp; &nbsp; 看看头像区域到底有哪些布局和控件，造成这么多的耗时。通过Dump View Hierarchy可以发现一些问题，如下图：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/0a5300c9787e24f506dfe1df04c104c9848fbbcc.jpeg" alt="" width="515" height="553"><br><br>&nbsp; &nbsp; 从上图可以发现，该界面的布局嵌套比较深，而且简单的头像区域用了比较复杂的布局配置，这个布局明显是可以优化的。头像的位置看到了2个ImageView控件，一个默认头像，另外一个是当有头像时显示。但是通过两个控件显示有些多余了，而且多了一层无用的布局嵌套。布局的复杂对于该界面的滑动过程并没有多少影响，毕竟上下滑动的时候，不像ListView有getView过程，这里只是用了ScrollView，所以在没有触发requestLayout的情况下，对帧率影响不大。而且红色线条长主要还是复杂的OpenGL绘制命令引起的。虽然比较难定位，但是不找到元凶如鲠在喉，实在不爽。只能任你东西南北风，咬定青山不放松了，继续再想办法。<br><h3 id="7">4）利用Trace OpenGL查看绘制过程</h3>
+&nbsp; &nbsp; &nbsp;看来只能试试Trace For OpenGL工具了，该工具可以一帧一帧的查看绘制过程。通过该工具，可以还原GPU在绘制一帧的过程以及各个过程中函数的耗时情况，那么就来查看一下顶部头像区域的绘制过程吧。<br><br><div><img style="display:block;margin-left:auto;margin-right:auto;" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/53de1d11e4ddcf6b9986ab8be8fdce9ebde2e76f.jpeg" alt="" width="542"></div>
+<br>&nbsp; &nbsp; 通过上面我们可以看到，光一个头像区域，就用了6次绘制命令，特别是后面圆角头像的每个命令都比较耗时。顶部默认头像会先画一遍，这时候已经有头像存在了，这个控件却没有隐藏，一次多余的过度绘制。圆角头像的实现用了4步才完成，期间的有一个绘制命令特别耗时，从而导致了整个界面GL命令的耗时。通过修改实现方法后帧率就达到正常了。另外通过SysTrace工具也可以看到这个性能损耗点，需要在开发者选项中将【启用OpenGL跟踪】设置为Systrace(图形)。我们可以看到在有头像和无头像的时候，有个glCopyTexSubImage2D方法平均耗时9ms以上，导致这帧绘制耗时。如下图所示：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/6c269fe1f73784fa1f26d9fda4d915835f2f15c4.jpeg" alt="" width="2114"><br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/43611cb687e694f3b2d264b789548c55e8220801.jpeg" alt="" width="2220"><br><br>&nbsp; &nbsp; 这两个工具配合起来排查OpenGL的耗时点就能比较方便的找到根源了，到这里总算是找到问题所在了，真是有种山穷水复疑无路，柳暗花明又一村的感觉^_^。<br>&nbsp; &nbsp; 这里用了多个性能分析工具，最终才定位到问题，这个过程本身也是这些工具学会和上手的好机会，这样通过多种工具才能定位到问题根源的问题并不会很多，在微淘、旺信等界面也是由于圆形头像、圆角矩形头像等自定义控件实现问题引起。&nbsp; &nbsp;&nbsp;<br>&nbsp; &nbsp; 当然，作为这个模块的开发人员可能会觉得这些过程有点多余，毕竟对于自己开发的模块来说，注释掉一个控件和一段代码来定位问题也是很有效的手段，可以较容易的定位到问题。不过对于性能分析人员和其他测试人员来说，未必有这样的环境，只能通过工具来分析的话，学会这些工具和方法也是很有必要的。<br><h2 id="8">四、系统Bug等带来的性能问题</h2>
+&nbsp; &nbsp; 在排查性能的过程中，也会遇到一些系统问题导致的帧率下降的问题，例如在10月上旬的时候，遇到一个魅族的手机，进入界面和滑动过程都特别的卡，通过TraceView工具分析可以发现，其中的TextView初始化占用了38.7%的CPU时间，还是第一次遇到这样的问题，如下图所示：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/a1da3c678292bd2db295082f877a709b38769c56.png" alt="" width="1522"><br><br>&nbsp; &nbsp; 在TextView的构造函数中，多出了一个mzInit函数，之前在其他手机上并未发现有这样一个耗时函数，看名字应该是魅族自己添加的一个函数，而就是该函数导致了性能问题。进一步的跟踪发现，该函数会去判断一个默认主题。但是该函数中用到的一个主题Class却找不到，导致初始化过程中引发了ClassNotFoundException，频繁的引起ClassNotFoundException导致了性能的严重下降，在创建ClassNotFoundException的过程中会调用Throwable.fillInStackTrace()方法并进一步调用nativeFillInStackTrace()填充调用堆栈信息，这个过程是相当耗时的，所以在TextView越多的界面就会表现的越慢，会出现明显的卡顿了。<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/3264943c5702bd5582a39cef07cd3ba32f2fb860.png" alt="" width="1972"><br><br>&nbsp; &nbsp; 除了手机厂商定制过程中会出现一些bug引起问题外，Android系统本身也有一些问题会导致帧率的问题，例如在有输入框的界面，像手淘中的首页顶部点击的搜索界面、微淘界面的搜索，订单界面的搜索等存在输入框的界面中，当输入法消失的时候，界面会不停的自动刷新，不仅导致耗电，而且导致丢帧问题。当在这些界面的时候，统计出来的帧率就可能受到这个问题的影响导致帧率很低。我们看下微淘的搜索界面，其实很简单，刚进入的时候，输入法会自动弹出，这个时候并不会导致界面的自动刷新，如果用户按了Back键，界面自动刷新就启动了，但是用户是无法察觉的，我们通过工具可以发现这个问题：<br><br><div><img style="display:block;margin-left:auto;margin-right:auto;" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/d0db395db410c1f5eea447a1c8daab57e56cabd3.png" alt="" width="340"></div>
+<div><img style="display:block;margin-left:auto;margin-right:auto;" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/ade126a58abcf2781d4af1be28049a0d671e97f7.png" alt="" width="600"></div>
+&nbsp; &nbsp; &nbsp;<br>&nbsp; &nbsp; 观察这个界面，其实非常的简洁。但是却在不停的自动刷新，而且帧率绘制过程却超过16ms。通过TraceView工具，来查看问题的原因，在输入框退出的时候，Editor会启动定时刷新的机制，并引起了整个界面的invalidate，这样整个界面每次刷新过程中都需要重建所有控件的DisplayList，TextView的绘制onDraw的性能相对ImageView本身就会耗时很多。另外所有控件失效后，也会导致所有DisplayList都需要重新的执行绘制，这样就导致了整个绘制过程也会比较耗时。<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/5ee56e10dcff0bd73d09567d74ac7a74a7a7ec6b.png" alt="" width="1358"><br><br>&nbsp; &nbsp; &nbsp;这种系统导致的问题，如果没有借助这些工具是很难发现的，因为后面的自动刷新表面上看不到，如果在列表滑动界面，那么这个列表界面在此时的性能就会很糟糕。为了解决这个问题，查看Editor的源码后，发现失去焦点的情况下，该定时机制就不会启动，所以<strong><span style="color:#ff0000;">在输入法消失的时候，让这个输入框失去焦点，可以解决这个刷新问题</span></strong>，即可以提升帧率，也可以节约耗电量。这其实是一个很细节的问题，当时我去对比微信的时候，发现微信并不会自动刷新，而百度糯米、京东等软件确和我们存在一样的问题。所以很多细微的点，需要我们不断的去优化，没有最好，只有更好。<br><br>&nbsp; &nbsp; 写到这里也需要在谈一下GPU配置工具的一个使用问题，<span style="color:#ff0000;"><strong>在未开启硬件加速的界面，是不会显示GPU配置信息的条状信息，通过adb shell dumpsys gfxinfo也是无法获得帧率信息</strong></span>。通过这个方法也能很快的判断出界面是否开启了硬件加速，如下图所示，我们看京东的搜索界面，其没有开启硬件加速，所以看不到GPU配置信息的显示。<br><br><div><img style="display:block;margin-left:auto;margin-right:auto;" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/c7175ef4baf2c519ef1ad41876384e07b0e19d2a.png" alt="" width="360"></div>
+<br>&nbsp; &nbsp; 虽然看不到界面的帧率情况，但是后台的自动刷新功能是否就不存在呢？通过TraceView工具，跟踪京东的这个界面后，我们还是可以发现自动刷新仍然在工作。如下图所示：<br><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/189331ca0fc79bb2c6a8136f070ac9eb2dad7fc2.png" alt="" width="1388"><br><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/e67c861e23b1c73b5d1cc55ef1e2d2df128fca4d.png" alt="" width="1430"><br><br>&nbsp; &nbsp; <strong><span style="color:#ff0000;">有些界面刷新虽然察觉不到，但是却会影响系统的性能，也会增加耗电量，所以在遇到输入框的时候，应该要注意到这个细节，在没有输入法的时候记得让该控件失去焦点。</span></strong>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/46313/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">5人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/157642" title="游苏"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_162cb2e653c0d6606f1de997d7c664c2.png_80x80" width="26" height="26" alt="游苏" class="img-user"></a></li><li><a href="http://www.atatech.org/users/126870" title="归空"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_61172e71dca85da69cc67c95a12392bf.png_80x80" width="26" height="26" alt="归空" class="img-user"></a></li><li><a href="http://www.atatech.org/users/93387" title="箫君"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_52b459eb433f1054adc1465d51c5eab6.png_80x80" width="26" height="26" alt="箫君" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13776" title="元伤"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20120719180826_13776_60.png_80x80" width="26" height="26" alt="元伤" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81324" title="歪木"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_1e69ed329a0425bc5582acdc0573c53c.png_80x80" width="26" height="26" alt="歪木" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/46313#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (3)
+                  </a>
+        <a href="http://www.atatech.org/articles/46313/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          22
+        </a>
+        <a href="http://www.atatech.org/articles/46313/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          23
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="46313" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/46313/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          4
+        </a>
+        <a href="http://www.atatech.org/articles/46313/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          5
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/157642" title="游苏"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_162cb2e653c0d6606f1de997d7c664c2.png_80x80" width="28" height="28" alt="游苏" class="img-user"></a></li><li><a href="http://www.atatech.org/users/33925" title="白书"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_71b539f8a0207a307900ca15cbebc334.png_80x80" width="28" height="28" alt="白书" class="img-user"></a></li><li><a href="http://www.atatech.org/users/137366" title="龙翊"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_3a6b30414d585f9c690e7e299bdf119e.png_80x80" width="28" height="28" alt="龙翊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/126870" title="归空"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_61172e71dca85da69cc67c95a12392bf.png_80x80" width="28" height="28" alt="归空" class="img-user"></a></li><li><a href="http://www.atatech.org/users/70874" title="兰昊"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/img_20141225101925.jpg_80x80" width="28" height="28" alt="兰昊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13776" title="元伤"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20120719180826_13776_60.png_80x80" width="28" height="28" alt="元伤" class="img-user"></a></li><li><a href="http://www.atatech.org/users/7896" title="达海"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20120719180745_7896_60.jpeg_80x80" width="28" height="28" alt="达海" class="img-user"></a></li><li><a href="http://www.atatech.org/users/9232" title="极寒"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20120725183031_9232_60.jpeg_80x80" width="28" height="28" alt="极寒" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132816" title="皙华"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/img_20150519171629.jpg_80x80" width="28" height="28" alt="皙华" class="img-user"></a></li><li><a href="http://www.atatech.org/users/76069" title="钜令"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_146a06815d49f00a824b94e2949de829.png_80x80" width="28" height="28" alt="钜令" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23049" title="连虎"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_d5a9ee07f24fb62f40781d00df2d47db.png_80x80" width="28" height="28" alt="连虎" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81324" title="歪木"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_1e69ed329a0425bc5582acdc0573c53c.png_80x80" width="28" height="28" alt="歪木" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/22554" title="苍斐"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20140303195454_22554_60.jpeg_80x80" width="28" height="28" alt="苍斐" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34964" title="丹琼"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_502c4afdfeedb869dd6c8c1496e7da0f.png_80x80" width="28" height="28" alt="丹琼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/98373" title="风沂"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_cd6b7c9da633a827c12ccfb9e35f9ed6.png_80x80" width="28" height="28" alt="风沂" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/11592" title="谢萱"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_avatar_20120719180810_11592_60.jpeg_80x80" width="28" height="28" alt="谢萱" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/38014">YunOS相册冷启动性能优化实践</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/29216">OverDraw-OverDraw介绍</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/28383">Android应用电量测试方法及分析</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/33596">Android倒计时视图优化</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/31925">Android runtime resource overlay &amp; 性能调试工具</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/42703">手淘安卓版性能优化1 - 性能相关概念介绍</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/46175">上一篇：手淘安卓版性能优化15 - 界面性能之减少不必要的刷新和Layout请求</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/46524">下一篇：手淘安卓版性能优化17 - 减少GC，提升性能（上）</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-76736">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/68201" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_2c77e1339c13c8be2f4b24c231945c73.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/68201" class="author">不冲</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46313#comment-76736" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-17T16:34:31+08:00">2015-12-17 16:34:31</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>怎么优化都是卡，卡得我根本没有用的想法</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/76736/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/76736/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-76736&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-76736">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-76736">
+      <div class="sub-comments media-list" id="comment-76736-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-12-17T18:09:26+08:00">2015-12-17 18:09:26</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>我们正在推动优化过程中。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/76736/subcomments/23473/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/76736/subcomments/23473/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-23473&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-23473" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/76736/subcomments/" method="POST" data-remote="true" data-target="#comment-76736-sub" data-done="$(&#39;#sub-comments-count-76736&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/76736/subcomments/" method="POST" data-remote="true" data-target="#comment-76736-sub" data-done="$(&#39;#sub-comments-count-76736&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-76811">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/150189" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_30dd2f5216638636f41e15155433517d.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/150189" class="author">泛叶</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46313#comment-76811" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-17T18:03:57+08:00">2015-12-17 18:03:57</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>今天正好发现了静默页面持续刷新这个问题，这文章发的很及时啊！赞</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/76811/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/76811/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-76811&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-76811">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-76811" style="display:none">
+      <div class="sub-comments media-list" id="comment-76811-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/76811/subcomments/" method="POST" data-remote="true" data-target="#comment-76811-sub" data-done="$(&#39;#sub-comments-count-76811&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-77242">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/140750" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/u_identicon_6b173d460156e3d796e1da1b8320caa4.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        3F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/140750" class="author">火丙</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46313#comment-77242" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-22T15:29:23+08:00">2015-12-22 15:29:23</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>Cool.<br>另外，有没有去收集一些卡顿的场景？例如记录Handler中处理时间超过2S的消息等。UC的经验是通过统计这一类的消息，然后分析处理，能够解决很多用户提出来的卡顿的问题。</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/77242/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77242/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-77242&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-77242">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-77242">
+      <div class="sub-comments media-list" id="comment-77242-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-12-22T15:37:36+08:00">2015-12-22 15:37:36</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>这个是监控工具做的，有类似的做法。还可以检测ANR等。我这边更多的是从工具和代码基础性的地方谈。监控的手淘中有栅栏在做。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/77242/subcomments/23592/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77242/subcomments/23592/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-23592&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-23592" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/77242/subcomments/" method="POST" data-remote="true" data-target="#comment-77242-sub" data-done="$(&#39;#sub-comments-count-77242&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/77242/subcomments/" method="POST" data-remote="true" data-target="#comment-77242-sub" data-done="$(&#39;#sub-comments-count-77242&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="46313">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/pic.gif"></a></span><script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/pic.gif"></a></span><script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9616+-+%E7%95%8C%E9%9D%A2%E6%80%A7%E8%83%BD%E4%B9%8B%E5%B8%A7%E7%8E%87%E6%8E%92%E6%9F%A5%E5%AE%88%E5%BE%97%E4%BA%91%E5%BC%80%E8%A7%81%E6%9C%88%E6%98%8E%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F46313%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明", "", "", 'article-46313']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/46313#" class="go-top" style="display: block;"><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化16 - 界面性能之帧率排查守得云开见月明_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: absolute; top: 11227px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/46313#0">一、硬件加速引起的性能问题</a></li><li><a href="http://www.atatech.org/articles/46313#1">二、布局的性能测试</a></li><li><a href="http://www.atatech.org/articles/46313#2">三、复杂控件带来的性能问题</a></li><ul><li><a href="http://www.atatech.org/articles/46313#3">1）大致锁定性能问题区域</a></li><li><a href="http://www.atatech.org/articles/46313#4">2）用TraceView工具分析</a></li><li><a href="http://www.atatech.org/articles/46313#5">3）用SysTrace工具分析</a></li><li><a href="http://www.atatech.org/articles/46313#6">3）用Dump View Hierarchy检查布局</a></li><li><a href="http://www.atatech.org/articles/46313#7">4）利用Trace OpenGL查看绘制过程</a></li></ul><li><a href="http://www.atatech.org/articles/46313#8">四、系统Bug等带来的性能问题</a></li></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

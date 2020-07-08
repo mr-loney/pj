@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/46717 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化18 - 减少GC，提升性能（下）</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化18 - 减少GC，提升性能（下）
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 840</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-24T13:57:37+08:00">2015-12-24 13:57:37</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/46717/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="Android性能 GC优化 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button loading"><div class="selectize-input items not-full has-options has-items"><div data-value="Android性能" class="item">Android性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="GC优化" class="item">GC优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=Android%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">Android性能</a><a href="http://www.atatech.org/search?q=GC%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">GC优化</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/46717/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        
+<h2 id="0">五、防止内存泄露</h2>
+&nbsp; &nbsp; 很多初学者以为Java有了垃圾回收后就不存在内存泄露的问题。但是Java中的内存如果使用不当还是会像C和C++一样导致内存泄露，如果大量的内存泄露，就很容易就出现OOM。另外Java语言还允许通过JNI调用C和C++实现的Native代码，这部分代码的内存分配并不受垃圾回收的控制，所以，使用不当也会造成内存的泄露。Java中的内存泄露常见的有以下几种：
+<h3 id="1">1）静态变量和单例的滥用</h3>
+&nbsp; &nbsp; 静态变量及常规单例的生命周期都是取决于类的生命周期，一般都伴随着整个Android进程的生命周期。当静态变量引用了堆内存的话，这块内存就无法被回收。如果我们的代码中静态变量和单例滥用，很容易导致内存泄露。在优化的过程中，静态变量，特别是单例在手淘中各个模块中都有大量的使用，虽然单例使用起来很方便，但是却不利于内存的释放，如果很多变量被定义成static类型的，那就更加糟糕。一个好设计，不应该依赖于太多的单例和静态变量。在设计单例的时候，我们有时候也应该允许其释放自身的引用，特别是占用了大量内存的单例，我们更应该取其长处，避其不足。
+<h3 id="2">2）&nbsp;长生命周期的对象持有短生命周期对象的引用</h3>
+&nbsp; &nbsp; 当长生命周期的对象持有短生命周期对象的引用的时候，很可能就会导致内存回收不及时，甚至导致内存泄露。比如很常见的，向全局性的模块注册各种Listener等，如果退出界面的时候忘记取消注册，那就很容易导致内存的泄露。<br>&nbsp; &nbsp; 对于在设计中需要保存外部注册的Listener对象时，可以尽量选用WeakReference来保存，或者在生命周期结束的时候主动释放所有已经注册进来的Listener。 &nbsp;<br>&nbsp; &nbsp; 在Android中注册广播也和这个相似，不过系统对这个做了优化，防止了内存泄露。在Activity销毁的时候，ActivityThread.handleDestroyActivity()方法中会调用ContextImpl.scheduleFinalCleanup()方法，接着又调用ActivityThread.scheduleContextCleanup()，该方法又回到了ContextImpl.performFinalCleanup()，最后调用LoadedApk.removeContextRegistrations()的代码，该函数会删除所有的注册消息ReceiverDispatcher并给出“has leaked IntentReceiver”的提示。如下图所示，在系统退出的时候会看到这个提示，我们在设计的时候也可以使用这样的思路：<br><br><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/bc222cee360b1690f23a9e943a55357d4a29b8fc.png" alt="" width="900"><br><h3 id="3">3）利用finalize做为安全网</h3>
+&nbsp; &nbsp;&nbsp;finalize方法有点类似于C++的析构函数，但又有很大的区别，不能把它当做析构函数来使用，后面会更详细的分析。在Android系统中，有不少利用该方法做资源释放的最后防线的。例如我们最常用的Bitmap，还有Cursor，Database等，这些类都使用了finalize来做资源的回收，以防止用户在忘记回收的时候，系统依然能够有机会来回收这些资源。我们来看一下SQLiteDatabase的源码：<br><br><pre><code class="hljs scala">public <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DatabaseObjectNotClosedException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">RuntimeException</span></span>{
+    <span class="hljs-keyword">private</span> static <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> s = <span class="hljs-string">"Application did not close the cursor or database object "</span> +
+            <span class="hljs-string">"that was opened here"</span>;
+
+    public <span class="hljs-type">DatabaseObjectNotClosedException</span>()
+    {
+       <span class="hljs-keyword">super</span>(s);
+    }
+}
+   
+public <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SQLiteDatabase</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SQLiteClosable</span> </span>{
+   <span class="hljs-keyword">private</span> <span class="hljs-type">SQLiteDatabase</span>(<span class="hljs-type">String</span> path, <span class="hljs-type">CursorFactory</span> factory, int flags) {
+	…
+        mStackTrace = <span class="hljs-keyword">new</span> <span class="hljs-type">DatabaseObjectNotClosedException</span>().fillInStackTrace();
+        …
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">protected</span> void finalize() {
+        <span class="hljs-keyword">if</span> (isOpen()) {
+            <span class="hljs-type">Log</span>.e(<span class="hljs-type">TAG</span>, <span class="hljs-string">"close() was never explicitly called on database '"</span> +
+                    mPath + <span class="hljs-string">"' "</span>, mStackTrace);
+            closeClosable();
+            onAllReferencesReleased();
+        }
+    }
+}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;SQLiteDatabase类在finalize中会关闭没有关闭的数据库，并抛出异常，就是我们常见的"Application did not close the cursor or database object "。<br><br>&nbsp; &nbsp;在Java的设计中也存在类似的做法，我们很常见的FileInputStream、FileOutputStream等类也是利用了finalize来做内存回收的保护。我们来看下FileInputStream的代码：</p>
+<pre><code class="hljs scala">public <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileInputStream</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">InputStream</span> <span class="hljs-title">implements</span> <span class="hljs-title">Closeable</span> </span>{
+
+    <span class="hljs-comment">/**
+     * Ensures that all resources for this stream are released when it is about
+     * to be garbage collected.
+     *
+     * @throws IOException
+     *             if an error occurs attempting to finalize this stream.
+     */</span>
+    <span class="hljs-meta">@Override</span> <span class="hljs-keyword">protected</span> void finalize() <span class="hljs-keyword">throws</span> <span class="hljs-type">IOException</span> {
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">if</span> (guard != <span class="hljs-literal">null</span>) {
+                guard.warnIfOpen();
+            }
+            close();
+        } <span class="hljs-keyword">finally</span> {
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">super</span>.finalize();
+            } <span class="hljs-keyword">catch</span> (<span class="hljs-type">Throwable</span> t) {
+                <span class="hljs-comment">// for consistency with the RI, we must override Object.finalize() to</span>
+                <span class="hljs-comment">// remove the 'throws Throwable' clause.</span>
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-type">AssertionError</span>(t);
+            }
+        }
+    }
+} </code></pre>
+<p>&nbsp; &nbsp; 通过上面的分析或许大家会以为finalize可以作为内存泄露的一道防护线，但是大家是否注意到，上面案例上的都是用来释放Native内存的，而java本身的内存泄露防护并不提倡使用该方法，而且使用上还有值得注意的地方，后面会有更详细的说明。</p>
+<h3 id="4">4）合理控制需要大块内存的并发线程数</h3>
+<p>&nbsp; &nbsp; 当线程中需要使用大块内存的时候，例如图片的解码、文件的解析等，我们就应该注意线程的并发数量，这个时候并不一定4个线程就会比2个线程运行的更快，即使CPU没有满负荷工作。例如解码一张图片需要8M内存，如果4个线程同时解码，最多的时候就需要使用32M的内存，对于Java堆而言，32M内存可能需要经过很多次的扩容才能满足，如果系统内存紧张，还要先回收其他进程的内存，这样无疑会使得系统变得更慢。在手淘的解码库中，就做了这个优化，将原来的4个线程同时解码调整为1个线程解码。</p>
+<h3 id="5">5）使用好Java的多种引用</h3>
+<p>&nbsp; &nbsp; Java除了强引用之外，还有SoftReference，WeakReference，PhantomReference等。<br>&nbsp; &nbsp; 在对象的分配中如果遇到内存不足会导致GC，第一次分配对象失败会触发GC但是不回收软引用，如果再次分配还是失败就会对堆进行扩容（在堆的大小还没有达到最大值的情况下），并再次尝试分配，如果还是分配失败，就会将软引用的内存也给回收。所以SoftReference会在虚拟机中存在较长的时间。软引用可以使用一个引用队列ReferenceQueue，当对象被回收时，就会被加入到这个队列中。<br>&nbsp; &nbsp;&nbsp;WeakReference是一种比软引用更弱的引用类型，在系统GC时，只要发现弱引用，不管系统的堆空间是否足够，都会将对象进行回收。但是由于垃圾回收的线程优先级较低，因此并不一定能很快的发现持有弱引用的对象。在这时，弱引用还是可以存在较长的时间。弱引用也可以使用一个引用队列ReferenceQueue，当对象被回收时，就会被加入到这个队列中。&nbsp;&nbsp;<br>&nbsp; &nbsp;PhantomReference虚引用是所有类型中最弱的一个，它不会影响到对象的生命周期，一个持有虚引用的对象，和没有引用几乎是一样的，随时都可能被垃圾回收。当试图通过PhantomReference的get()方法取得强引用时，总是会失败。并且，虚引用必须和引用队列一起使用，它的作用就是跟踪垃圾回收的过程。<br>&nbsp; &nbsp; 这里讲到的3种引用都可以配合ReferenceQueue使用，也都有一定的垃圾回收跟踪功能，但是他们还是有一些差别的。我们首先看一下Reference的源代码：</p>
+<pre><code class="hljs gherkin">public abstract class Reference<span class="hljs-variable">&lt;T&gt;</span> {
+
+    /<span class="hljs-keyword">*</span><span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> The object to which this reference refers.
+     <span class="hljs-keyword">*</span> VM requirement: this field <span class="hljs-variable">&lt;em&gt;</span>must<span class="hljs-variable">&lt;/em&gt;</span> be called <span class="hljs-string">"referent"</span>
+     <span class="hljs-keyword">*</span> and be an object.
+     <span class="hljs-keyword">*</span>/
+    volatile T referent;
+
+    /<span class="hljs-keyword">*</span><span class="hljs-keyword">*</span>
+     <span class="hljs-keyword">*</span> If non-null, the queue on which this reference will be enqueued
+     <span class="hljs-keyword">*</span> when the referent is appropriately reachable.
+     <span class="hljs-keyword">*</span> VM requirement: this field <span class="hljs-variable">&lt;em&gt;</span>must<span class="hljs-variable">&lt;/em&gt;</span> be called <span class="hljs-string">"queue"</span>
+     <span class="hljs-keyword">*</span> and be a java.lang.ref.ReferenceQueue.
+     <span class="hljs-keyword">*</span>/
+    <span class="hljs-meta">@SuppressWarnings("unchecked")</span>
+    volatile ReferenceQueue queue;
+……
+}
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;Reference中引用的object叫做referent。 VM在对referent做垃圾回收的时候可以分为以下几个阶段：Unfinalized（没有执行finalize）、 Finalizable（可以执行finalize了，系统会在随后的某个时间执行finalize）、 Finalized（该对象的finalize已经被执行了）、 Reclaimed（该对象已经被回收了）。<br>&nbsp; &nbsp; SoftReference和WeakReference在GC对referent状态改变时，先clear SoftReference、WeakReference对referent的引用，对应的referent状态为Finalizable，只是可以放入Finalize queue，然后把SoftReference、WeakReference放入ReferenceQueue。 而PhantomReference在GC对referent的状态改变时，在把PhantomReference放入ReferenceQueue之前referent已经被GC处理到Reclaimed了阶段了，即该referent被销毁了。&nbsp;所以我们可以使用PhantomReference来更好的控制一些关于对象生命周期的事情，当SoftReference和WeakReference放入ReferenceQueue时，并不能保证该referent是被销毁了，而且对象可以在finalize方法里再生。而使用PhantomReference，当在ReferenceQueue中发现PhantomReference时，可以保证referent已经被销毁了。</p>
+<h3 id="6">6）定时及线程时间导致的泄露</h3>
+<p>&nbsp; &nbsp; 很多时候我们都会用到定时逻辑，例如通过Handler发送一个定时消息，间隔一段时间后再执行，此时如果界面提前退出了，Looper队列中仍然引用了Activity等相关的实例，会导致一定时期内的内存泄露。所以在界面退出或者模块执行完成后，应该通过&nbsp;Handler的remove函数，清理掉所有的消息，特别是定时消息。以防止泄露和空指针异常。<br>&nbsp; &nbsp; 另外当线程引用了外部的实例资源，而该线程被放入线程池中等待，或者执行中遇到等待亦或是执行时间很长，也会导致外部实例的内存无法及时释放，导致暂时或者长时间的泄露。所以在使用线程的时候，也要注意内存的及时释放问题，特别是你的线程占用较大资源的时候。</p>
+<h3 id="7">7）使用静态内部类减少泄露</h3>
+&nbsp; &nbsp; Java的非静态内部类和静态内部类的一个很大区别就是是否持有外部类的实例。非静态的内部类，会隐式的持有外部类实例，虽然使用起来很方便，但是也容易给垃圾回收埋下隐患。Android中很常见的定义就是ViewHolder，用来存放控件的引用。如果这些内部类都是非静态的，那么当传递给线程，定时器或者注册到其他模块中，就会容易引起内存的不能及时回收。所以如果不是需要频繁调用外部类的方法和变量，建议使用静态内部类。<br><h3 id="8">8）系统Bug引起的内存泄露</h3>
+<p>&nbsp; &nbsp; Android系统本身也有一些Bug会导致内存泄露，有些类会引用Activity的实例，例如部分Android版本的InputMethodManager存在bug，会持有Activity的实例，导致泄露，如下图所示，购物车的Activity被InputMethodManager持有导致泄露。<br><br><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/6b7a118e90c526b21734dfe5332373b3122cd77d.jpeg" alt="" width="1090"><br><br>&nbsp; &nbsp; 对于这样的泄露，有人试图用反射的方法去释放系统的引用，由于时序和版本的影响，该方法也不能很好的解决这类问题。最好的方法就是在Activity销毁的时候手动释放图片资源以及用到的较大的对象。如：</p>
+<pre><code class="hljs hsp">	View view = mActivity.getWindow().getDecorView()<span class="hljs-comment">;</span>
+	unbindDrawables(view)<span class="hljs-comment">;</span>
+
+	public static void unbindDrawables(View view) {
+		<span class="hljs-keyword">if</span> (view == null)
+			<span class="hljs-keyword">return</span><span class="hljs-comment">;</span>
+		<span class="hljs-keyword">if</span> (view instanceof ViewGroup) {
+			ViewGroup viewGroup = (ViewGroup) view<span class="hljs-comment">;</span>
+			<span class="hljs-keyword">int</span> chindCount = viewGroup.getChildCount()<span class="hljs-comment">;</span>
+			<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span><span class="hljs-comment">; i &lt; chindCount; i++) {</span>
+				View childTemp = viewGroup.getChildAt(i)<span class="hljs-comment">;</span>
+				unbindDrawables(childTemp)<span class="hljs-comment">;</span>
+			}
+			view.setBackgroundDrawable(null)<span class="hljs-comment">;</span>
+		} <span class="hljs-keyword">else</span> {
+			view.setBackgroundDrawable(null)<span class="hljs-comment">;</span>
+			<span class="hljs-keyword">if</span> (view instanceof ImageView) {
+				ImageView imageView = (ImageView) view<span class="hljs-comment">;</span>
+				imageView.setImageDrawable(null)<span class="hljs-comment">;</span>
+			}
+		}
+	}
+</code></pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2 id="9">六、用好FinalizerReference</h2>
+<p>&nbsp; &nbsp; 在Java源码中还能找到一个叫做FinalizerReference的类。java.lang.ref.FinalizerReference和其他引用同在一个目录，如下图所示：<br><br><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/e144a9ee9880e9d26e5b2c0f506790898e9566ed.png" alt="" width="592"><br>&nbsp; &nbsp; <br>&nbsp; &nbsp; 我们在代码中并没有使用到FinalizerReference，通过TraceView我们可以找到这个隐藏着的类的踪迹。如下图所示：<br><br><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/b5a737fd139107fcc0c839d4cdaa49daa653816b.png" alt="" width="2018"></p>
+<p>&nbsp; &nbsp; 上面我们也发现了一个FinalizerDaemon的线程，其主要执行的函数就是Daemons$FinalizerDaemon.doFinalize(FinalizerReference&lt;?&gt; reference)的代码。而且我们也已经看到了，该函数中，主要都是调用了类的finalize()方法。我们不妨看下FinalizerReference和Daemons的源码：</p>
+<pre><code class="hljs java"> <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FinalizerReference</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Reference</span>&lt;<span class="hljs-title">T</span>&gt; </span>{
+     <span class="hljs-comment">// This queue contains those objects eligible for finalization.</span>
+     <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ReferenceQueue&lt;Object&gt; queue = <span class="hljs-keyword">new</span> ReferenceQueue&lt;Object&gt;();
+ 
+     <span class="hljs-comment">// Guards the list (not the queue).</span>
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Object LIST_LOCK = <span class="hljs-keyword">new</span> Object();
+ 
+     <span class="hljs-comment">// This list contains a FinalizerReference for every finalizable object in the heap.</span>
+     <span class="hljs-comment">// Objects in this list may or may not be eligible for finalization yet.</span>
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> FinalizerReference&lt;?&gt; head = <span class="hljs-keyword">null</span>;
+ 
+     <span class="hljs-comment">// The links used to construct the list.</span>
+     <span class="hljs-keyword">private</span> FinalizerReference&lt;?&gt; prev;
+     <span class="hljs-keyword">private</span> FinalizerReference&lt;?&gt; next;
+ 
+     <span class="hljs-comment">// When the GC wants something finalized, it moves it from the 'referent' field to</span>
+     <span class="hljs-comment">// the 'zombie' field instead.</span>
+     <span class="hljs-keyword">private</span> T zombie;
+ 
+     <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">FinalizerReference</span><span class="hljs-params">(T r, ReferenceQueue&lt;? <span class="hljs-keyword">super</span> T&gt; q)</span> </span>{
+         <span class="hljs-keyword">super</span>(r, q);
+     }
+ 
+     <span class="hljs-meta">@Override</span> <span class="hljs-function"><span class="hljs-keyword">public</span> T <span class="hljs-title">get</span><span class="hljs-params">()</span> </span>{
+         <span class="hljs-keyword">return</span> zombie;
+     }
+ 
+     <span class="hljs-meta">@Override</span> <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">clear</span><span class="hljs-params">()</span> </span>{
+         zombie = <span class="hljs-keyword">null</span>;
+     }
+
+  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(Object referent)</span> </span>{
+         FinalizerReference&lt;?&gt; reference = <span class="hljs-keyword">new</span> FinalizerReference&lt;Object&gt;(referent, queue);
+         <span class="hljs-keyword">synchronized</span> (LIST_LOCK) {
+             reference.prev = <span class="hljs-keyword">null</span>;
+             reference.next = head;
+             <span class="hljs-keyword">if</span> (head != <span class="hljs-keyword">null</span>) {
+                 head.prev = reference;
+             }
+             head = reference;
+         }
+     }
+ 
+     <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">remove</span><span class="hljs-params">(FinalizerReference&lt;?&gt; reference)</span> </span>{
+         <span class="hljs-keyword">synchronized</span> (LIST_LOCK) {
+             FinalizerReference&lt;?&gt; next = reference.next;
+             FinalizerReference&lt;?&gt; prev = reference.prev;
+             reference.next = <span class="hljs-keyword">null</span>;
+             reference.prev = <span class="hljs-keyword">null</span>;
+             <span class="hljs-keyword">if</span> (prev != <span class="hljs-keyword">null</span>) {
+                 prev.next = next;
+             } <span class="hljs-keyword">else</span> {
+                 head = next;
+            }
+            <span class="hljs-keyword">if</span> (next != <span class="hljs-keyword">null</span>) {
+                 next.prev = prev;
+             }
+         }
+     }
+}
+
+
+
+  <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Daemons</span> </span>{
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> NANOS_PER_MILLI = <span class="hljs-number">1000</span> * <span class="hljs-number">1000</span>;
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> NANOS_PER_SECOND = NANOS_PER_MILLI * <span class="hljs-number">1000</span>;
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> MAX_FINALIZE_NANOS = <span class="hljs-number">10L</span> * NANOS_PER_SECOND;
+ 
+     <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">start</span><span class="hljs-params">()</span> </span>{
+         ReferenceQueueDaemon.INSTANCE.start();
+        FinalizerDaemon.INSTANCE.start();
+         FinalizerWatchdogDaemon.INSTANCE.start();
+     }
+ 
+     <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">stop</span><span class="hljs-params">()</span> </span>{
+         ReferenceQueueDaemon.INSTANCE.stop();
+         FinalizerDaemon.INSTANCE.stop();
+         FinalizerWatchdogDaemon.INSTANCE.stop();
+     }
+
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">More</span> <span class="hljs-title">Daemon</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>{
+         <span class="hljs-keyword">private</span> Thread thread;
+ 
+         <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">start</span><span class="hljs-params">()</span> </span>{
+             <span class="hljs-keyword">if</span> (thread != <span class="hljs-keyword">null</span>) {
+                 <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalStateException(<span class="hljs-string">"already running"</span>);
+             }
+             thread = <span class="hljs-keyword">new</span> Thread(ThreadGroup.mMain, <span class="hljs-keyword">this</span>,
+                 getClass().getSimpleName());
+             thread.setDaemon(<span class="hljs-keyword">true</span>);
+             thread.start();
+         }
+      ……
+     }
+
+ <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FinalizerDaemon</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Daemon</span> </span>{
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> FinalizerDaemon INSTANCE = <span class="hljs-keyword">new</span> FinalizerDaemon();
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ReferenceQueue&lt;Object&gt; queue = FinalizerReference.queue;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> Object finalizingObject;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">long</span> finalizingStartedNanos;
+
+        <span class="hljs-meta">@Override</span> <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">while</span> (isRunning()) {
+                <span class="hljs-comment">// Take a reference, blocking until one is ready or the thread should stop</span>
+                <span class="hljs-keyword">try</span> {
+                    doFinalize((FinalizerReference&lt;?&gt;) queue.remove());
+                } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {
+                }
+            }
+         }
+
+        <span class="hljs-meta">@FindBugsSuppressWarnings</span>(<span class="hljs-string">"FI_EXPLICIT_INVOCATION"</span>)
+        <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doFinalize</span><span class="hljs-params">(FinalizerReference&lt;?&gt; reference)</span> </span>{
+            FinalizerReference.remove(reference);
+            Object object = reference.get();
+            reference.clear();
+            <span class="hljs-keyword">try</span> {
+               finalizingStartedNanos = System.nanoTime();
+                finalizingObject = object;
+                <span class="hljs-keyword">synchronized</span> (FinalizerWatchdogDaemon.INSTANCE) {
+                    FinalizerWatchdogDaemon.INSTANCE.notify();
+                }
+                object.finalize();
+            } <span class="hljs-keyword">catch</span> (Throwable ex) {
+               <span class="hljs-comment">// The RI silently swallows these, but Android has always logged.</span>
+                System.logE(<span class="hljs-string">"Uncaught exception thrown by finalizer"</span>, ex);
+            } <span class="hljs-keyword">finally</span> {
+                finalizingObject = <span class="hljs-keyword">null</span>;
+            }
+        }
+    }
+}</code></pre>
+<p>&nbsp; &nbsp; 从上面的代码我们可以看出FinalizerReference类中有两处使用了静态变量，queue和head。当调用该类的add方法时，会将当前对象插入到FinalizerReference的对象链表里，链表是被head静态引用的，也就是说在这个链表里的对象都无法被GC掉。 什么样的对象会被加入到FinalizerReference的链表中呢？<br>&nbsp; &nbsp; Java中的类除了有public，abstract，final等类型外，还有一种Finalizer的类，GC在处理这种类的对象时要做一些特殊的处理，如在这个对象被回收之前会调用它的finalize方法。如何判断一个类是不是一个Finalizer类呢，我们知道Object有个finalize()方法，代码如下：</p>
+<pre><code class="hljs aspectj"><span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">finalize</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Throwable </span>{ }</code></pre>
+<p>&nbsp; &nbsp; 在Object类里定义的是一个finalize的空方法，Java里的所有类都会继承这个方法，也可以覆写该方法。而判断当前类是否是Finalizer类的标准并不仅仅是当前类是否含有一个参数为空，返回值为void的finalize方法，还要求finalize方法必须非空，因此Object类虽然含有一个finalize方法，但它并不是Finalizer类，Object的对象在被GC回收时并不会调用它的finalize方法。Java中类在加载过程中其实就已经被标记为是否为Finalizer类了，在类加载的时候会遍历当前类的所有方法，包括父类的方法，只要有一个参数为空且返回void的非空finalize方法就认为这个类是Finalizer类。</p>
+<p>&nbsp; &nbsp; 在GC发生时，GC会判断Finalizer类对象是不是只被FinalizerReference类引用，如果仅仅被FinalizerReference里面的链表所引用，就说明没有其他的引用存在了，这个对象已经可以回收，可以去执行它的finalize方法了。于是将这个Finalizer对象放到FinalizerReference类的ReferenceQueue&lt;Object&gt; queue里，但此时这个对象并没有被回收，因为FinalizerReference对这个类还有强引用。接下来系统的FinalizerDaemon线程会来继续跟进这个类的回收，我们再来查看上面的代码：</p>
+<pre><code class="hljs cs">        @<span class="hljs-function">Override <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">while</span> (isRunning()) {
+                <span class="hljs-comment">// Take a reference, blocking until one is ready or the thread should stop</span>
+                <span class="hljs-keyword">try</span> {
+                    doFinalize((FinalizerReference&lt;?&gt;) queue.remove());
+                } <span class="hljs-keyword">catch</span> (InterruptedException ignored) {
+                }
+            }
+        }
+
+        @FindBugsSuppressWarnings(<span class="hljs-string">"FI_EXPLICIT_INVOCATION"</span>)
+        <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doFinalize</span>(<span class="hljs-params">FinalizerReference&lt;?&gt; reference</span>) </span>{
+            FinalizerReference.remove(reference);
+            Object <span class="hljs-keyword">object</span> = reference.<span class="hljs-keyword">get</span>();
+            reference.clear();
+            <span class="hljs-keyword">try</span> {
+               finalizingStartedNanos = System.nanoTime();
+                finalizingObject = <span class="hljs-keyword">object</span>;
+                synchronized (FinalizerWatchdogDaemon.INSTANCE) {
+                    FinalizerWatchdogDaemon.INSTANCE.notify();
+                }
+                <span class="hljs-keyword">object</span>.finalize();
+            } <span class="hljs-keyword">catch</span> (Throwable ex) {
+               <span class="hljs-comment">// The RI silently swallows these, but Android has always logged.</span>
+                System.logE(<span class="hljs-string">"Uncaught exception thrown by finalizer"</span>, ex);
+            } <span class="hljs-keyword">finally</span> {
+                finalizingObject = <span class="hljs-keyword">null</span>;
+            }
+        }
+    }</code></pre>
+<p><br>&nbsp; &nbsp; &nbsp;函数首先会调用queue.remove()从队列中移除并将该Finalizer类的对象作为参数传递给doFinalize方法。如果队列为空，该线程就会进通过wait(timeoutMillis, timeoutNanos)不断的挂起和唤醒。通过调用FinalizerReference.remove(reference)，将该对象从静态的链表中移除，接着将该对象与FinalizerReference解绑，再调用该对象的object.finalize()方法。因为前面已经将该Finalizer类对象从静态链表中移除了，即使在finalize()方法将该对象复活（如赋值给一个强引用），后面再次被GC回收的时候已经不会再调用finalize()方法了，因为FinalizerReference类中已经没有该对象的引用了，这也是<span style="color:#ff0000;"><strong>finalize()只会被调用一次的原因</strong></span>。doFinalize以及其外层的函数都做了try的异常保护，所以在finalize()方法中发生异常并不会导致该线程崩溃，只是finalize()方法中的代码如果抛异常，会被外层捕获而被忽略，所以<strong><span style="color:#ff0000;">我们在写finalize()方法的时候，如果遇到复杂的逻辑也应该加上try异常保护</span></strong>，避免到时候难以察觉问题出在哪里。</p>
+<p>&nbsp; &nbsp; 或许到这里还有人在疑惑为什么要讨论以上这些。不知道大家是否注意到了，GC在处理Finalizer类对象时的不同之处。第一次GC的时候只是将该对象放入到FinalizerReference的队列中，并等待finalize()方法被执行。finalize()执行完毕后也就和普通的对象一样，不存在FinalizerReference对它的引用了。这样在接下来的GC才能将该对象回收掉。由于FinalizerDaemon线程的优先级比较低，所以在finalize()方法执行的过程中可能已经经历了多次的GC，而该对象迟迟不能回收，有可能会导致大部分Finalizer对象进入到类似于老年代（Android 5.0中Generational Semi-Space（GSS）GC中有类似于老年代、新生代的分类）Promote Space中，此时容易引发Promote Space的GC，甚至Full GC，GC暂停时间明显变长。<br><br>&nbsp; &nbsp; 通过上面的介绍，我们应该可以理解，为什么前面要提到慎用finalize()方法了。因为它会影响对象的生命周期和GC的执行效率，它要至少经历两次GC才能被回收。如果finalize中执行了耗时操作，那就会给垃圾回收带来灾难性的后果。所以，即使是系统中的Cursor，FileInputStream类有这层保护，我们也是希望主动调用内存的释放方法，而不是等待GC的时候来回收，这个只能作为最后的防线。<span style="color:#ff0000;"><strong>如果依赖于finalize来回收内存，不仅时效性得不到保证，容易引发更多的GC和占用更多的内存，还可能进一步导致OOM和稳定性问题</strong>。</span>后续在对手淘代码的性能检查中，也会加强这方面的检测，<span style="color:#ff0000;"><strong>特别是高频率使用的对象以及占用关键资源的对象，不能重写finalize方法</strong></span>。除非是作为一道必须的安全网，或者是为了释放非关键的Native内存，否则不要使用该方法。滥用finalize方法将会给性能带来几倍甚至几百倍的差别。<br>&nbsp; &nbsp; 在Java和Android中有不少系统类使用了该方法，所以在遇到这些类的时候，我们也要谨慎的使用，如：Pattern、Matcher、FileInputStream、FileOutputStream、RandomAccessFile、StringBlock、CharsetDecoderICU、XmlBlock、DecimalFormat、Binder、Paint、Path、SQLiteConnection、SQLCursor、SQLiteDatabase、BigInt、Matrix、Parcel等。<br>&nbsp; &nbsp; 另外finalize方法在重写的时候必须要调用父类的finalize方法。写法如下所示：</p>
+<pre><code class="hljs aspectj"><span class="hljs-meta">@Override</span>
+<span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">finalize</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Throwable</span>{
+    <span class="hljs-keyword">try</span>{
+  .........
+    }<span class="hljs-keyword">finally</span> {
+        <span class="hljs-keyword">super</span>.finalize();
+    }
+}</code></pre>
+<p>&nbsp; &nbsp; 如果漏掉了父类的finalize方法，父类的finalize是不会被自动调用到的。为了防止这样的问题出现，可以把finalize方法放在一个匿名类中，而不是直接放在外围类中。这样，该匿名类的唯一用途就是终结它的外围实例。例如Android的Bitmap类就是用了这样的设计方式，被称为终结方法守卫者，以下是摘自该类的部分代码：</p>
+<pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Bitmap</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Parcelable</span> </span>{
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> BitmapFinalizer mFinalizer;
+
+    Bitmap(<span class="hljs-keyword">int</span> nativeBitmap, <span class="hljs-keyword">byte</span>[] buffer, <span class="hljs-keyword">boolean</span> isMutable, <span class="hljs-keyword">byte</span>[] ninePatchChunk,
+            <span class="hljs-keyword">int</span>[] layoutBounds, <span class="hljs-keyword">int</span> density) {
+        mFinalizer = <span class="hljs-keyword">new</span> BitmapFinalizer(nativeBitmap);
+    }
+
+   <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BitmapFinalizer</span> </span>{
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> mNativeBitmap;
+
+        BitmapFinalizer(<span class="hljs-keyword">int</span> nativeBitmap) {
+            mNativeBitmap = nativeBitmap;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">finalize</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">try</span> {
+                <span class="hljs-keyword">super</span>.finalize();
+            } <span class="hljs-keyword">catch</span> (Throwable t) {
+                <span class="hljs-comment">// Ignore</span>
+            } <span class="hljs-keyword">finally</span> {
+                nativeDestructor(mNativeBitmap);
+            }
+        }
+    }
+}</code></pre>
+<p>&nbsp; &nbsp; &nbsp;由于finalize中存在对象复活的可能性，也会导致GC性能降低，在一个复杂系统中该怎么来实现类似于finalize释放资源的功能呢？<strong><span style="color:#ff0000;">使用虚引用等来清理对象所占的资源，是对finalize方法的一种比较好的替代方法。</span></strong>PhantomReference配合ReferenceQueue使用可以知道哪些类已经被回收了。<br><br></p>
+<h2 id="10">七、容器类的内存与性能</h2>
+<p>&nbsp; &nbsp; 从性能的角度考虑优先使用数组 ，但是容器的功能更加强大，所以我们现在已经习惯了容器的使用。ArrayList和HashMap等的使用随处可见，在大量使用容器的时候 ，我们是否会下意识的关注容器的内存和性能问题呢？<br>&nbsp; &nbsp; 比如HashMap要比ArrayList ,SparseArray多占用内存 ，HashMap每次2倍的扩容 ,还要额外带来重新hash的开销。ArrayList的扩容是1.5倍 ，而且没有HashMap的额外的Map.Entry的对象分配 ，内存上会更节约。特别是当数据量比较大的时候 ，Map.Entry带来的影响 ，以及1.5倍和2倍的数量上会很可观。<br>&nbsp; &nbsp; LinkedList使用了双向链表的数据结构，与基于数组的ArrayList使用场景不同。<strong><em>添加到列表的尾部</em></strong>，这两者性能上都很高。ArrayList只要当前容量足够大，add操作的效率非常高，扩容的过程使用了System.arraycopy()方法，效率也是相当高的。LinkedList使用了链表，不需要扩容，但是每次增加元素都需要新建一个Entry对象，类似于HashMap，这样就多了对象的分配和赋值，在频繁的时候还是有一定的影响，对GC也会造成一定的影响。<strong><em>添加元素到任意位置的时候</em></strong>，LinkedList会优于ArrayList很多，因为LinkedList和插入的位置基本是无关的。而ArrayList在中间插入元素，会导致一次数组的复制操作，元素越靠前，数组重组的开销也会越大。删除和添加元素类似。<strong><em>遍历方面</em></strong>，使用迭代器和ForEach循环的话，两者性能基本差不多，而使用for随机访问的话，ArrayList表现很快，而LinkedList极其糟糕。<br>&nbsp; &nbsp; 遍历ArrayList的方法这里提到了3种，而我们应该使用的应该是for下标的随机访问形式，使用该方式性能可以提升1.5倍到2倍以上。因为使用ForEach循环和迭代器基本是一样的，而每次调用ForEach或者迭代器循环，ArrayList都会新建一个new ArrayListIterator()对象。并且迭代器本身的访问也是有方法调用和赋值开销的，所以性能上会下降，而且在高频率函数中使用这种方式遍历，如在onTouchEvent，onDraw这种频率很高的函数中使用，就会不断的产生这些临时迭代器对象，对GC和性能造成影响。如ArrayList中的代码：</p>
+<pre><code class="hljs nimrod">    @<span class="hljs-type">Override</span> public <span class="hljs-type">Iterator</span>&lt;E&gt; <span class="hljs-keyword">iterator</span>() {
+        <span class="hljs-keyword">return</span> new <span class="hljs-type">ArrayListIterator</span>();
+    }
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;<strong><span style="color:#ff0000;">所以，在使用ArrayList、Vector等实现了RandomAccess接口的类来说，遍历的时候一定要使用for的下标访问形式以提升性能，也可以减少对象的分配。</span></strong><br>&nbsp; &nbsp; &nbsp;<br>&nbsp; &nbsp; 对于HashMap等Map的遍历上，实现方式比ArrayList实现的相对好一点，在调用KeySet和EntrySet的时候，返回的都是同一个实例，避免了对象的频繁分配。<br><br></p>
+<pre><code class="hljs php">    <span class="hljs-comment">/**
+     * Returns a set of the keys contained in this map. The set is backed by
+     * this map so changes to one are reflected by the other. The set does not
+     * support adding.
+     *
+     * <span class="hljs-doctag">@return</span> a set of the keys.
+     */</span>
+    @Override <span class="hljs-keyword">public</span> Set&lt;K&gt; keySet() {
+        Set&lt;K&gt; ks = keySet;
+        <span class="hljs-keyword">return</span> (ks != <span class="hljs-keyword">null</span>) ? ks : (keySet = <span class="hljs-keyword">new</span> KeySet());
+    }
+
+    <span class="hljs-comment">/**
+     * Returns a set containing all of the mappings in this map. Each mapping is
+     * an instance of {<span class="hljs-doctag">@link</span> Map.Entry}. As the set is backed by this map,
+     * changes in one will be reflected in the other.
+     *
+     * <span class="hljs-doctag">@return</span> a set of the mappings.
+     */</span>
+    <span class="hljs-keyword">public</span> Set&lt;Entry&lt;K, V&gt;&gt; entrySet() {
+        Set&lt;Entry&lt;K, V&gt;&gt; es = entrySet;
+        <span class="hljs-keyword">return</span> (es != <span class="hljs-keyword">null</span>) ? es : (entrySet = <span class="hljs-keyword">new</span> EntrySet());
+    }
+</code></pre>
+<p>&nbsp; &nbsp; &nbsp;容器的初始容量也是影响性能的一个很大因素，频繁的扩容会导致更多的对象分配，数组重组，像HashMap还有额外的重新Hash的开销，所以在能大致知道数量的情况下，需要设置初始容量。除了可以提升性能 ,内存上也能有较大的优势。特别是在数据量较大的情况下 , 比如Android中的ArrayList最小初始值是12 ,如果你的数据总共只有26155个元素 ,如果不是指定初始容量 ,默认添加的话 ,经过很多次的数组重新分配和数组拷贝 ，最后数组的大小是39226的大小 ，浪费了13071个数组空间。对于HashMap类型的 ，因为负载因子默认是0.75 ，浪费的就会更多 ，对内存的消耗也会更多。<br>&nbsp; &nbsp; HashMap、HashSet等除了受到初始容量的影响还会受到负载因子大小的影响，该因子太小容易导致内存的浪费，太大则容易增加Hash冲突的概率，也会影响性能。<br>&nbsp; &nbsp; 对于有多线程同步需求的性能来说，可以使用ConcurrentHashMap等Concurrent包下的一些容器来替代会获得更好的性能。<br>&nbsp; &nbsp; 在Android中，新增了一种SparseArray（还包括SparseIntArray,SparseBooleanArray,LongSparseArray 等）稀疏数组的容器，用来代替HashMap&lt;Integer , *&gt;，HashMap&lt;Long , *&gt;等类型的容器 ，它没有HashMap的额外开销 ，可以节约内存 ，比HashMap大致节省30%多的内存。初始大小是13 ，但是为了保证有序性 ，插入 ，查找等效率都会不及HashMap ，使用的时候需要综合选择。<strong><span style="color:#ff0000;">在数据量较大，不需要有类似于HashMap那样有快速定位需求的情况下，请用SparseArray代替HashMap</span></strong>，例如我们经常将一些参数列表保存在HashMap中，这个时候就可以使用SparseArray来代替。</p>
+<p>&nbsp; &nbsp; 另外在Java中还有WeakHashMap类，它使用弱引用作为内部数据的存储方案，可以自动释放已经被回收的key所在的表项。在作为大数据存储或者缓存的时候可以防止内存的泄露。</p>
+<h2 id="11">八、减少内存碎片</h2>
+&nbsp; &nbsp; Android虚拟机不像HotSpot那样较为完善和高效，有很好的分代和各个代不同的回收算法。在Android 5.0以下，主要的虚拟机回收算法都是标记-清除算法（Mark-Sweep），这个回收算法的最大问题就是，空间问题，标记清除之后会产生大量的非连续空间碎片，过多的碎片将导致程序在以后的运行中找不到足够大的连续内存空间来分配给较大的对象而不得不提前触发另一次垃圾收集事件。而且堆的利用率也会不高，堆的扩容也会更加的频繁且不容易恢复到合理的大小，因为碎片阻碍了堆的收缩。明明看到堆的剩余空间还很充足，但是分配一个比这个小的内存仍然会触发GC。所以减少内存碎片也是提升性能和减少GC的一个重要手段。在Android 5.0中，增加了压缩回收算法，对内存碎片的回收有了比较大的改进。<br>&nbsp; &nbsp; 减少长生命周期对象的频繁分配和不间断分配是一个减少碎片的有效方法，例如我们很多的单例、静态变量引用的对象，长期占据了这部分堆内存，从而导致了堆空间的不连续。关于这方面的更多改进，将在后续的文章中做更多的介绍。<br><h2 id="12">九、使用独立子进程</h2>
+&nbsp; &nbsp; 在使用一些特别占用资源的模块或者界面的时候，我们可以将其放在独立的新进程中运行，可以减少对主进程的影响，从而提升性能。例如对WebView访问一些外部的界面，可以将这个Activity独立在新的进程中，Activity退出的时候可以彻底结束掉这个进程，做到资源的干净回收。<br><h2 id="13">十、用工具检测，精雕细琢</h2>
+&nbsp; &nbsp; Android中为我们提供了一个很好的工具--AlloCation Tracker。在优化的后期，我们可以通过AlloCation Tracker工具观察内存的分配情况。在滑动，静默，切换等场景中找到多余的分配的对象，特别是分配多的对象，去掉或者复用这些对象，提升性能并减少GC的压力。这是一个精雕细琢的工具，建议大家也多使用，可以发现很多小对象的分配问题。如下图所示，该工具可以看到分配的大小，分配的类，所在的类，以及分配的线程，并且可以按照这些维度来排序：<br><br><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/57c64d10283febfa6d89fddc6098bc46f7030c96.png" alt="" width="800"><br><br><br>&nbsp; &nbsp; 这两篇文章中主要谈了减少GC和优化内存使用的方法，希望在开发的时候都能够更关注这些方面，减少对象的分配，尽量减少内存的使用，即使是Native内存和Ashmem的内存，同样都会导致系统可用内存的减少。而Android在设计上并不是程序退出后就会释放进程占用的内存，缓存了较多的程序和后台进程，本身可使用的内存并不会很多。而是在运行期间根据重要性在过程中动态的去回收其他进程的内存（如按照Empty process、Background process、Service process、Visible process、Foreground process的顺序去回收内存），频繁的回收其他进程的内存自然会降低系统的性能。激进式的使用Native内存和Ashmem的内存会引发系统回收其他进程的内存，也可能导致ActivityManagerService发出OnTrimMemory、OnLowMemory的通知。下图就是手淘的界面在滑动过程中，收到了OnTrimMemory通知，影响了帧率。<br><br><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/fec666abf31a42a69a4290d1d33cf8917a02d3e0.png" alt="" width="878">
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/46717/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">8人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/71169" title="榕舒"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20140415113042_71169_60.jpeg_80x80" width="26" height="26" alt="榕舒" class="img-user"></a></li><li><a href="http://www.atatech.org/users/99638" title="无锚"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20140918085354.gif_80x80" width="26" height="26" alt="无锚" class="img-user"></a></li><li><a href="http://www.atatech.org/users/95675" title="铭戎"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_41465030cec4e06c95d3d0cb9623acfc.png_80x80" width="26" height="26" alt="铭戎" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130616" title="虎三"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20160104093442.jpg_80x80" width="26" height="26" alt="虎三" class="img-user"></a></li><li><a href="http://www.atatech.org/users/149914" title="名爵"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_02d6ab2a0b02858dc686b57e9c005e0c.png_80x80" width="26" height="26" alt="名爵" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81324" title="歪木"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_1e69ed329a0425bc5582acdc0573c53c.png_80x80" width="26" height="26" alt="歪木" class="img-user"></a></li><li><a href="http://www.atatech.org/users/93387" title="箫君"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_52b459eb433f1054adc1465d51c5eab6.png_80x80" width="26" height="26" alt="箫君" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64438" title="陶肥"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_7682e8463d6a49b46d71f0759325e095.png_80x80" width="26" height="26" alt="陶肥" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/46717#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (4)
+                  </a>
+        <a href="http://www.atatech.org/articles/46717/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          30
+        </a>
+        <a href="http://www.atatech.org/articles/46717/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          31
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="46717" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/46717/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          19
+        </a>
+        <a href="http://www.atatech.org/articles/46717/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          20
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/10608" title="空相"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_689041c2baed0f6d91050495d632d6e0.png_80x80" width="28" height="28" alt="空相" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13550" title="鼬神"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120725183050_13550_60.jpeg_80x80" width="28" height="28" alt="鼬神" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34847" title="济翼"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151208175631.jpg_80x80" width="28" height="28" alt="济翼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/112278" title="荩臣"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_cbb1d1fa069633356340114439ed2a82.png_80x80" width="28" height="28" alt="荩臣" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24449" title="问世"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_fdc9538552329dc72122809403b3238a.png_80x80" width="28" height="28" alt="问世" class="img-user"></a></li><li><a href="http://www.atatech.org/users/7541" title="释然"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120719180742_7541_60.jpeg_80x80" width="28" height="28" alt="释然" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130616" title="虎三"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20160104093442.jpg_80x80" width="28" height="28" alt="虎三" class="img-user"></a></li><li><a href="http://www.atatech.org/users/73955" title="临远"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_c153716339d43d3de74d8b94d9ec9344.png_80x80" width="28" height="28" alt="临远" class="img-user"></a></li><li><a href="http://www.atatech.org/users/6261" title="悟石"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120719180737_6261_60.jpeg_80x80" width="28" height="28" alt="悟石" class="img-user"></a></li><li><a href="http://www.atatech.org/users/142186" title="斑尾"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_cefa96f5499f1dd3aaf34444537edb86.png_80x80" width="28" height="28" alt="斑尾" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81324" title="歪木"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_1e69ed329a0425bc5582acdc0573c53c.png_80x80" width="28" height="28" alt="歪木" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64157" title="如盐"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_652fca5e93b01f8e5bea89231142bd1e.png_80x80" width="28" height="28" alt="如盐" class="img-user"></a></li><li><a href="http://www.atatech.org/users/96662" title="孙波"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_203ac4aa5f997bf54b4d432171338a1a.png_80x80" width="28" height="28" alt="孙波" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64438" title="陶肥"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_7682e8463d6a49b46d71f0759325e095.png_80x80" width="28" height="28" alt="陶肥" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23566" title="跑者"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_ebb884f6fc4d14827b8c55d8411d8213.png_80x80" width="28" height="28" alt="跑者" class="img-user"></a></li><li><a href="http://www.atatech.org/users/97119" title="雪梦"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20150416165641.JPG_80x80" width="28" height="28" alt="雪梦" class="img-user"></a></li><li><a href="http://www.atatech.org/users/105597" title="寻禹"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20140926152139.jpeg_80x80" width="28" height="28" alt="寻禹" class="img-user"></a></li><li><a href="http://www.atatech.org/users/101818" title="鬼狒"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_fa27c23b99aae757d5bf0841ddfc73ea.png_80x80" width="28" height="28" alt="鬼狒" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/73403" title="戊子"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/73403_20140626113133_88.jpg_80x80" width="28" height="28" alt="戊子" class="img-user"></a></li><li><a href="http://www.atatech.org/users/70874" title="兰昊"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20141225101925.jpg_80x80" width="28" height="28" alt="兰昊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/136727" title="李少江"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_a3ff4b01ad8e85f12011b4ba6400834a.png_80x80" width="28" height="28" alt="李少江" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13855" title="执明"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_32f84b597629f37d9ef53d714fce6fa1.png_80x80" width="28" height="28" alt="执明" class="img-user"></a></li><li><a href="http://www.atatech.org/users/33925" title="白书"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_71b539f8a0207a307900ca15cbebc334.png_80x80" width="28" height="28" alt="白书" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/69607" title="肖月"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_8bb3fb5ce00e8affb83f367f06dae31b.png_80x80" width="28" height="28" alt="肖月" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23076" title="兰兰"><img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20131230181137_23076_60.jpeg_80x80" width="28" height="28" alt="兰兰" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/12802">读书笔记-内存初始化和清理</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/39778">Java内存模型</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/41067">Fresco源码分析(三)——揭开内存自...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/24595">memory leak 2：Activitys, Threads</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/17721">Android 内存泄露检测和分析</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/35801">java运行时内存区分</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/46524">上一篇：手淘安卓版性能优化17 - 减少GC，提升性能（上）</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/46997">下一篇：手淘安卓版性能优化19 - 字符串与格式化的性能及注意事项</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-77471">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/136727" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_a3ff4b01ad8e85f12011b4ba6400834a.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/136727" class="author">李少江</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46717#comment-77471" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-24T14:51:09+08:00">2015-12-24 14:51:09</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>看了一下写的很不错-</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/77471/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77471/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-77471&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-77471">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-77471" style="display:none">
+      <div class="sub-comments media-list" id="comment-77471-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/77471/subcomments/" method="POST" data-remote="true" data-target="#comment-77471-sub" data-done="$(&#39;#sub-comments-count-77471&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-77942">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/19187" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151229164902.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/19187" class="author">冰阳</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46717#comment-77942" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-29T16:47:24+08:00">2015-12-29 16:47:24</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>这是个浩大的工程</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/77942/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77942/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-77942&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-77942">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-77942">
+      <div class="sub-comments media-list" id="comment-77942-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-12-29T17:40:22+08:00">2015-12-29 17:40:22</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>是的，这些地方需要开发人员本身注意才行。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/77942/subcomments/23865/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77942/subcomments/23865/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-23865&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-23865" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/77942/subcomments/" method="POST" data-remote="true" data-target="#comment-77942-sub" data-done="$(&#39;#sub-comments-count-77942&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/77942/subcomments/" method="POST" data-remote="true" data-target="#comment-77942-sub" data-done="$(&#39;#sub-comments-count-77942&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-77956">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/93387" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_identicon_52b459eb433f1054adc1465d51c5eab6.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        3F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/93387" class="author">箫君</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46717#comment-77956" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-29T17:38:58+08:00">2015-12-29 17:38:58</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>老牛B了</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/77956/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77956/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-77956&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-77956">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-77956">
+      <div class="sub-comments media-list" id="comment-77956-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-12-29T17:40:32+08:00">2015-12-29 17:40:32</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>谢谢!</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/77956/subcomments/23866/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77956/subcomments/23866/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-23866&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-23866" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/77956/subcomments/" method="POST" data-remote="true" data-target="#comment-77956-sub" data-done="$(&#39;#sub-comments-count-77956&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/77956/subcomments/" method="POST" data-remote="true" data-target="#comment-77956-sub" data-done="$(&#39;#sub-comments-count-77956&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-78328">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/12694" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120725183047_12694_60.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        4F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/12694" class="author">欧国</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/46717#comment-78328" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2016-01-04T11:44:30+08:00">2016-01-04 11:44:30</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>可以考虑出书了。。。</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/78328/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78328/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-78328&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-78328">4</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-78328">
+      <div class="sub-comments media-list" id="comment-78328-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2016-01-05T09:46:56+08:00">2016-01-05 09:46:56</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>哈哈，那是很麻烦的事情。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/78328/subcomments/24060/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78328/subcomments/24060/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-24060&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-24060" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/78328/subcomments/" method="POST" data-remote="true" data-target="#comment-78328-sub" data-done="$(&#39;#sub-comments-count-78328&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/12694" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120725183047_12694_60.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/12694" class="author">欧国</a>
+            <time class="pull-right small js-relative-time" datetime="2016-01-05T09:49:39+08:00">2016-01-05 09:49:39</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/33951">@<span></span>雪鹭</a> 还好，很多事情现在出版社都可以协助搞。一些校对和数据安全，同事们都可以帮忙。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/78328/subcomments/24061/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78328/subcomments/24061/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-24061&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-24061" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/78328/subcomments/" method="POST" data-remote="true" data-target="#comment-78328-sub" data-done="$(&#39;#sub-comments-count-78328&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@欧国 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2016-01-05T09:52:01+08:00">2016-01-05 09:52:01</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/12694">@<span></span>欧国</a> 年后考虑下，谢谢！</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/78328/subcomments/24062/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78328/subcomments/24062/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-24062&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-24062" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/78328/subcomments/" method="POST" data-remote="true" data-target="#comment-78328-sub" data-done="$(&#39;#sub-comments-count-78328&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/12694" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/u_avatar_20120725183047_12694_60.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/12694" class="author">欧国</a>
+            <time class="pull-right small js-relative-time" datetime="2016-01-05T09:53:51+08:00">2016-01-05 09:53:51</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>嗯。除了Android性能优化，可以加些架构组的一些其他内容再补充。手机淘宝第一本书可能就这样出来了。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/78328/subcomments/24064/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/78328/subcomments/24064/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-24064&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-24064" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/78328/subcomments/" method="POST" data-remote="true" data-target="#comment-78328-sub" data-done="$(&#39;#sub-comments-count-78328&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@欧国 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/78328/subcomments/" method="POST" data-remote="true" data-target="#comment-78328-sub" data-done="$(&#39;#sub-comments-count-78328&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="46717">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/pic.gif"></a></span><script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/pic.gif"></a></span><script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9618+-+%E5%87%8F%E5%B0%91GC%EF%BC%8C%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD%EF%BC%88%E4%B8%8B%EF%BC%89%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F46717%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化18 - 减少GC，提升性能（下）", "", "", 'article-46717']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/46717#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化18 - 减少GC，提升性能（下）_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/46717#0">五、防止内存泄露</a></li><ul><li><a href="http://www.atatech.org/articles/46717#1">1）静态变量和单例的滥用</a></li><li><a href="http://www.atatech.org/articles/46717#2">2）&nbsp;长生命周期的对象持有短生命周期对象的引用</a></li><li><a href="http://www.atatech.org/articles/46717#3">3）利用finalize做为安全网</a></li><li><a href="http://www.atatech.org/articles/46717#4">4）合理控制需要大块内存的并发线程数</a></li><li><a href="http://www.atatech.org/articles/46717#5">5）使用好Java的多种引用</a></li><li><a href="http://www.atatech.org/articles/46717#6">6）定时及线程时间导致的泄露</a></li><li><a href="http://www.atatech.org/articles/46717#7">7）使用静态内部类减少泄露</a></li><li><a href="http://www.atatech.org/articles/46717#8">8）系统Bug引起的内存泄露</a></li></ul><li><a href="http://www.atatech.org/articles/46717#9">六、用好FinalizerReference</a></li><li><a href="http://www.atatech.org/articles/46717#10">七、容器类的内存与性能</a></li><li><a href="http://www.atatech.org/articles/46717#11">八、减少内存碎片</a></li><li><a href="http://www.atatech.org/articles/46717#12">九、使用独立子进程</a></li><li><a href="http://www.atatech.org/articles/46717#13">十、用工具检测，精雕细琢</a></li></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

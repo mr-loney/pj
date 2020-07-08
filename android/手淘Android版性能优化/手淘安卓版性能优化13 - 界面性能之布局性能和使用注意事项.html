@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/45920 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 244</span>
+          <span class="info">
+                        <time class="" datetime="2015-12-10T11:46:07+08:00">2015-12-10 11:46:07</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/45920/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="性能优化 android " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="性能优化" class="item">性能优化<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="android" class="item">android<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96&type=INSIDE_ARTICLE_TAG" class="label label-ata">性能优化</a><a href="http://www.atatech.org/search?q=android&type=INSIDE_ARTICLE_TAG" class="label label-ata">android</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/45920/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 布局（Layout）是刚接触Android开发就会遇到的基础知识。在Android中，主要有五种布局方式，分别是：FrameLayout（框架布局），LinearLayout （线性布局），AbsoluteLayout（绝对布局），RelativeLayout（相对布局），TableLayout（表格布局），而我们最常用的布局是RelativeLayout、LinearLayout和FrameLayout三种布局。关于布局的如何使用，很多资料也都有相关的介绍，这里不讨论基础的使用过程。<br>&nbsp; &nbsp; 虽然布局在开发中经常使用，甚至有些开发人员已经使用了很多年了，但是对布局的性能表现是否做过较多的了解呢？或许减少层级，提升性能已经成为大家最耳熟能详的优化攻略了。<br>&nbsp; &nbsp; 在整个手淘优化过程中，几乎所有的页面都有遇到布局性能的问题，不过我们也发现这个过程中，开发人员并不重视在布局性能上的优化，但是界面的帧率和布局又是息息相关的，特别是在可以移动的列表等界面中，布局的性能对帧率影响就更加明显了。<br><h2 id="0">一、灵活使用布局</h2>
+&nbsp; &nbsp;对于左右对半或者按比例分布的效果，很多人立马会想到LinearLayout，通过weight属性来实现。例如，如下的界面，在手淘中应用广泛：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/dcb1e58fe5fbdbb7934d528d100cc0ab717bacd1.png" alt="" width="688"><br><br>&nbsp; &nbsp; 对于以上的这个界面，或许很快就可以想到用3层LinearLayout来实现它，如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/711e2f224555320a1a1a2f293d0ef148e7e44cdf.jpeg" alt="" width="688"><br><br>&nbsp; &nbsp; 上面我们用了3层的LinearLayout来实现了这个布局，那么用其他布局能否实现一样的效果呢？答案是肯定的，用RelativeLayout一样可以达到这个效果，而且只要一层布局。如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/84b32aa699f247e3071c88accf860d067ab86731.jpeg" alt="" width="688"><br><br>&nbsp; &nbsp; 在RelativeLayout布局中，我们将中间的竖条控件作为水平居中的控件，左右两边图片部分以它作为参考，文字部分又以中间的参考线和图片控件作为参照，这样就只要一层就可以实现整个布局。<br>&nbsp; &nbsp; 当然RelativeLayout的灵活之处还有更好用的地方，如果上面中间的控件不需要有颜色显示。那么我们用一个invisible的控件占位并作为参考系，其它控件仍然能以该控件作为参考摆放。而且RelativeLayout中的子控件的宽度、高度、上下左右的起点都能以其它控件作为参考，使用起来可以非常的灵活，使得整个布局扁平化，而其强大的功能也能实现非常复杂的效果。<br>&nbsp; &nbsp; 上面这个用例只是提供了一种思路，在性能上并不是最好的，后续会更详细的分析布局的性能。<br><h2 id="1">二、优化层级和减少View</h2>
+&nbsp; &nbsp; 层级越多，测量和布局的时间就会越久，同时创建硬件列表的时间也会相应增加。有时我们会嵌套很多布局来实现原本只要简单布局就可以实现的功能，有时还会添加一些测试阶段才会使用的布局。布局本身也是View，多余的布局和其他的View控件，同时也增加了xml的infalte的时间以及增加了无用的内存开销。<br><h3 id="2">2.1 通过Merge标签减少View树层次</h3>
+&nbsp; &nbsp; 我们在自定义可重用布局的时候，都会新建一个文件来存放这个布局。当我们在文件中include这个布局文件的时候，很可能就额外多了一层的布局。如果这时候使用Merge的话，再使用&lt;include&gt;包含这个的布局的时候，系统会自动忽略merge层级，把它的子view直接放置与include平级的布局下。还有一种情况，例如在LinearLayout等布局里面嵌入一个布局时，刚好这个布局的根节点也是LinearLayout等布局的时候，既两层布局使用了同一种类型的布局时，这样就多了一层没有用的嵌套，而这个时候如果使用merge根标签就可以避免这样的问题，减少这层无用的嵌套。<br>&nbsp; &nbsp; 不过&lt;merge&gt;只能作为XML布局的根标签使用。当Inflate以&lt;merge&gt;开头的布局文件时，必须指定一个父ViewGroup，并且必须设定attachToRoot为true。<br><h3 id="3">2.2 通过ViewStub标签优化布局</h3>
+&nbsp; &nbsp; ViewStub标签是我在优化中使用比较多的一个标签。比如一些显示错误的界面、加载提示框的界面，ProgressBar等界面，以及用户很少会触发的界面，当这些不是必须显示的布局都堆在一起时，会对infalte性能、内存等产生不利影响。这个时候用ViewStub标签就很合适，可以将这些不常用的布局另外保存为布局文件，对应的位置布局用ViewStub标签代替。等到真正需要显示的时候再对ViewStub初始化。因为ViewStub是一个轻量级的View，它是一个不可见，且不占布局位置，占用资源非常小的控件。所以使用ViewStub后，可以加快Inflate的时间，减少创建的对象数量，从而提升性能和减少内存的占用。不过ViewStub只能Inflate一次，一旦初始化后该标签就会被真正的布局所代替。<br>&nbsp; &nbsp; 例如在购物车中，有编辑状态和非编辑状态。首次进入的时候肯定是非编辑状态。而且购物车还有网络错误、购物车为空等布局界面。这些界面都不是一定会显示，很多用户进入购物车不会选择编辑，这个用户购物车只要有商品，那么购物车为空的布局就是多余的。所以当时在优化的时候，就在这些布局上应用了ViewStub。在真正需要使用这些界面的时候再去初始化这部分控件。 从而可以提升进入界面和滑动过程中的性能，同时也降低了一些内存的分配和使用。例如下图所示：上面是正常状态，下面是【编辑】状态，两种情况下的布局是不一样的，这里的编辑状态使用了ViewStub，在没有点击编辑按钮的情况下是不会创建这部分布局的。<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/69db99c62dcaee884fdaf9dba44166acae9e37d0.jpeg" alt="" width="681"><br><br><h3 id="4">2.3 减少不需要的View</h3>
+&nbsp; &nbsp;&nbsp;一方面减少层级本身就是减少了view的数量，另外像一些场景，文字有大有小，有不同颜色，其实用一个TextView就可以实现，例如可以借助Spannable对象实现。不需要使用很多个TextView来实现。例如，在【我的订单】界面，我们可以看到商品和价格的位置用了4个TextView控件来实现，这个有点多余，而且本身TextView创建的时间相对于ImageView都要长很多，内存消耗也会比一般的控件大。<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/60b7c8a015cec9a484bdd87c3665fc3c1c260420.png" alt="" width="1602"><br><p>&nbsp; &nbsp; &nbsp;有时候用一个自定义控件可以做到一个复杂布局加多个view需要做的是事情，这个时候用自定义控件来实现性能上和内存上都会更有优势。<br>&nbsp; &nbsp; &nbsp;另外，有时我们发现一个空白区域的占位也使用了一个view去做，其实用layout_margin属性或者用其他方式就能代替掉这个View，在首页、搜索等不少界面都发现了类似的做法，例如搜索列表界面，在搜索关键字后面有一个view，只是用来作为占位控件，如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/59f71e1acfdd269d3a591156c0154e3809efb4bf.png" alt="" width="1606"><br><br></p>
+<h2 id="5">三、常见布局的性能</h2>
+&nbsp; &nbsp; 我们来看下3种使用最频繁的布局和一些View的性能问题，通过几个维度来分析。<br><h3 id="6">3.1  View创建时间的性能</h3>
+&nbsp; &nbsp; View的创建时间也是性能上影响的一个因素，在创建过程中，ListView、TextView等明显要比View和ImageView慢很多，所以在布局中使用多个View的时候需要考虑到创建的性能一般在infalte的时候会创建布局中的元素View。这个会影响到infalte的性能。（以下都是在三星I9300设备（Android 4.3的系统）上测试的数据，供参考）<br>&nbsp; &nbsp; 我们以View的创建作为基数1，对比其他Layout和常见View的创建时间，如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/ce137683683ff422aa9079b030798ec2390c2aa5.jpeg" alt="" width="461"><br><br><br>&nbsp; &nbsp; &nbsp;从测试中大致可以看出这些View的创建性能，首先创建View的性能要比创建StringBuilder等普通的类慢很多。创建一个View是创建一个StringBuilder类耗时的14倍。ImageView比普通的View稍慢，1.6倍左右，而TextView就要慢很多。TextView的创建时间是普通View的11倍，是StringBuilder的157倍。我们常用的ListView就更慢了，是普通View的70倍。所以在配置布局和制作缓存的时候，应该考虑到布局元素的性能影响。<br><h3 id="7">3.2 onMeasure时间的性能</h3>
+&nbsp; &nbsp; 在界面显示的过程中，onMeasure和onLayout是两个相当关键的耗时点。下面我们看一下3种最常用布局的性能。这里测试了1层，3层，7层嵌套同种类型的Layout的数据，其中LinearLayout由于其在使用Weight属性的时候会测量子控件两次，所以性能有所下降。测试中的最下层布局有2个子控件，这里以FrameLayout 1层嵌套的性能作为基准，定为1，以下是各个布局的性能大致表现：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/a3cd4ca9809e3ee2af3f8f230ba74140c27143ec.jpeg" alt="" width="1276"><br><br>&nbsp; &nbsp; 从上面我们可以看到，在onMeasure的时候，FrameLayout的性能表现最优，其次是LinearLayout，最差的是RelativeLayout。在多层嵌套的时候，FrameLayout、LinearLayout也会有比较明显的性能下降，但是RelativeLayout的性能下降特别快。因为RelativeLayout需要两次测量，而且由于其灵活性，测量过程的代码也较为复查和耗时，所以嵌套层级变多的时候，多一层就相当于比上一层多一倍的测量次数。LinearLayout在使用Weight属性的时候也会遇到测量两次的问题，带来一些性能的损耗，但是没有RelativeLayout的灵活性，所以测量的代码耗时要短很多。而且LinearLayout当使用Weight属性的时候，使用android:layout_width=“0dp” 比android:layout_width="wrap_content"性能更好。<br>&nbsp; &nbsp; 另外，我们再来做一个4个子控件的测试，由于控件大小和图片内容的变化，测试的数据也会与上次有所不同，这样也能看出来，Layout本身的布局又和子控件的布局是有关系的，子控件自身测量快的话，也会加快整体布局的性能，例如TextView的测量过程就会比ImageView耗时很多。测试的结果如下图所示，虽然倍数不一样，但是整体的趋势还是基本保持和2个控件的时候一致。<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/2f60d2ce485955ae70ab82d9e187aaa38ea15ace.jpeg" alt="" width="1276"><br><br><h3 id="8">3.3 onLayout时间的性能</h3>
+&nbsp; &nbsp; 布局的性能在几种Layout中的区别没有onMeasure明显，因为onLayout是根据测量好的位置摆放控件，没有像onMeasure过程那样可能涉及到多次的测量和复杂的计算。如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/26b2cafcb4bf7c9f81afc4c41cf842364db53ae5.jpeg" alt="" width="1018"><br>&nbsp;&nbsp;<br>&nbsp; &nbsp; &nbsp;从上图可以看到，RelativeLayout在onMeasure函数中随着层级的增加表现的很糟糕，而在onLayout的函数中表现的比较优异。FrameLayout的表现也比较平稳，LinearLayout显得略差。另外3种布局的整体性能在不同嵌套层级情况下相差都不大，而且随着层级的增加，性能下降的也不大。<br>&nbsp; &nbsp; &nbsp;下面我们再看下onMeasure和onLayout的占比关系，下图是onMeasure/onLayout的一个倍数关系：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/33ec764e0c6876648b301b5fd0111dea6c7546b5.jpeg" alt="" width="1252"><br><br>&nbsp; &nbsp; 上图中，我们可以看到，FrameLayout和普通的LinearLayout表现都比较稳定。两者的函数性能相差并不大。而LinearLayout使用了weight属性后，onMeasure的耗时要比onLayout明显大好几倍。特别是RelativeLayout，onMeasure的耗时始终比onLayout耗时高很多倍，特别是嵌套层级多了以后相差相当的悬殊。<br>&nbsp; &nbsp; 所以，在使用RelativeLayout的时候主要关注onMeasure的性能，在使用FrameLayout和普通的LinearLayout的时候，可以结合两个函数的性能一起来看。在使用LinearLayout的weight属性的时候也要更加关注onMeasure的性能。当然凡事都不是绝对的，前面也说到，子控件的onMeasure的时间会因为控件类型、控件内容而不同，需要具体情况具体分析。这里只是一个大致的思路和参考。<br><br>&nbsp; &nbsp; 回过头来，我们再来看上面提到的【我的订单】界面的一个布局，如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/60b7c8a015cec9a484bdd87c3665fc3c1c260420.png" alt="" width="1602"><br><br>&nbsp; &nbsp; &nbsp;上面4个TextView是平行的关系，但是却使用了RelativeLayout作为外层布局，这明显是一个需要优化的布局。当然在我们各个界面中，这样的例子肯定非常的多。<br><br><h2 id="9">四、防止多余的infalte耗时</h2>
+&nbsp; &nbsp; 虽然ListView和RecycleView等都自己做了内部的控件复用，但在一些情况下，仍然会出现控件没有复用导致的性能问题。如在复杂的界面，可能希望动态添加和删除一些控件来达到界面的效果，但是这个动态添加和删除的控件可能都没有做到有效的回收。另外如在ViewPager制作广告轮播时，当广告条目很多，ViewPager缓存的数量太小时，也会频繁的添加和删除控件，如果这个时候没有对移除的控件自己做复用，后续也会有infalte的额外耗时。如下图所示：<br><br><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/476a6611ae7a8a3e62f45577a00c8d818544b3a2.png" alt="" width="1068"><br><br>&nbsp; &nbsp; &nbsp;上图是双十一版本开发阶段搜索界面的Systrace工具分析的图，我们可以看到在滑动过程中出现了多次的布局infalte，影响了性能。<br><br>&nbsp; &nbsp;&nbsp;<img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/0512ab79009c6225e656e753284073c62a22378c.png" alt="" width="874"><br><br>&nbsp; &nbsp; 上图是【我的订单】界面滑动过程中的分析图，我们也可以看到中途出现较多的infalte耗时，影响了性能，等等，其他界面在使用的过程中也存在一些问题。<br>&nbsp; &nbsp; 所以在很多情况下，我们还是要注意一些细节点，防止界面上不必要的infalte控件的耗时，有些可能是使用不当引起，有些可能是没有做控件复用，界面的开发过程中需要多检查一些界面滑动过程中的这部分细节。<br><br><h2 id="10">五、布局使用的注意事项</h2>
+&nbsp; &nbsp; 通过上面的数据，虽然这些数据不是精确的，但是可以看出基本的性能趋势。所以之前我们经常提到的精简层级也不是一定正确的， 例如上面有一项测试中的数据，RelativeLayout的一层嵌套却比FrameLayout和普通的LinearLayout的7层嵌套性能还要低。但是随着层级的增加，创建这些控件的时间和内存使用都会增加，这并非是一个有标准答案的课题。而且有很多人以为FrameLayout的嵌套基本不会对性能有影响，但是通过测试，FrameLayout的嵌套层级也会对性能产生明显的影响。所以并不是层级越少性能越好，这是要综合考虑的问题。<br><br><h3 id="11">5.1 RelativeLayout的使用</h3>
+&nbsp; &nbsp; RelativeLayout由于其灵活性和扁平化，很多时候作为默认的布局来使用。但是我们看到它的性能表现是最差的。所以：<br>1）在层级多的情况下，顶层尽量不应该使用RelativeLayout。<br>2）在子View中存在较多TextView，ListView等onMeasure测量耗时的控件情况下，也要避免使用RelativeLayout。<br>3）在作为ListView等Item项，需要频繁添加删除，进行频繁onMeasure的时候，要避免使用RelativeLayout，特别是在层级复杂的时候。<br>4）在子元素数量较多的情况下，也要尽可能避免使用RelativeLayout，因为子元素越多，2次测量带来的性能损耗更为明显。<br>5）RelativeLayout比较适合用在不会经常的被重新布局的界面上，这样可以做到灵活的配置界面，扁平化层级，但又不会影响后续的帧率。<br><h3 id="12">5.1 LinearLayout的使用</h3>
+&nbsp; &nbsp;&nbsp;LinearLayout的性能表现比较优越，且比FrameLayout灵活很多。但是要注意weight熟悉的使用，该属性会对性能带来几倍的影响。当使用weight属性的时候，需要设置android:layout_width=“0dp”，这样可以提升性能。<br><br><h3 id="13">5.3 FrameLayout的使用</h3>
+&nbsp; &nbsp;&nbsp;FrameLayout的性能表现是最优的，因为其测量过程相对简单。但是FrameLayout的嵌套使用也会对性能造成明显的影响，在布局中，需要配合Merge标签来合并不必要的层级，其他几个布局也是一样，能合并的尽可能的合并。<br><h3 id="14">5.4 配合使用提升性能</h3>
+&nbsp; &nbsp; 很多情况下，我们都是需要配合多种布局来完成复杂的界面。这个时候需要做多方面的考虑和测试，利用上面的一些原则，将布局达到性能比较好的程度。比如如果子View的数量少，且onMeasure被子控件重写，简单计算就能确定宽高，甚至在后续的重新测量过程中，不必要再进行计算，直接返回原来的宽高（就像某些界面的定了宽高的图片），这种情况下，外层使用RelativeLayout的性能表现也会很好。如果上面的控件view是一个自定义的布局或者自定义的ViewGroup，那么即使在顶层使用RelativeLayout也是没有问题的。<br>&nbsp; &nbsp; 另外我们也要注意到控件的创建性能，如果一个TextView能够实现的，不要用多个TextView来实现，这既可以提升infalte过程的性能，又可以节约更多的内存。<br><br><p>&nbsp; &nbsp; 布局问题是一个复杂的问题，开发过程中实现界面的效果很容易，但是要实现最佳的性能，节约更多的内存，却需要开发的时候细细琢磨，综合考虑和尝试来达到一个比较优越的结果。</p>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/45920/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">2人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/157642" title="游苏"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_162cb2e653c0d6606f1de997d7c664c2.png_80x80" width="26" height="26" alt="游苏" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="26" height="26" alt="大胃" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/45920#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (2)
+                  </a>
+        <a href="http://www.atatech.org/articles/45920/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          17
+        </a>
+        <a href="http://www.atatech.org/articles/45920/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          18
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="45920" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/45920/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          4
+        </a>
+        <a href="http://www.atatech.org/articles/45920/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          5
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/112278" title="荩臣"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_cbb1d1fa069633356340114439ed2a82.png_80x80" width="28" height="28" alt="荩臣" class="img-user"></a></li><li><a href="http://www.atatech.org/users/94668" title="夏曼"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_22f9b4944c1da18543d8340bb73cf6c5.png_80x80" width="28" height="28" alt="夏曼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/157642" title="游苏"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_162cb2e653c0d6606f1de997d7c664c2.png_80x80" width="28" height="28" alt="游苏" class="img-user"></a></li><li><a href="http://www.atatech.org/users/112765" title="麓菲"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_71a1b3b80e21bfd32bc43071c3b3d7dc.png_80x80" width="28" height="28" alt="麓菲" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23076" title="兰兰"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_avatar_20131230181137_23076_60.jpeg_80x80" width="28" height="28" alt="兰兰" class="img-user"></a></li><li><a href="http://www.atatech.org/users/33925" title="白书"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_71b539f8a0207a307900ca15cbebc334.png_80x80" width="28" height="28" alt="白书" class="img-user"></a></li><li><a href="http://www.atatech.org/users/141365" title="码侠"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_b53122e087921d99bf0e31a3083a6029.png_80x80" width="28" height="28" alt="码侠" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/97119" title="雪梦"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/img_20150416165641.JPG_80x80" width="28" height="28" alt="雪梦" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132816" title="皙华"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/img_20150519171629.jpg_80x80" width="28" height="28" alt="皙华" class="img-user"></a></li><li><a href="http://www.atatech.org/users/124646" title="彭烈"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/img_20151013203959.jpg_80x80" width="28" height="28" alt="彭烈" class="img-user"></a></li><li><a href="http://www.atatech.org/users/8143" title="九畹"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_avatar_20120719180748_8143_60.jpeg_80x80" width="28" height="28" alt="九畹" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74644" title="大胃"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_85cbba2027f3e9a9028c99fe0f7306b2.png_80x80" width="28" height="28" alt="大胃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/157934" title="简燃"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_7d0de71cfd44806280ef83bcb88effee.png_80x80" width="28" height="28" alt="简燃" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/18187">动画时间控制</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/47164">图形性能instruments中的core animation 工具</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/38561">让你的列表滚动得像风一样快</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/34920">Android性能优化之布局</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/46175">手淘安卓版性能优化15 - 界面性能之减...</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/45282">Android的硬件加速</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/45768">上一篇：手淘安卓版性能优化12 - 界面性能之优化过度绘制</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/45999">下一篇：手淘安卓版性能优化14 - 界面性能之加快界面显示</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-76077">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33925" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_71b539f8a0207a307900ca15cbebc334.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33925" class="author">白书</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/45920#comment-76077" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-11T16:06:03+08:00">2015-12-11 16:06:03</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>帮助很大~~~学习学习</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/76077/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/76077/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-76077&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-76077">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-76077" style="display:none">
+      <div class="sub-comments media-list" id="comment-76077-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/76077/subcomments/" method="POST" data-remote="true" data-target="#comment-76077-sub" data-done="$(&#39;#sub-comments-count-76077&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-77958">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/165674" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/u_identicon_9dd88a4f83645def5427b4ff8d543e3d.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/165674" class="author">其鹿</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/45920#comment-77958" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-12-29T17:52:37+08:00">2015-12-29 17:52:37</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>赞赞，学习了</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/77958/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/77958/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-77958&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-77958">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-77958" style="display:none">
+      <div class="sub-comments media-list" id="comment-77958-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/77958/subcomments/" method="POST" data-remote="true" data-target="#comment-77958-sub" data-done="$(&#39;#sub-comments-count-77958&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="45920">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/pic.gif"></a></span><script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/pic.gif"></a></span><script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%9613+-+%E7%95%8C%E9%9D%A2%E6%80%A7%E8%83%BD%E4%B9%8B%E5%B8%83%E5%B1%80%E6%80%A7%E8%83%BD%E5%92%8C%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F45920%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项", "", "", 'article-45920']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/45920#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化13 - 界面性能之布局性能和使用注意事项_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/45920#0">一、灵活使用布局</a></li><li><a href="http://www.atatech.org/articles/45920#1">二、优化层级和减少View</a></li><ul><li><a href="http://www.atatech.org/articles/45920#2">2.1 通过Merge标签减少View树层次</a></li><li><a href="http://www.atatech.org/articles/45920#3">2.2 通过ViewStub标签优化布局</a></li><li><a href="http://www.atatech.org/articles/45920#4">2.3 减少不需要的View</a></li></ul><li><a href="http://www.atatech.org/articles/45920#5">三、常见布局的性能</a></li><ul><li><a href="http://www.atatech.org/articles/45920#6">3.1  View创建时间的性能</a></li><li><a href="http://www.atatech.org/articles/45920#7">3.2 onMeasure时间的性能</a></li><li><a href="http://www.atatech.org/articles/45920#8">3.3 onLayout时间的性能</a></li></ul><li><a href="http://www.atatech.org/articles/45920#9">四、防止多余的infalte耗时</a></li><li><a href="http://www.atatech.org/articles/45920#10">五、布局使用的注意事项</a></li><ul><li><a href="http://www.atatech.org/articles/45920#11">5.1 RelativeLayout的使用</a></li><li><a href="http://www.atatech.org/articles/45920#12">5.1 LinearLayout的使用</a></li><li><a href="http://www.atatech.org/articles/45920#13">5.3 FrameLayout的使用</a></li><li><a href="http://www.atatech.org/articles/45920#14">5.4 配合使用提升性能</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

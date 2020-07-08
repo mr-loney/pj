@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/43376 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化4 - 手淘中存在的主要问题</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+            <div class="_article-ribbon _article-ribbon-danger">
+      <span class="glyphicon glyphicon-lock"></span>
+      <span class="_article-ribbon-text">内部资料请勿外传</span>
+    </div>
+            <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化4 - 手淘中存在的主要问题
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 712</span>
+          <span class="info">
+                        <time class="" datetime="2015-10-28T14:57:30+08:00">2015-10-28 14:57:30</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/43376/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="客户端性能 存在的问题 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="客户端性能" class="item">客户端性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="存在的问题" class="item">存在的问题<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">客户端性能</a><a href="http://www.atatech.org/search?q=%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98&type=INSIDE_ARTICLE_TAG" class="label label-ata">存在的问题</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/43376/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 一月份转岗到手机淘宝，以前一直以为这样大型的APP应该很多都是很牛的代码和设计 ，可以学到很多的东西。不过当我接手购物车的时刻起 ，当我以前的团队成员接手首页等代码后 ，有种期待越大失望也越大的感觉。真的是每个看似光鲜亮丽的外表下都有一颗千疮百孔的心。可能以前养成了对代码的质量要求比较高的习惯吧 ，虽然刚接手这块业务 ，可后面的几个月还是全部重写了整个购物车应用模块的代码。在这个过程中 ，经常会遇到编译和打包的问题 ，这也是很多新人觉得很烦人的地方 ，有时候半天打包不成功 ，加上每次小改个代码编译也要等好一会 ，影响了开发的效率。特别是在集成的时候 ，受到其他模块的影响 ，可能很多时间都浪费在协调和配合改动之上 ，影响了效率 ，或许这也是很多业务线开发人员没有更多的精力去注重性能和内存问题的原因之一。<br>&nbsp; &nbsp; &nbsp; 从6月开始 ，一直专注在手淘安卓版的性能分析和改进中 ，为此也看了很多其他模块的代码 ，也和很多开发有过交流 ，突然感慨起那句“人少做精品”的话有时也挺有道理。我们那么多的开发 ，但是在代码性能和质量上 ，以及在整个手淘App全局性能的考虑上真的是太少了 ，大多数都是忙着完成业务 ，很少会考虑到其他方面。我们专门为双十一版本的性能优化建了一个群 ，拉进来各个被追踪到有性能问题模块相关的开发。每次在里面提及一些常见问题的时候 ，发现即使过了一个版本 ，当我跟踪其他模块的时候 ，这些典型的问题依然存在 ，没人会主动去做这方面的优化 ，甚至有些人也根本不care ，觉得自己的这个问题很小。这也是我这些天打算把这些经验和问题都写出来的原因之一。毕竟一个这么大的APP的性能和内存问题不可能总是通过这种运动式的方式去解决 ，一定要每个开发和测试都重视这些性能和内存问题的时候 ，特别是在写每行代码的时候就已经在思考这些问题的时候才会使这个APP的性能和内存朝着良性循环的方向发展。<br><br>&nbsp; &nbsp; 从这段时间的跟踪和查看代码来看 ，主要有以下几个突出的问题。<br><h2 id="0">日志输出泛滥</h2>
+&nbsp; &nbsp; 每个模块都打印了大量的日志 ，其中很多日志已经没必要了 ，但是没有人去清理。有些代码逻辑经过几个版本已经很稳定了 ，这个时候当时调试的一些日志没有必要再输出 ，只要少数关键地方容易出错的日志即可 ，那些进入一个函数就把参数打印出来 ，把结果打印出来的函数实在是对性能的浪费 ，完全是没有必要的。优化前的版本 ，几秒钟就几千条的日志输出 ，这样既不利于性能 ，也不利于其他人的调试。另外字符串中大量的+号 ，本身也导致了大量的对象分配和扩容 ，对性能产生了较大的影响 ，特别有些日志还对字符串做格式化等操作 ，在高频率函数中将产生严重的性能问题。<br><h2 id="1">单例和静态变量的滥用</h2>
+&nbsp; &nbsp;&nbsp;单例和静态变量使用起来确实方便 ，但是都会长期占用内存 ，特别是单例或静态变量引用了较大内存资源的时候 ，很容易引起内存问题。在随便哪个模块中都能找到不少的单例身影 ，一旦这样的模块初始化越多 ，被占用的内存也就越多。当时发现地理模块的单例就有15个之多 ，静态变量更是随处可见。在购物车的新版本中 ，只是用到了一个单例 ，没有使用静态变量 ，而且在购物车退出的时候也会释放单例的引用 ，做到该模块退出后能够干净的清理自己使用的内存。<br>&nbsp; &nbsp; &nbsp;另外一个问题是单例的写法有很多种 ，有同步锁的 ，有不同步的等等 ，有些写法也都是错误的。<br><h2 id="2">线程 ，线程池的混乱</h2>
+&nbsp; &nbsp;&nbsp;6月份手淘在启动后 ，能够查看到的线程数就有100多个 ，还有很多中间过程启动又退出的线程加起来就更多了。这么多的线程在做事 ，CPU使用率居高不下就一点也不奇怪了。线程池的使用也有点混乱 ，很多模块明明有定义自己的线程池 ，但是很多线程却又是通过start方式直接启动 ，并没有交给线程池启动。而且很多模块也会定义多个多线程池 ，并发线程数 设置的不合理。有些线程的启动也没有注意时机 ，在程序刚启动的时候就开始启动等等。这样的问题和多个人接手业务 ，代码比较混乱有关 ，另外框架层虽然有线程池 ，但是很多业务方觉得优先级不高 ，不愿意使用。这个也和我们框架层对线程池的管理功能没有做完善有关 ，后面架构组也会进一步优化线程的管理。<br><h2 id="3">不必要的同步锁</h2>
+&nbsp; &nbsp;&nbsp;有些代码只有在主线程中调用 ，但却还要加锁 ，这样反而对性能产生了影响。有些函数只要互斥几行代码 ，但却是整个函数加锁。有些单例的调用也是加了同步锁等等 ，有时候为了多线程不至于出错 ，并没有考虑加锁带来的性能开销。<br><h2 id="4">不考虑对象复用</h2>
+&nbsp; &nbsp;&nbsp;发现很多高频率调用函数中 ，并没有考虑对象的复用问题 ，每次都是new一个对象。对于业务界面 ，有些界面有几个按钮点击事件 ，就new几个OnClickListener ，对于中间件 ，也经常看到每次都new一个匿名内部类 ，其实这些对象基本只要创建一个就可以了。还有一种很常见的多余的对象分配 ，在类的成员函数定义的时候已经new了一个对象 ，但是下面代码使用的时候又重新去new了这个对象 ，这样只是一种浪费 ，如果这个对象很复杂 ，还会影响类的初始化性能。<br>&nbsp; &nbsp; &nbsp;另外对于系统的很多复用池也不清楚 ，没有合理的使用。如Android的Message内部有复用池，我们创建Message的时候应该是尽量使用H<span>andler</span>.obtainMessage去复用池取，而不是每次都new;再比如Integer、Long、Short等包装对象 ，内部都有256个缓存对象 ，我们很多代码中都是直接new的 ，可能很多人都不清楚这些系统的复用池 ，用valueOf来创建包装对象会优先使用复用池。如下图所示：<br>&nbsp;<br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/3ef88f17fc813ad9c891639243178db2447432fc" alt="" width="1008"><br><br><h2 id="5">命名混乱</h2>
+&nbsp; &nbsp; &nbsp;Java本身有自己的变量驼峰规范和常量大写命名规范 ，有些模块中 ，命名比较混乱。而在安卓的代码中 ，普通的成员变量基本以m开头 ，静态的成员变量以s开头 ，这样便于区分。我们的模块中有些代码按照安卓的通用做法这样写了 ，但是有些还是比较混乱的 ，除了不符合java规范外 ，在同一个文件中 ，有些成员变量以m开头 ，有些不以m开头 ，这个和多个人修改同一个文件 ，又有各自的风格有关。如下面的代码 ，变量也用了常量的命名方法。<br><br>private String VERSION = "1.0"; <br>private boolean NEED_ECODE = false;<br><br><h2 id="6">不注意主线程耗时</h2>
+&nbsp; &nbsp; &nbsp;主线程不做耗时操作说起来大家都知道 ，但是在这几个月的性能跟踪过程中发现 ，不管是首页、社区、微淘等功能界面 ，还是中间件的配置中心 ，MTOP ，UT等 ，都存在不少的主线程耗时操作 ，包括架构组本身维护的update等一些模块中也存在着耗时操作。<br><br><h2 id="7">太过依赖异常捕获</h2>
+&nbsp; &nbsp;&nbsp;异常处理机制可以确保程序的健壮性 ，降低崩溃率。简单加个异常捕获 ，程序是不会看到崩溃 ，但是过分的依赖异常 ，很多原本应该程序设计者去提高代码健壮性的时候却用了异常捕获 ，像最简单的空指针异常 ，数组越界 ，这些本不应该使用异常来处理。像AppMonitor模块中 ，几乎大部分代码都在try保护下工作 ，很多try都是好几层次的嵌套 ，这样不仅影响了代码的可读性 ，大大降低了代码的性能 ， 对后续的维护也带来很大的困难。<br><br><h2 id="8">忽略构造函数和静态初始化的性能</h2>
+&nbsp; &nbsp;&nbsp;我们的项目中会使用很多单例以及很多复杂的类 ，特别是很多成员变量很多的类 ，不管什么时候用到 ，有时候就在成员变量定义的时候直接就初始化该变量了 ，这样一些复杂的类就会一个接着一个的初始化相关的类 ，引起了构造函数执行时间很长。尤其是在底层基础库中 ，很多高频率调用函数中 ，类的初始化性能是不可忽视的。静态变量和静态代码块都是在类被加载的时候执行 ，如果类的静态变量赋值复杂或者静态代码块中执行了比较耗时的代码 ，这样对这个类的首次初始化过程就会比较耗时。这些都是很容易忽视的地方 ，尤其是在主线程调用的时候 ，就会影响主线程的性能。<br>&nbsp; &nbsp; &nbsp; &nbsp;除了影响性能 ，在静态代码块中做一些逻辑处理的事情 ，像注册自身业务等 ，本身也容易引起该逻辑触发时机的不易控制的问题。<br><h2 id="9">
+<span>Handler</span><span>和</span><span>Timer</span><span>线程使用混乱</span>
+</h2>
+&nbsp; &nbsp;&nbsp;在程序中经常会用到定时和延迟执行的情况 ，这个时候往往会用到Handler和Timer。但是很多地方我们的使用都有点混乱 ，首先如果类中已经有Handler了 ，完全没必要再使用Timer来实现定时。另外发现在中间件中频繁的使用Handler的post函数 ，这个原本是在UI界面中偶尔方便异步使用的 ，包括View.post等。但是在底层库中 ，特别是高频率调用函数使用post的话就会有性能问题 ，Handler.post(new Runnable)每次都会创建一个Runnable对象 ，这个时候用sendMessage等相关的函数就会更合理 ，当然上层业务的高频率函数中也是一样的道理 ，例如我在AppMonitor和WeAppPlus中都发现较多这样的代码。特别是每次还要创建Handler就更加糟糕了。当时在对摇一摇模块的代码检查中就发现了这样的问题 ，Handler和Timer使用的就比较混乱 ，而且Hander定时后又用到Timer定时 ，多此一举的写法 ，如下图所示：<br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/290236cde6a8e2a18b58be1acb899f947866032c" alt="" width="706"><br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/58c3824ccb6c0a67bbbfddcc4cd738709189b24d" alt="" width="912"><br><br><br><h2 id="10"><span>中间件以及监控模块本身的性能问题</span></h2>
+&nbsp; &nbsp;&nbsp;在双十一版本中 ，UT ，Appmonitor ，网络等底层库中发现了很多的性能问题和不必要的内存分配。虽然每个点看起来都不是大问题 ，但是作为给上层调用的函数 ，以及有些高频率的函数 ，如果在性能上占用较多CPU ，造成较多GC压力的话 ，就会给整个App带来较多的性能影响。另外像监控的一些模块 ，栅栏模块 ，Tlog日志 ，以及监控ANR的模块等都发现了明显的性能问题。打铁还需自身硬 ，如果后台监督模块有性能问题 ，那统计的结果就会大打折扣了。<br>&nbsp; &nbsp;&nbsp;这段时间删除了很多不必要的Log输出 ，以前动不动就几千条的日志影响开发调试的问题有了好转。但是剩下保留的这些日志的性能能损耗 ，主要是优化在Release版本中 ，Debug版本和灰度版本还是有比较大的性能损耗 ，这样开发阶段势必会影响上层业务的性能。所以底层库也好 ，监督模块也好 ，不管是Release还是Debug版本 ，都希望能够达到很好的性能 ，减少对上层业务的影响。目前架构组这边也在优化Tlog的功能 ，争取接管以后的日志输出 ，减少这方面的性能损耗。<br>&nbsp;&nbsp;<br><h2 id="11"><span>几乎没有人注重接口调用性能</span></h2>
+&nbsp; &nbsp;&nbsp;接口调用的性能虽然通过几次调用很难察觉 ，但是在高频率调用函数中 ，还是会被工具跟踪这部分的性能损耗。特别是在单例 ，及for循环中 ，大量的原本可以省略的接口调用和函数调用 ，会带来额外的一些性能损耗。虽然在上层界面上很少会遇到这方面的性能问题 ，因为高频率的函数并不多 ，但是出于高质量的代码习惯 ，也应该尽量考虑接口的调用性能。后面的文章中也会更详细的看到接口调用性能的损耗。积水成渊 ，例如下面的代码我们随处可见 ，手淘已经是一个上百个业务模块的App了 ，如果这部分代码都能注重的话 ，在整体上也会有一个性能的提升。<br><br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/752cd5d81aa188399232d01e7a19c214d80f2aed" alt="" width="2118"><br><br><h2 id="12"><span>没有合理使用容器</span></h2>
+&nbsp; &nbsp;&nbsp;从性能的角度考虑优先使用数组 ，但是我们在代码中很少能看到数组的使用 ，除了非常简单的一些参数等。在大量使用容器的时候 ，我们也往往忽略了容器的内存和性能问题。比如HashMap要比ArrayList ，SparseArray多占用内存 ，HashMap每次2倍的扩容 ，还要额外带来重新hash的开销。ArrayList的扩容只是1.5倍 ，而且没有HashMap的额外的Map.Entry的对象分配 ，内存上会更节约。特别是当数据量比较大的时候 ，Map.Entry带来的影响 ，以及1.5倍和2倍的数量上会很可观。所以不要动不动就用HashMap ，有时候会更适合的容器。为了避免扩容带来的性能开销 ，对容器设置合理的初值也是很必要的 ，除了可以提升性能 ，内存上也能有较大的优势。特别是在数据量较大的情况下 ， 比如Android中的ArrayList最小初始值是12 ，如果你的数据总共只有26155个元素 ，如果不是指定初始容量 ，默认添加的话 ，经过很多次的数组重新分配和数组拷贝 ，而且最后数组的大小是39226的大小 ，浪费了13071个数组空间。对于HashMap类型的 ，因为负载因子默认是0.75 ，浪费的就会更多 ，对内存的消耗也会更多。SparseArray是Android中用来代替HashMap&lt;Integer ， *&gt;类型的容器 ，它也没有HashMap的额外开销 ，节约内存 ，初始大小是13 ，但是为了保证有序性 ，插入 ，查找等效率都会不及HashMap ，需要综合选择。<br><br><h2 id="13">不必要的判断</h2>
+&nbsp; &nbsp;&nbsp;一些不必要的判断 ，虽然对性能的影响很小 ，但是多余的判断能省则省 ，也能体现一些java中基础知识的用法 ，比如instanceof 关键字 ，其实已经包含了对null的判断 ，前面在判断!=null ，是多余的 ，但是我们很多代码中都能发现这样的写法。下面的两个模块中都有大量这样的写法 ，当然其他很多模块还有类似的问题。<br><br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/d4bce2c9c487c3ff6877bc8ee1afb22e8100fcfd" alt="" width="1252"><br><br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/ee575ee31bbedaf731060e537c1fc9ba2e04fb72" alt="" width="932"><br><br>&nbsp; &nbsp;&nbsp;另外对字符串是否会空字符串的如TextUtils.isEmpty函数 ，在高频率调用下 ，也会成为一个相对耗时的函数。在高频率情况下 ，就要考虑这些函数是否有多余的判断了。如在webapp模块中 ，就发现该函数因为频率很高 ，导致了较多的CPU时间的占用 ，查看代码也发现有不少地方的判断是多余的 ，可以省略掉。<br><br><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/94d1216dd22f84afa3dedb296d1ee765c32c4ddd" alt="" width="2204"><br><h2 id="14">过多的业务埋点</h2>
+&nbsp; &nbsp;&nbsp;在很多界面 ，列表的滑动性能中 ，getview如果复用的话 ，40%左右的性能是用在埋点上的。除了埋点UT本身需要优化外 ，埋点太多太复杂也是一个原因。<br><h2 id="15">过渡绘制严重</h2>
+&nbsp; &nbsp;&nbsp;我们在大部分界面都发现了大量的GPU过渡绘制 ，有些界面甚至整屏的深红色（4倍及以上的）过渡绘制 ，这样很浪费CPU和GPU的资源。而过渡绘制优化在开发阶段是比较容易优化的一件事情。<br><h2 id="16">布局层次复杂</h2>
+&nbsp; &nbsp;&nbsp;优化过程中 ，发现在很多界面 ，原本简单的布局都用了很多层级来完成 ，使得层级过深 ，像我的淘宝、搜索关键字界面、旺信的聊天界面、有好货、详情、购物车的推荐区域、订单详情的推荐区域等等 ，有些甚至达到了20多层（包括系统的层级） ，这样的布局下 ，性能肯定受到比较多的影响。<br><h2 id="17">动画等细节点不注意</h2>
+&nbsp; &nbsp;&nbsp;在这次双十一版本中 ，发现首页、社区、微淘等广告条普遍都没有注意细节点 ，例如在不可见区域的时候没有停止动画的定时器 ，没有缓存动画的布局等等。<br><h2 id="18">SharedPreferences存储大块数据</h2>
+&nbsp; &nbsp;&nbsp;SharedPreferences是一个轻量级数据存储，是以键值对来存储应用程序的配置。但是我们在优化过程中发现很多业务方把大块的数据存储在键值中，有些键值多达70k以上。不仅严重影响了性能，导致加载和写入SharedPreferences的线程占用大量CPU，还会导致额外的内存浪费，因为SharedPreferences有键值对的缓存。<br><h2 id="19">缺少内存和性能的自我测试</h2>
+&nbsp; &nbsp;&nbsp;即使在双十一版本中 ，每个集成都会暴露出新的性能等问题 ，这和开发阶段缺少基础的内存和性能测试很有关系 ，有些简单的主线程耗时 ，开发者或者测试人员用TraceView工具简单跟踪下就发现了。所以这就需要开发和测试人员在性能和内存的理解以及工具的使用上都要更加的注重 ，当然最好是开发阶段就有这个意识 ，防微杜渐。<br><br>&nbsp; &nbsp;&nbsp;这里列举了部分典型的问题 ，如果每天去做性能分析 ，问题总是层出不穷 ，虽然原因错综复杂 ，但是如果每个开发人员都能更加重视这方面 ，我们的问题就会少很多。的确 ，我们在很多方面已经做得很牛 ，但是也有很多细节方面我们做得很不够 ，不积跬步 ，无以至千里 ，不积小流 ，无以成江海。或许你认为这么点性能不至于有较大的影响 ，但是对于这多的代码和人来说 ，每个地方性能都提升一点点 ，每个地方内存都节约一点点 ，最后带来的或许是一个很大的提升。接下来 ，将会详细分析这段时间的优化过程和介绍代码上的性能点。
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="true">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/43376/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">13人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/9891" title="九重"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183035_9891_60.jpeg_80x80" width="26" height="26" alt="九重" class="img-user"></a></li><li><a href="http://www.atatech.org/users/92098" title="钟琪"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_de6dc821922910a74d69bfbddaeabb6c.png_80x80" width="26" height="26" alt="钟琪" class="img-user"></a></li><li><a href="http://www.atatech.org/users/67031" title="箫枫"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_f55b61d6b3bf265db7d801774062598a.png_80x80" width="26" height="26" alt="箫枫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/141158" title="燕五"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150601144033.jpg_80x80" width="26" height="26" alt="燕五" class="img-user"></a></li><li><a href="http://www.atatech.org/users/141045" title="黄岳钊"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_4727945300602771cd9e624b6edb3763.png_80x80" width="26" height="26" alt="黄岳钊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/30626" title="行直"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_8385583a61497aa5d15857e068482a65.png_80x80" width="26" height="26" alt="行直" class="img-user"></a></li><li><a href="http://www.atatech.org/users/137268" title="七飞"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_1440d6467e3b7e97b7a7a2777a5ce107.png_80x80" width="26" height="26" alt="七飞" class="img-user"></a></li><li><a href="http://www.atatech.org/users/78976" title="忍哲"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_dd9b491f4ff6bd93a7ac2d7031b41eb9.png_80x80" width="26" height="26" alt="忍哲" class="img-user"></a></li><li><a data-toggle="modal" href="http://www.atatech.org/articles/43376/followers" data-target="#modal-followers" title="查看全部"><div class="img-user img-user-more text-center" style="width:26px;height:26px">...</div></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/43376#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (11)
+                  </a>
+        <a href="http://www.atatech.org/articles/43376/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          57
+        </a>
+        <a href="http://www.atatech.org/articles/43376/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          58
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="43376" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/43376/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          14
+        </a>
+        <a href="http://www.atatech.org/articles/43376/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          15
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/74721" title="刘景景"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_b35929457977f1c51c81d3396f2be8b6.png_80x80" width="28" height="28" alt="刘景景" class="img-user"></a></li><li><a href="http://www.atatech.org/users/15774" title="襄玲"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120719180901_15774_60.jpeg_80x80" width="28" height="28" alt="襄玲" class="img-user"></a></li><li><a href="http://www.atatech.org/users/93359" title="清缨"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150722155416.png_80x80" width="28" height="28" alt="清缨" class="img-user"></a></li><li><a href="http://www.atatech.org/users/92098" title="钟琪"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_de6dc821922910a74d69bfbddaeabb6c.png_80x80" width="28" height="28" alt="钟琪" class="img-user"></a></li><li><a href="http://www.atatech.org/users/141697" title="空风"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151221162343.jpg_80x80" width="28" height="28" alt="空风" class="img-user"></a></li><li><a href="http://www.atatech.org/users/104480" title="狄路"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_efd00b3f4beb22f4dee9bffc00a3717a.png_80x80" width="28" height="28" alt="狄路" class="img-user"></a></li><li><a href="http://www.atatech.org/users/165674" title="其鹿"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_9dd88a4f83645def5427b4ff8d543e3d.png_80x80" width="28" height="28" alt="其鹿" class="img-user"></a></li><li><a href="http://www.atatech.org/users/69013" title="微峰"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_c1f818ce8ab11d96f33c803348b2686e.png_80x80" width="28" height="28" alt="微峰" class="img-user"></a></li><li><a href="http://www.atatech.org/users/16782" title="问学"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_faa1f47d99384715608f21292313ab25.png_80x80" width="28" height="28" alt="问学" class="img-user"></a></li><li><a href="http://www.atatech.org/users/162867" title="不衣"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151226204204.png_80x80" width="28" height="28" alt="不衣" class="img-user"></a></li><li><a href="http://www.atatech.org/users/164080" title="狐忌"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_af16f5c4011aeb751eedec8b0ea4e6b8.png_80x80" width="28" height="28" alt="狐忌" class="img-user"></a></li><li><a href="http://www.atatech.org/users/137041" title="丙辰"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20160115145636.jpg_80x80" width="28" height="28" alt="丙辰" class="img-user"></a></li><li><a href="http://www.atatech.org/users/145263" title="知兵"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_3dc61ed0fbaadae0fdae1c0301ffd6d1.png_80x80" width="28" height="28" alt="知兵" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132237" title="骊仁"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151127131903.png_80x80" width="28" height="28" alt="骊仁" class="img-user"></a></li><li><a href="http://www.atatech.org/users/131085" title="欣宸"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150403142913.jpeg_80x80" width="28" height="28" alt="欣宸" class="img-user"></a></li><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/74795" title="空净"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_f0ff6a6ed5127a1ab6817f3f38f9ebdc.png_80x80" width="28" height="28" alt="空净" class="img-user"></a></li><li><a href="http://www.atatech.org/users/66537" title="轻零"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_4c8c66106db275df91afd1244e27e553.png_80x80" width="28" height="28" alt="轻零" class="img-user"></a></li><li><a href="http://www.atatech.org/users/115604" title="宁天"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_b735243fb6e9686d7202a064586dac1a.png_80x80" width="28" height="28" alt="宁天" class="img-user"></a></li><li><a href="http://www.atatech.org/users/159890" title="玄译"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_313ef068be62afeaef23bc051576b358.png_80x80" width="28" height="28" alt="玄译" class="img-user"></a></li><li><a href="http://www.atatech.org/users/20106" title="堂主"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183106_20106_60.jpeg_80x80" width="28" height="28" alt="堂主" class="img-user"></a></li><li><a href="http://www.atatech.org/users/145945" title="坚一"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150619142442.jpg_80x80" width="28" height="28" alt="坚一" class="img-user"></a></li><li><a href="http://www.atatech.org/users/32705" title="九旋"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151217164705.jpg_80x80" width="28" height="28" alt="九旋" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34017" title="弓摧"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_5581708a62ef7eadcae4dcc7f85ded49.png_80x80" width="28" height="28" alt="弓摧" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23303" title="墨昕"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20141229103214.jpg_80x80" width="28" height="28" alt="墨昕" class="img-user"></a></li><li><a href="http://www.atatech.org/users/121498" title="砺健"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_7a92cfd5a6965aa3e92d9079fed30143.png_80x80" width="28" height="28" alt="砺健" class="img-user"></a></li><li><a href="http://www.atatech.org/users/14832" title="紫韶"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183053_14832_60.jpeg_80x80" width="28" height="28" alt="紫韶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/93448" title="怒飞"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20140729201823.png_80x80" width="28" height="28" alt="怒飞" class="img-user"></a></li><li><a href="http://www.atatech.org/users/136062" title="锦颢"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150818111054.jpg_80x80" width="28" height="28" alt="锦颢" class="img-user"></a></li><li><a href="http://www.atatech.org/users/152916" title="凤煜"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_06d0d096c9459c85e47be1e40ce897cc.png_80x80" width="28" height="28" alt="凤煜" class="img-user"></a></li><li><a href="http://www.atatech.org/users/20553" title="扬香"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_e7cf3b4d9bec0c3e9cd89a0ae87c2813.png_80x80" width="28" height="28" alt="扬香" class="img-user"></a></li><li><a href="http://www.atatech.org/users/72169" title="八四"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_cc3f968660af85d090355394a933409a.png_80x80" width="28" height="28" alt="八四" class="img-user"></a></li><li><a href="http://www.atatech.org/users/22675" title="东淮"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151223162007.jpg_80x80" width="28" height="28" alt="东淮" class="img-user"></a></li><li><a href="http://www.atatech.org/users/93414" title="天乔"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_e5ad7a58d3b486f97f3cbb9f1bf33d48.png_80x80" width="28" height="28" alt="天乔" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13088" title="严成方"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_c4536001673379765300886594b6b485.png_80x80" width="28" height="28" alt="严成方" class="img-user"></a></li><li><a href="http://www.atatech.org/users/92944" title="余善"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150819201302.35 拍摄的照片_80x80" width="28" height="28" alt="余善" class="img-user"></a></li><li><a href="http://www.atatech.org/users/70376" title="窥基"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_39357dcaf752cdb27e3ed3b6de0852fb.png_80x80" width="28" height="28" alt="窥基" class="img-user"></a></li><li><a href="http://www.atatech.org/users/35661" title="五牧"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20131007194221_35661_60.jpeg_80x80" width="28" height="28" alt="五牧" class="img-user"></a></li><li><a href="http://www.atatech.org/users/10631" title="沈浪"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_7e8c3b36784c572ea4d560578eec954b.png_80x80" width="28" height="28" alt="沈浪" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71314" title="松茂"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20140414154901_71314_60.jpeg_80x80" width="28" height="28" alt="松茂" class="img-user"></a></li><li><a href="http://www.atatech.org/users/144756" title="清樾"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_36d84ce7d2c30d8b20ba1fd992568f72.png_80x80" width="28" height="28" alt="清樾" class="img-user"></a></li><li><a href="http://www.atatech.org/users/68525" title="卧猫"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20131012202525_68525_60.jpeg_80x80" width="28" height="28" alt="卧猫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/68303" title="芒格"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20140815235907.png_80x80" width="28" height="28" alt="芒格" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13976" title="焦哥"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183051_13976_60.jpeg_80x80" width="28" height="28" alt="焦哥" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/118867" title="擘山"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151229144211.JPG_80x80" width="28" height="28" alt="擘山" class="img-user"></a></li><li><a href="http://www.atatech.org/users/132816" title="皙华"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150519171629.jpg_80x80" width="28" height="28" alt="皙华" class="img-user"></a></li><li><a href="http://www.atatech.org/users/35317" title="弘树"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/35317_20140226185658_21.jpeg_80x80" width="28" height="28" alt="弘树" class="img-user"></a></li><li><a href="http://www.atatech.org/users/134604" title="姜程"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_bb1b2f0ed3012675c2003225d2883f2f.png_80x80" width="28" height="28" alt="姜程" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23352" title="查郁"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_fb0851c42060e233001707a719030e8c.png_80x80" width="28" height="28" alt="查郁" class="img-user"></a></li><li><a href="http://www.atatech.org/users/15132" title="云晰"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120719180846_15132_60.jpeg_80x80" width="28" height="28" alt="云晰" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13855" title="执明"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_32f84b597629f37d9ef53d714fce6fa1.png_80x80" width="28" height="28" alt="执明" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><li><a href="http://www.atatech.org/users/4703" title="子张"><img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183005_4703_60.jpeg_80x80" width="28" height="28" alt="子张" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/35142">JAVA Profiling，我们又来了...</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/3067">基于Fragment的Android前台服务框架</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/44387">旺信android性能优化篇二</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/45469">手淘安卓版性能优化10- Shar...</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/29183">Android耗电量之WakeLock篇</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/35470">android开发68技</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/42862">上一篇：手淘安卓版性能优化3 -  其它性能分析工具的经验</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/43380">下一篇：手淘安卓版性能优化5 - 手淘遇到的性能问题和优化工具</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-71062">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/4703" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_avatar_20120725183005_4703_60.jpeg_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/4703" class="author">子张</a>
+            <a href="http://www.atatech.org/articles/29616" target="_blank"><small style="color:#999;"> (来自移动版)</small></a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71062" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-10-28T21:01:22+08:00">2015-10-28 21:01:22</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>赞你的勇气和专业精神</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71062/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71062/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71062&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71062">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71062">
+      <div class="sub-comments media-list" id="comment-71062-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-29T10:26:55+08:00">2015-10-29 10:26:55</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>谢谢，正视问题才能推动问题的解决^_^</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71062/subcomments/21618/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71062/subcomments/21618/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21618&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21618" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71062/subcomments/" method="POST" data-remote="true" data-target="#comment-71062-sub" data-done="$(&#39;#sub-comments-count-71062&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71062/subcomments/" method="POST" data-remote="true" data-target="#comment-71062-sub" data-done="$(&#39;#sub-comments-count-71062&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71199">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/132816" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150519171629.jpg_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/132816" class="author">皙华</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71199" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-10-30T09:09:55+08:00">2015-10-30 09:09:55</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>这个硕大的问题……仅仅靠几个人推动是远远不够的，赞你</p>
+
+    </div>
+    
+        <div class="voters voters-p">
+  <span>雪鹭</span>    <span>赞同</span>
+  </div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71199/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <a href="http://www.atatech.org/comments/71199/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        2
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71199&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71199">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71199" style="display:none">
+      <div class="sub-comments media-list" id="comment-71199-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71199/subcomments/" method="POST" data-remote="true" data-target="#comment-71199-sub" data-done="$(&#39;#sub-comments-count-71199&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71226">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/118867" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151229144211.JPG_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        3F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/118867" class="author">擘山</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71226" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-10-30T11:44:24+08:00">2015-10-30 11:44:24</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>所以后续手淘优化过之后，性能提升大吗？</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71226/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71226&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71226">7</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71226">
+      <div class="sub-comments media-list" id="comment-71226-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T12:34:36+08:00">2015-10-30 12:34:36</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>陈德志 ，后面的文章会有更多的介绍</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21696/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21696/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21696&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21696" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T11:46:02+08:00">2015-10-30 11:46:02</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>有一些提升，但是还有很多需要优化的还没做。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21688/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21688/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21688&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21688" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/118867" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151229144211.JPG_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/118867" class="author">擘山</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T11:56:01+08:00">2015-10-30 11:56:01</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/33951">@<span></span>雪鹭</a> 感觉手淘比钱包的性能要差很多。钱包使用起来整个很流畅</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21690/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21690/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21690&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21690" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@擘山 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/140787" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_12e2f56679a085139ddeb47d972b83a9.png_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/140787" class="author">陈德志</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T11:59:53+08:00">2015-10-30 11:59:53</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>看看你们优化的效果怎么样，希望能够列出详细点，更多细节，方便UC浏览器这边参考使用</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21691/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21691/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21691&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21691" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@陈德志 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T12:24:48+08:00">2015-10-30 12:24:48</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/118867">@<span></span>擘山</a> 手淘的几个主要界面是以图片显示为主的，这个不能比。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21692/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21692/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21692&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21692" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T12:27:20+08:00">2015-10-30 12:27:20</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/118867">@<span></span>擘山</a> 在低端机上，可以用5月版本和双十一版本，可以感觉的出来这段时间的优化效果，当然还有很多地方我们也再想办法继续优化中，这个不是一两天和一两个人能够完成的。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21693/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21693/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21693&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21693" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/118867" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151229144211.JPG_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/118867" class="author">擘山</a>
+            <time class="pull-right small js-relative-time" datetime="2015-10-30T14:40:08+08:00">2015-10-30 14:40:08</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/33951">@<span></span>雪鹭</a> 这个倒真的是</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71226/subcomments/21701/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71226/subcomments/21701/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21701&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21701" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@擘山 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71226/subcomments/" method="POST" data-remote="true" data-target="#comment-71226-sub" data-done="$(&#39;#sub-comments-count-71226&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71600">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/144756" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_36d84ce7d2c30d8b20ba1fd992568f72.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        4F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/144756" class="author">清樾</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71600" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-04T15:40:37+08:00">2015-11-04 15:40:37</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>虽然每个人都有自己的代码风格，但是在一个团队里工作最好还是有一个统一遵循的规则 + code review</p>
+
+    </div>
+    
+        <div class="voters voters-p">
+  <span>雪鹭</span>    <span>赞同</span>
+  </div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71600/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <a href="http://www.atatech.org/comments/71600/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        2
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71600&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71600">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71600" style="display:none">
+      <div class="sub-comments media-list" id="comment-71600-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71600/subcomments/" method="POST" data-remote="true" data-target="#comment-71600-sub" data-done="$(&#39;#sub-comments-count-71600&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71654">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/93448" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20140729201823.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        5F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/93448" class="author">怒飞</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71654" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-04T19:58:02+08:00">2015-11-04 19:58:02</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>先赞一个，专业精神！特别能理解楼主的体会，好的代码，除了有好的架构，更多是要从流程上避免“代码腐烂”。如何顶着业务压力坚守质量流程，是一个难题啊。个人觉得，一要业务方和老板们的体谅，二要好的团队培训/交流，避免把人当生产工具。期待楼主牵头，搞个交流会啥的！</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71654/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71654/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71654&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71654">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71654">
+      <div class="sub-comments media-list" id="comment-71654-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-05T14:15:26+08:00">2015-11-05 14:15:26</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>的确是这样，更多的还是要自己也重视才行。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71654/subcomments/21870/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71654/subcomments/21870/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21870&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21870" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71654/subcomments/" method="POST" data-remote="true" data-target="#comment-71654-sub" data-done="$(&#39;#sub-comments-count-71654&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71654/subcomments/" method="POST" data-remote="true" data-target="#comment-71654-sub" data-done="$(&#39;#sub-comments-count-71654&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71732">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/23111" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_7ffd8e40d538d8b30ce61cbabff98065.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        6F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/23111" class="author">子雨</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71732" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-05T15:08:42+08:00">2015-11-05 15:08:42</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>赞！不积跬步 ,无以至千里。</p>
+
+    </div>
+    
+        <div class="voters voters-p">
+  <span>雪鹭</span>    <span>赞同</span>
+  </div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71732/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <a href="http://www.atatech.org/comments/71732/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        2
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71732&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71732">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71732" style="display:none">
+      <div class="sub-comments media-list" id="comment-71732-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71732/subcomments/" method="POST" data-remote="true" data-target="#comment-71732-sub" data-done="$(&#39;#sub-comments-count-71732&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71799">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/32886" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_ec47f9657c90a6db70e5e4f1cd1f7a02.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        7F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/32886" class="author">罗喉</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71799" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-06T10:43:26+08:00">2015-11-06 10:43:26</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>购物车之前改过一次版，你维护的这个版本996期间开发的，是一个之前做c/c++，对android不太熟悉的同学做的。<br>
+能看到这些有一定专业深度的问题是并改善掉，值得称赞~</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71799/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71799/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71799&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71799">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71799">
+      <div class="sub-comments media-list" id="comment-71799-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-06T11:25:56+08:00">2015-11-06 11:25:56</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>是的</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71799/subcomments/21894/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71799/subcomments/21894/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21894&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21894" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71799/subcomments/" method="POST" data-remote="true" data-target="#comment-71799-sub" data-done="$(&#39;#sub-comments-count-71799&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71799/subcomments/" method="POST" data-remote="true" data-target="#comment-71799-sub" data-done="$(&#39;#sub-comments-count-71799&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71872">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/137268" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_1440d6467e3b7e97b7a7a2777a5ce107.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        8F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/137268" class="author">七飞</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71872" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-06T17:12:37+08:00">2015-11-06 17:12:37</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>赞。分析很全面，很多APP都存在这些问题。推动优化重构的路是漫长的。加油！</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71872/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71872/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71872&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71872">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71872">
+      <div class="sub-comments media-list" id="comment-71872-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-06T19:52:56+08:00">2015-11-06 19:52:56</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>谢谢，接下来就是想从源头抓起，这样才会效果比较好。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71872/subcomments/21928/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71872/subcomments/21928/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21928&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21928" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71872/subcomments/" method="POST" data-remote="true" data-target="#comment-71872-sub" data-done="$(&#39;#sub-comments-count-71872&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71872/subcomments/" method="POST" data-remote="true" data-target="#comment-71872-sub" data-done="$(&#39;#sub-comments-count-71872&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71948">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/93627" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_8dfe69ac47bb97b53ad5f48ef80a6b89.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        9F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/93627" class="author">曲径</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-71948" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-09T10:54:17+08:00">2015-11-09 10:54:17</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>每个经过多次迭代的产品都会有这样的代码，包括很多大牛的代码</p>
+
+    </div>
+    
+        <div class="voters voters-p">
+  <span>为知</span>    <span>赞同</span>
+  </div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71948/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <a href="http://www.atatech.org/comments/71948/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        2
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71948&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71948">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71948" style="display:none">
+      <div class="sub-comments media-list" id="comment-71948-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71948/subcomments/" method="POST" data-remote="true" data-target="#comment-71948-sub" data-done="$(&#39;#sub-comments-count-71948&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-72124">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/80164" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20150323212527.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        10F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/80164" class="author">为知</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-72124" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-10T19:22:37+08:00">2015-11-10 19:22:37</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>重构它需要有信心和勇气 赞 赞 加油!</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/72124/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/72124/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-72124&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-72124">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-72124">
+      <div class="sub-comments media-list" id="comment-72124-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-16T15:35:31+08:00">2015-11-16 15:35:31</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>谢谢</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/72124/subcomments/22180/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/72124/subcomments/22180/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-22180&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-22180" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/72124/subcomments/" method="POST" data-remote="true" data-target="#comment-72124-sub" data-done="$(&#39;#sub-comments-count-72124&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/72124/subcomments/" method="POST" data-remote="true" data-target="#comment-72124-sub" data-done="$(&#39;#sub-comments-count-72124&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-72537">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/165674" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/u_identicon_9dd88a4f83645def5427b4ff8d543e3d.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        11F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/165674" class="author">其鹿</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43376#comment-72537" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-16T15:26:19+08:00">2015-11-16 15:26:19</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>赞楼主的专业精神！</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/72537/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/72537/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-72537&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-72537">1</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-72537">
+      <div class="sub-comments media-list" id="comment-72537-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-16T15:35:26+08:00">2015-11-16 15:35:26</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>谢谢</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/72537/subcomments/22179/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/72537/subcomments/22179/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-22179&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-22179" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/72537/subcomments/" method="POST" data-remote="true" data-target="#comment-72537-sub" data-done="$(&#39;#sub-comments-count-72537&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/72537/subcomments/" method="POST" data-remote="true" data-target="#comment-72537-sub" data-done="$(&#39;#sub-comments-count-72537&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="43376">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/pic.gif"></a></span><script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/stat.php" type="text/javascript"></script><script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/pic.gif"></a></span><script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/stat(1).php" type="text/javascript"></script><script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%964+-+%E6%89%8B%E6%B7%98%E4%B8%AD%E5%AD%98%E5%9C%A8%E7%9A%84%E4%B8%BB%E8%A6%81%E9%97%AE%E9%A2%98%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F43376%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化4 - 手淘中存在的主要问题", "", "", 'article-43376']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/43376#" class="go-top" style="display: block;"><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘安卓版性能优化4 - 手淘中存在的主要问题_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: absolute; top: 7666px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/43376#0">日志输出泛滥</a></li><li><a href="http://www.atatech.org/articles/43376#1">单例和静态变量的滥用</a></li><li><a href="http://www.atatech.org/articles/43376#2">线程 ，线程池的混乱</a></li><li><a href="http://www.atatech.org/articles/43376#3">不必要的同步锁</a></li><li><a href="http://www.atatech.org/articles/43376#4">不考虑对象复用</a></li><li><a href="http://www.atatech.org/articles/43376#5">命名混乱</a></li><li><a href="http://www.atatech.org/articles/43376#6">不注意主线程耗时</a></li><li><a href="http://www.atatech.org/articles/43376#7">太过依赖异常捕获</a></li><li><a href="http://www.atatech.org/articles/43376#8">忽略构造函数和静态初始化的性能</a></li><li><a href="http://www.atatech.org/articles/43376#9">
+Handler和Timer线程使用混乱
+</a></li><li><a href="http://www.atatech.org/articles/43376#10">中间件以及监控模块本身的性能问题</a></li><li><a href="http://www.atatech.org/articles/43376#11">几乎没有人注重接口调用性能</a></li><li><a href="http://www.atatech.org/articles/43376#12">没有合理使用容器</a></li><li><a href="http://www.atatech.org/articles/43376#13">不必要的判断</a></li><li><a href="http://www.atatech.org/articles/43376#14">过多的业务埋点</a></li><li><a href="http://www.atatech.org/articles/43376#15">过渡绘制严重</a></li><li><a href="http://www.atatech.org/articles/43376#16">布局层次复杂</a></li><li><a href="http://www.atatech.org/articles/43376#17">动画等细节点不注意</a></li><li><a href="http://www.atatech.org/articles/43376#18">SharedPreferences存储大块数据</a></li><li><a href="http://www.atatech.org/articles/43376#19">缺少内存和性能的自我测试</a></li></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>

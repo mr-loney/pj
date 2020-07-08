@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.atatech.org/articles/43598 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>手淘安卓版性能优化6 -  Dalvik虚拟机和ART运行时的介绍及对性能的影响</title>
+    <meta name="description" content="">
+    
+    <meta name="viewport" content="width=1100, maximum-scale=1.0, user-scalable=yes">
+    <link rel="stylesheet" href="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/app-d729b1740cf6e6a3320d5df9d0d1576961212edd.css">
+    <script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/app-dcb78f3964677239b437a05dd98b8d14129b8aa4.js" data-main="article/show"></script>
+    <script>require('main')</script>
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv-3.7.0.min.js"></script>
+    <script src="/js/respond-1.4.2.min.js"></script>
+    <![endif]-->
+  <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">.MathJax_Preview .MJXc-math {color: inherit!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXc-script {font-size: .8em}
+.MJXc-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXc-bold {font-weight: bold}
+.MJXc-italic {font-style: italic}
+.MJXc-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXc-largeop {font-size: 150%}
+.MJXc-largeop.MJXc-int {vertical-align: -.2em}
+.MJXc-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXc-display {display: block; text-align: center; margin: 1em 0}
+.MJXc-math span {display: inline-block}
+.MJXc-box {display: block!important; text-align: center}
+.MJXc-box:after {content: " "}
+.MJXc-rule {display: block!important; margin-top: .1em}
+.MJXc-char {display: block!important}
+.MJXc-mo {margin: 0 .15em}
+.MJXc-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXc-denom {display: inline-table!important; width: 100%}
+.MJXc-denom > * {display: table-row!important}
+.MJXc-surd {vertical-align: top}
+.MJXc-surd > * {display: block!important}
+.MJXc-script-box > *  {display: table!important; height: 50%}
+.MJXc-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXc-script-box > *:last-child > * {vertical-align: bottom}
+.MJXc-script-box > * > * > * {display: block!important}
+.MJXc-mphantom {visibility: hidden}
+.MJXc-munderover {display: inline-table!important}
+.MJXc-over {display: inline-block!important; text-align: center}
+.MJXc-over > * {display: block!important}
+.MJXc-munderover > * {display: table-row!important}
+.MJXc-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXc-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXc-mtr {display: table-row!important}
+.MJXc-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXc-mtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-mlabeledtr {display: table-row!important}
+.MJXc-mlabeledtr > .MJXc-mtd:first-child {padding-left: 0}
+.MJXc-mlabeledtr:first-child > .MJXc-mtd {padding-top: 0}
+.MJXc-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXc-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXc-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXc-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXc-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXc-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXc-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXc-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXc-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXc-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXc-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_CHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+  <body class=""><div id="MathJax_Message" style="display: none;"></div>
+
+              <header>
+  <div class="navbar navbar-default">
+    <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="http://www.atatech.org/square/">首页</a></li>
+          <li><a href="http://www.atatech.org/articles/?sort=yuan">文章</a></li>
+          <li><a href="http://www.atatech.org/ask">问答</a></li>
+          <li><a href="http://www.atatech.org/edu/lesson/">课程</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/groups/">圈子</a></li>
+          <li><a href="http://www.atatech.org/teams/">团队博客</a></li>
+          <li><a href="http://www.atatech.org/rookie/">新人专区</a></li>
+          <li class="divider"></li>
+          <li><a href="http://www.atatech.org/databoard/" target="_blank">数据看板</a></li>
+          <li><a href="http://www.atatech.org/field/security/">安全领域</a></li>
+          <li><a href="http://www.atatech.org/specials/49engine/" target="_blank">技术战役</a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+                              <li><a href="http://www.atatech.org/notifications/">消息</a></li>
+          <li><a href="http://www.atatech.org/feed/">动态</a></li>
+          <li class="divider"></li>
+          <li class="dropdown">
+            <a href="http://www.atatech.org/users/140790#information" class="navbar-avatar" data-toggle="dropdown">
+              <img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_9af9b84c4f0d4b2a5a560227fcfe613d.png_40x40" width="20" height="20" alt="卢龙" class="img-circle">
+              <span>&nbsp;卢龙</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="http://www.atatech.org/users/140790/own#information">
+                <span class="glyphicon glyphicon-edit"></span>
+                <span>我的文章</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/ask#information">
+                <span class="glyphicon glyphicon-question-sign"></span>
+                <span>我的问题</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/mark#information">
+                <span class="glyphicon glyphicon-star-empty"></span>
+                <span>我的收藏</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/users/140790/groups">
+                <span class="glyphicon glyphicon-record"></span>
+                <span>我的圈子</span>
+                </a>
+              </li>
+              <li>
+                <a href="http://www.atatech.org/teams">
+                <span class="glyphicon glyphicon-list-alt"></span>
+                <span>我的博客</span>
+                </a>
+              </li>
+              
+                            <li>
+                <a href="http://www.atatech.org/settings/">
+                <span class="glyphicon glyphicon-cog"></span>
+                <span>个人设置</span>
+                </a>
+              </li>
+                            <li class="divider"></li>
+              <li>
+                <a href="http://www.atatech.org/logout" data-method="post">
+                <span class="glyphicon glyphicon-log-out"></span>
+                <span>退出</span>
+                </a>
+              </li>
+            </ul><!-- /.dropdown -->
+          </li>
+          <li class="dropdown quick-search">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span></button>
+            <div class="dropdown-menu form-group" role="menu">
+              <form action="http://www.atatech.org/search" method="get" class="quick-form js-active-on-valid">
+                    <input type="hidden" name="type" value="ARTICLE">
+                    <input type="text" name="q" class="form-control" placeholder="全站搜索" required="">
+                    <button type="submit" class="quick_btn"></button>
+              </form>
+            </div>
+          </li>
+        </ul>
+    </div>
+  </div>
+  
+  </header>
+                <div class="container">
+          </div>
+        
+
+<div class="container"><div class="_article-container">
+    <div class="_article-ribbons hidden-xs">
+                <div class="_article-ribbon _article-ribbon-info">
+            <span class="glyphicon glyphicon-leaf"></span>
+      <span class="_article-ribbon-text">作者原创</span>
+    </div>
+          </div>
+  <div class="_article-box" role="main">
+    <article class="_article">
+      <header class="heading">
+        <h1 class="title clearfix unsafe">
+          <span class="highlight">
+            手淘安卓版性能优化6 -  Dalvik虚拟机和ART运行时的介绍及对性能的影响
+                      </span>
+        </h1>
+        <div class="infos clearfix">
+          <a href="http://www.atatech.org/users/33951" class="info" title="雪鹭"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/img_20151126155914.jpg_80x80" width="32" height="32" alt="雪鹭" class="img-user"><span>&nbsp;雪鹭</span></a>                    <span class="info">浏览 368</span>
+          <span class="info">
+                        <time class="" datetime="2015-11-02T11:34:28+08:00">2015-11-02 11:34:28</time>
+          </span>
+                                                    <span class="info">
+                  发表于：
+                  <a href="http://www.atatech.org/teams/68">手机淘宝技术团队</a>
+                                    <span>&gt;&gt;</span>
+                  <a href="http://www.atatech.org/teams/68?cid=327">技术沉淀</a>
+                                  </span>
+          
+          <div class="pull-right">
+                        
+                        
+                      </div>
+        </div>
+
+                <div class="labels">
+    <form accept-charset="UTF-8" action="http://www.atatech.org/articles/43598/tags" autocomplete="off" method="post" data-remote="true" data-done="$(this).closest(&#39;.labels&#39;).replaceWith(r);$.alert(&#39;修改成功&#39;, &#39;success&#39;)" style="display:none">
+    <input type="hidden" name="_method" value="put">
+    <div class="form-group">
+      <input type="text" name="tags" class="form-control selectized" value="gc Android性能 " tabindex="-1" style="display: none;"><div class="selectize-control form-control multi plugin-remove_button"><div class="selectize-input items not-full has-options has-items"><div data-value="gc" class="item">gc<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><div data-value="Android性能" class="item">Android性能<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a></div><input type="text" autocomplete="off" tabindex="" style="width: 4px;"></div><div class="selectize-dropdown form-control multi plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"><div data-value="Java核心技术" data-selectable="" class="option active">Java核心技术</div><div data-value="Java" data-selectable="" class="option">Java</div><div data-value="架构" data-selectable="" class="option">架构</div><div data-value="前端与交互设计" data-selectable="" class="option">前端与交互设计</div><div data-value="分布式系统与计算" data-selectable="" class="option">分布式系统与计算</div><div data-value="算法" data-selectable="" class="option">算法</div><div data-value="数据存储与数据库" data-selectable="" class="option">数据存储与数据库</div><div data-value="编程语言" data-selectable="" class="option">编程语言</div><div data-value="测试技术" data-selectable="" class="option">测试技术</div></div></div></div>
+    </div>
+    <div class="form-group text-right">
+      <button type="button" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">取消</button>
+      <button type="submit" class="btn btn-primary btn-sm">更新</button>
+    </div>
+  </form>
+    
+  <div>
+    <a href="http://www.atatech.org/search?q=gc&type=INSIDE_ARTICLE_TAG" class="label label-ata">gc</a><a href="http://www.atatech.org/search?q=Android%E6%80%A7%E8%83%BD&type=INSIDE_ARTICLE_TAG" class="label label-ata">Android性能</a>        <button type="button" id="edit-tags" class="btn btn-default btn-xs" onclick="$(this).closest(&#39;.labels&#39;).children().toggle()">
+      <span class="glyphicon glyphicon-pencil"></span>
+      修改标签
+    </button>
+    <a href="http://www.atatech.org/articles/43598/tags/history" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-tag-history">
+      <span class="glyphicon glyphicon-time"></span>
+      标签历史
+    </a>
+      </div>
+</div>
+      </header>
+      
+      <div class="content unsafe">
+        &nbsp; &nbsp; 垃圾回收是Java语言的一大特性，方便了编程，但是却是以消耗一些性能为代价的。在Android 2.3之前，Dalvik虚拟机使用的垃圾收集机制是Stop-the-world，而且是Full heap collection，也就是垃圾收集线程在执行的时候，其它的线程都停止，一次收集完全部的垃圾；在Android 2.3以及更高的版本中，Dalvik虚拟机使用的垃圾收集机制得到了改进：Concurrent，Partial collection，也就是垃圾收集线程与其它线程可以是并发执行的，而且一次可能只收集一部分垃圾。Android 5.0的ART运行时引入了Compacting GC，以及前景和背景GC等，进一步优化了内存的回收机制。Android 2.3以及更高的版本中Stop-The-World和Concurrent两种类型的GC都是都存在的，并不是全部并行的，即使是并行GC，也会有条件的挂起非GC线程。<br><br>&nbsp; &nbsp;&nbsp;6月份第一次在对首页等启动阶段性能优化的过程中，解决GC一直是我们的重中之重，所以了解GC的原理也是非常必要的，可以避免走一些弯路。Android中的虚拟机其实还是比较基础的，回收算法、性能等都不能和JAVA上高性能的HotSpot等虚拟机相比，在Android 5.0以下，基本没有分代的概念，回收算法也比较单调，导致碎片等问题影响性能和分配效率。Android 5.0的ART才开始引入简单的分代概念，但是和HotSpot等还是有差距的。加上移动端的内存和服务器端的内存使用不尽相同，Android虚拟机在内存分配过程中会不断调整堆的合理大小，多余的内存会交还给内核。所以我们在很多手机上经常看到频繁的GC_FOR_ALLOC的日志输出。因为虚拟机本身还不够成熟，所以我们在性能优化的过程中就有较大的难度，特别是Android5.0以下的系统中。接下来了解以下Dalvik和ART相关的一些知识和日志的格式，以便在开发过程中能够更好的了解内存和性能相关的知识。<br><h2 id="0"><span style="color:#ff6600;">1、Dalvik虚拟机GC的相关知识</span></h2>
+&nbsp; &nbsp; &nbsp; Dalvik虚拟机中，Java堆实际上是由一个Active堆和一个Zygote堆组成的。其中，Zygote堆用来管理Zygote进程在启动过程中预加载和创建的各种对象，而Active堆是在Zygote进程fork第一个子进程之前创建的。之后无论是Zygote进程还是其子进程，都在Active堆上进行对象分配和释放。这样做的目的是使得Zygote进程和其子进程最大限度地共享Zygote堆所占用的内存。为了管理Java堆，Dalvik虚拟机需要一些辅助数据结构，包括一个Card Table、两个Heap Bitmap和一个Mark Stack。Card Table是为了记录在垃圾收集过程中对象的引用情况的，以便可以实现Concurrent GC。<br>&nbsp; &nbsp; &nbsp; 函数dvmHeapStartup来创建Java堆。内部的gDvm是一个类型为DvmGlobals的全局变量，它通过各个成员变量记录了Dalvik虚拟机的各种信息。这里涉及到三个重要与Java堆相关的信息，分别是Java堆的起始大小（Starting Size）、最大值（Maximum Size）和增长上限值（Growth Limit）。在启动Dalvik虚拟机的时候，我们可以分别通过-Xms、-Xmx和-XX:HeapGrowthLimit三个选项来指定上述三个值。<br>&nbsp; &nbsp; &nbsp; Java堆的起始大小（Starting Size）指定了Davlik虚拟机在启动的时候向系统申请的物理内存的大小。后面再根据需要逐渐向系统申请更多的物理内存，直到达到最大值（Maximum Size）为止。这是一种按需要分配策略，可以避免内存浪费。在默认情况下，Java堆的起始大小（Starting Size）和最大值（Maximum Size）等于4M和16M。但是厂商会通过dalvik.vm.heapstartsize和dalvik.vm.heapsize这两个属性将它们设置为适合设备的值。<br>&nbsp; &nbsp; &nbsp; 在全局变量gDvm中，除了上面提到的三个信息之外，还有三种信息是与Java堆相关的，它们分别是堆最小空闲值（Min Free）、堆最大空闲值（Max Free）和堆目标利用率（Target Utilization）。这三个值可以分别通过Dalvik虚拟机的启动选项-XX:HeapMinFree、-XX:HeapMaxFree和-XX:HeapTargetUtilization来指定。它们用来确保每次GC之后，Java堆已经使用和空闲的内存有一个合适的比例，这样可以尽量地减少GC的次数。<br><h3 id="1"><span style="color:#339966;">1.1 Dalvik虚拟机的GC的类型：</span></h3>
+<strong>GC_FOR_MALLOC</strong>: 表示是在堆上分配对象时内存不足触发的GC。<br><strong>GC_CONCURRENT</strong>: 当我们应用程序的堆内存达到一定阈值，预设的阀值是一个比指定的堆最小空闲内存小128K的数值。也就是说，当堆的空闲内不足时，就会触发GC_CONCURRENT类型的GC。<br><strong>GC_EXPLICIT</strong>: 表示是应用程序调用System.gc、VMRuntime.gc接口或者收到SIGUSR1信号时触发的GC。<br><strong>GC_BEFORE_OOM</strong>: 表示是在准备抛OOM异常之前进行的最后努力而触发的GC。<br>&nbsp; &nbsp; &nbsp; 实际上，GC_FOR_MALLOC、GC_CONCURRENT和GC_BEFORE_OOM三种类型的GC都是在分配对象的过程触发的。<br><br><h3 id="2"><span style="color:#339966;">1.2 对象的分配过程：</span></h3>
+<img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/a17edfa89a6193191be3ab8d91cd5a220d1bcf75" alt="" width="572" height="1880"><br><br>&nbsp; &nbsp; &nbsp; Dalvik虚拟机支持非并行和并行两种GC。在图中，左边是非并行GC的执行过程，而右边是并行GC的执行过程。它们的总体流程是相似的，主要差别在于前者在执行的过程中一直是挂起非GC线程的，而后者是有条件地挂起非GC线程。无论是并行GC，还是非并行GC，它们都是通过函数dvmCollectGarbageInternal来执行的。在调用函数dvmCollectGarbageInternal之前，堆是已经被锁定了的，因此这时候任何需要堆上分配对象的线程都会被挂起。但这不会影响到那些不需要在堆上分配对象的线程。<br><br>&nbsp; &nbsp; &nbsp; 在图中显示的GC流程中，除了第一步的Lock Heap和最后一步的Unlock Heap，都对应于函数dvmCollectGarbageInternal的实现，它的执行逻辑如下所示：<br><br> 第1步到第3步用于并行和非并行GC：<br><br> 1. 调用函数dvmSuspendAllThreads挂起所有的线程，以免它们干扰GC。<br><br> 2. 调用函数dvmHeapBeginMarkStep初始化Mark Stack，并且设定好GC范围。<br><br> 3. 调用函数dvmHeapMarkRootSet标记根集对象。<br><br> 第4到第6步用于并行GC：<br><br> 4. 调用函数dvmClearCardTable清理Card Table。因为接下来我们将会唤醒第1步挂起的线程。并且使用这个Card Table来记录那些在GC过程中被修改的对象。<br><br> 5. 调用函数dvmUnlock解锁堆。这个是针对调用函数dvmCollectGarbageInternal执行GC前的堆锁定操作。<br><br> 6. 调用函数dvmResumeAllThreads唤醒第1步挂起的线程。<br><br> 第7步用于并行和非并行GC：<br><br> 7. 调用函数dvmHeapScanMarkedObjects从第3步获得的根集对象开始，归递标记所有被根集对象引用的对象。<br><br> 第8步到第11步用于并行GC：<br><br> 8. 调用函数dvmLockHeap重新锁定堆。这个是针对前面第5步的操作。<br><br> 9. 调用函数dvmSuspendAllThreads重新挂起所有的线程。这个是针对前面第6步的操作。<br><br> 10. 调用函数dvmHeapReMarkRootSet更新根集对象。因为有可能在第4步到第6步的执行过程中，有线程创建了新的根集对象。<br><br> 11. 调用函数dvmHeapReScanMarkedObjects归递标记那些在第4步到第6步的执行过程中被修改的对象。这些对象记录在Card Table中。<br><br> 第12步到第14步用于并行和非并行GC：<br><br> 12. 调用函数dvmHeapProcessReferences处理那些被软引用（Soft Reference）、弱引用（Weak Reference）和影子引用（Phantom Reference）引用的对象，以及重写了finalize方法的对象。这些对象都是需要特殊处理的。<br><br> 13. 调用函数dvmHeapSweepSystemWeaks回收系统内部使用的那些被弱引用引用的对象。<br><br> 14. 调用函数dvmHeapSourceSwapBitmaps交换Live Bitmap和Mark Bitmap。执行了前面的13步之后，所有还被引用的对象在Mark Bitmap中的bit都被设置为1。而Live Bitmap记录的是当前GC前还被引用着的对象。通过交换这两个Bitmap，就可以使得当前GC完成之后，使得Live Bitmap记录的是下次GC前还被引用着的对象。<br><br> 第15步和第16步用于并行GC：<br><br> 15. 调用函数dvmUnlock解锁堆。这个是针对前面第8步的操作。<br><br> 16. 调用函数dvmResumeAllThreads唤醒第9步挂起的线程。<br><br> 第17步和第18步用于并行和非并行GC：<br><br> 17. 调用函数dvmHeapSweepUnmarkedObjects回收那些没有被引用的对象。没有被引用的对象就是那些在执行第14步之前，在Live Bitmap中的bit设置为1，但是在Mark Bitmap中的bit设置为0的对象。<br><br> 18. 调用函数dvmHeapFinishMarkStep重置Mark Bitmap以及Mark Stack。这个是针对前面第2步的操作。<br><br> 第19步用于并行GC：<br><br> 19. 调用函数dvmLockHeap重新锁定堆。这个是针对前面第15步的操作。<br><br> 第20步用于并行和非并行GC：<br><br> 20. 调用函数dvmHeapSourceGrowForUtilization根据设置的堆目标利用率调整堆的大小。<br><br> 第21步用于并行GC： <br><br> 21. 调用函数dvmBroadcastCond唤醒那些等待GC执行完成再在堆上分配对象的线程。<br><br> 第22步用于非并行GC：<br><br> 22. 调用函数dvmResumeAllThreads唤醒第1步挂起的线程。<br><br> 第23步用到并行和非并行GC：<br><br> 23. 调用函数dvmEnqueueClearedReferences将那些目标对象已经被回收了的引用对象增加到相应的Java队列中去，以便应用程序可以知道哪些引用引用的对象已经被回收了。<br><br>&nbsp; &nbsp; &nbsp; 以上就是并行和非并行GC的执行总体流程，它们的主要区别在于，前者在GC过程中，有条件地挂起和唤醒非GC线程，而后者在执行GC的过程中，一直都是挂起非GC线程的。并行GC通过有条件地挂起和唤醒非GC线程，就可以使得应用程序获得更好的响应性。但是我们也应该看到，并行GC需要多执行一次标记根集对象以及递归标记那些在GC过程被访问了的对象的操作。也就是说，并行GC在使用得应用程序获得更好的响应性的同时，也需要花费更多的CPU资源。<br><br><h3 id="3"><span style="color:#339966;">1.2 GC触发时机：</span></h3>
+1. 调用函数dvmHeapSourceAlloc在Java堆上分配指定大小的内存。如果分配成功，那么就将分配得到的地址直接返回给调用者了。函数dvmHeapSourceAlloc在不改变Java堆当前大小的前提下进行内存分配。 函数dvmHeapSourceAlloc成功地在Active堆上分配到一个对象之后，就会检查Active堆当前已经分配的内存（heap-&gt;bytesAllocated）是否大于预设的阈值（heap-&gt;concurrentStartBytes）。如果大于，那么就会通过条件变量gHs-&gt;gcThreadCond唤醒GC线程进行垃圾回收。预设的阈值（heap-&gt;concurrentStartBytes）是一个比指定的堆最小空闲内存小128K的数值，各手机厂商也会修改该值到一个合理的值。<br> 2. 如果上一步内存分配失败，这时候就需要执行一次GC。GC线程是Dalvik虚拟机启动的过程中创建的，它的执行体函数是gcDaemonThread。不过如果GC线程已经在运行中，即gDvm.gcHeap-&gt;gcRunning的值等于true，那么就直接调用函数dvmWaitForConcurrentGcToComplete等到GC执行完成。否则的话，就需要调用函数gcForMalloc来执行一次GC_FOR_MALLOC的GC了，参数false表示不要回收软引用对象引用的对象。<br> 3. GC执行完毕后，再次调用函数dvmHeapSourceAlloc尝试内存分配操作。如果分配成功，那么就将分配得到的地址直接返回给调用者了。<br> 4. 如果上一步内存分配失败，这时候就要对Java堆进行扩容了。通过调用函数dvmHeapSourceAllocAndGrow尝试分配，这个函数会扩张堆。所以dvmHeapStartup的时候可以给一个比较小的初始堆，实在不够用再调用它进行扩张。<br> 5. 如果调用函数dvmHeapSourceAllocAndGrow分配内存成功，则直接将分配得到的地址直接返回给调用者了。<br> 6. 如果上一步内存分配还是失败，这时候就得回收软引用了。再次调用函数gcForMalloc来执行GC。参数true表示要回收软引用对象引用的对象。<br> 7. GC执行完毕，再次调用函数dvmHeapSourceAllocAndGrow进行内存分配。这是最后一次努力了，如果失败则抛出OOM。<br><br>&nbsp; &nbsp; &nbsp; &nbsp;通过这个流程可以看到，在对象的分配中会导致GC，第一次分配对象失败我们会触发GC但是不回收软引用，如果再次分配还是失败就会对堆进行扩容（在堆的大小还没有达到最大值Maximum Size的情况下），并再次尝试分配，如果还是分配失败。就会将软引用的内存也给回收。<br>&nbsp; &nbsp; &nbsp; 每次GC执行完成之后，都需要根据预先设置的目标堆利用率和已经分配出去的内存字节数计算得到理想的堆大小。已经分配出去的内存字节数只考虑在Active堆上分配出去的字节数。得到了Active堆已经分配出去的字节数currentHeapUsed之后，就可以调用函数getUtilizationTarget来计算Active堆的理想大小targetHeapSize了。 计算出来的堆理想大小targetSize要满足空闲内存不能大于预先设定的最大值（hs-&gt;maxFree）以及不能小于预先设定的最小值（hs-&gt;minFree）。接下来同函数dvmHeapSourceAlloc成功地在Active堆上分配到一个对象一样，检查并行GC的触发条件。当Active堆heap当前已经分配的大小超过heap-&gt;concurrentStartBytes时，就会触发并行GC。计算并行GC触发条件时，需要用到CONCURRENT_MIN_FREE和CONCURRENT_START两个值，预设的CONCURRENT_MIN_FREE定义为256K，而CONCURRENT_START定义为128K。各厂商也会根据手机设置合理的值如几百k。<br>&nbsp; &nbsp; &nbsp; 由此我们就可以知道，在预设情况下，当Active堆允许分配的内存小于256K时，禁止执行并行GC，而当Active堆允许分配的内存大于等于256K，并且剩余的空闲内存小于128K，就会触发并行GC。<br><br>&nbsp; &nbsp; &nbsp; 在6月份的优化过程中，我们也看到这个问题，启动阶段堆的大小慢慢增加，从10多M增加到几十M，这个中间有非常多的GC_FOR_ALLOC类型的输出，尤其在三星9300等手机上，GC十分的频繁，首页滑动一行图片就会产生2次GC_FOR_ALLOC，严重影响了性能。所以当时我们还想干脆在启动阶段直接先申请一个几时M的内存块，这样就不用频繁的扩容堆大小，引起那么多的GC了。只是想法很美好，现实很残酷，在部分手机上确实看到堆一下撑大了，但是GC的次数一点也没少。今天了解的更深入后再回过头来看当时的这个想法，或许会觉得可笑。因为在每次GC后虚拟机都会尽量让堆的利用率往目标利用率靠拢。所以当我们尝试手动去分配一些大块内存，试图去扩大可用堆大小的时候，反而会导致频繁的GC，因为这些对象的分配会导致GC，而GC后会让堆内存回到合适的大小，而我们扩容堆使用的局部变量也很快会被回收，堆大小也会缩减回来无法达到扩充的目的。通过一个简单的程序也能很好的看出这个扩容和收缩的过程。<br><br><pre><code class="hljs mipsasm">mHandler.postDelayed(new Runnable() {
+@Override
+public void run() {
+<span class="hljs-keyword">Bitmap </span><span class="hljs-keyword">bmp </span>= <span class="hljs-keyword">Bitmap.createBitmap(1280， </span><span class="hljs-number">768</span>， <span class="hljs-built_in">Config</span>.ARGB_8888)<span class="hljs-comment">;</span>
+<span class="hljs-keyword">bmp.recycle();
+</span>mHandler.postDelayed(this， <span class="hljs-number">2000</span>)<span class="hljs-comment">;</span>
+}
+}， <span class="hljs-number">2000</span>)<span class="hljs-comment">;</span></code></pre>
+<br>&nbsp; &nbsp; &nbsp; 如上面在一个定时代码中分配一个大图片，然后对图片进行recycle操作。我们就能发现每次创建图片的时候都会输出GC_FOR_ALLOC，通过工具可以看到堆在不停的扩大和收缩。<br><br><h3 id="4"><span style="color:#339966;">1.3 回收算法和内存碎片</span></h3>
+&nbsp; &nbsp; 主流的Davik采取的都是标注与清理（Mark and Sweep）回收算法，也有实现了拷贝GC的，这一点和HotSpot是不一样的，HotSpot是一款成熟且高性能的Java虚拟机，各个代的回收算法也都不尽相同。具体使用什么算法是在编译期决定的，无法在运行的时候动态更换。如果在编译dalvik虚拟机的命令中指明了"WITH_COPYING_GC"选项，则编译"/dalvik/vm/alloc/Copying.cpp"源码 – 此是Android中拷贝GC算法的实现，否则编译"/dalvik/vm/alloc/HeapSource.cpp" – 其实现了标注与清理GC算法。<br> 由于Mark and Sweep算法的缺点，容易导致内存碎片，所以在这个算法下，当我们有大量不连续小内存的时候，再分配一个较大对象时，还是会非常容易导致GC，比如我们分配一个图片内存的时候。所以对于Dalvik虚拟机的手机来说，我们首先要尽量避免频繁生成很多临时小变量，另一个又要尽量去避免产生很多长生命周期的大对象。<br><h2 id="5"><span style="color:#ff6600;">2、ART内存回收机制</span></h2>
+&nbsp; &nbsp; &nbsp; Android&nbsp;4.4中的ART运行时垃圾收集机制也涉及到类似于Zygote堆、Active堆、Card Table、Heap Bitmap和Mark Stack等概念。ART运行时内部使用的Java堆的主要组成包括Image Space、Zygote Space、Allocation Space和Large Object Space四个Space。其中Image Space用来存储一些预加载的类， Zygote Space和Allocation Space与Dalvik虚拟机中的Zygote堆和Active堆的作用是一样的。Zygote Space在Zygote进程和应用程序进程之间共享的，而Allocation Space则是每个进程独占的。同样的，Zygote进程一开始只有一个Image Space和一个Zygote Space。在Zygote进程fork第一个子进程之前，就会把Zygote Space一分为二，原来的已经被使用的那部分堆还叫Zygote Space，而未使用的那部分堆就叫Allocation Space。以后的对象都在Allocation Space上分配。<br> Large Object Space就是一些离散地址的集合，用来分配一些大对象，比如分配图片，称为Discontinuous Space。<br>&nbsp; &nbsp; &nbsp;&nbsp;Android 5.0中的ART引进了Compacting GC之后，ART运行时的堆空间结构就发生了变化。<br><br><h3 id="6"><span style="color:#339966;">2.1 ART的垃圾回收改进：</span></h3>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 1. ART运行时堆的划分和管理更细致，Android 4.4中它分为Image Space、Zygote Space、Allocation Space和Large Object Space四个Space，再加上一个Allocation Stack。其中，Allocation Space和Large Object Space和Dalvik虚拟机的Zygote堆和Active堆作用是一样的，而其余的Space则有特别的作用，例如，Image Space的对象是永远不需要回收的。Android 5.0开始引入了&nbsp;Compacting GC之后，ART运行时的堆空间结构就发生了变化，Image Space和Large Object Space没有发生根本性的变化，但是Zygote Space和Allocation Space就发生了很大的变化。例如增加了一个Non-Moving Space。由于在Compacting GC中，涉及到对象的移动，但是有些对象，例如类对象（Class）、类方法对象（ArtMethod）和类成员变量对象（ArtField），它们一经加载后，基本上就会一直存在。因此，频繁对此类对象进行移动是无益的，我们需要将它们分配在一个不能移动的Space中，以减少在Compacting GC需要处理的对象的数量。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2. ART运行时的每一个Space都有不同的回收策略，ART运行时根据这个特性提供了Mark Sweep、Partial Mark Sweep和Sticky Mark Sweep等三种回收力度不同的垃圾收集器。其中，Mark Sweep的垃圾回收力度最大，它会同时回收Zygote Space、Allocation Space和Large Object Space的垃圾，Partial Mark Sweep的垃圾回收力度居中，它只会同时回收Allocation Space和Large Object Space的垃圾，而Sticky Mark Sweep的垃圾回收力度最小，它只会回收Allocation Stack的垃圾，即上次GC以后分配出来的又不再使用了的对象。力度越大的垃圾收集器，回收垃圾时需要的时候也就越长。这样我们就可以在应用程序运行的过程中根据不同的情景使用不同的垃圾收集器，那就可以更有效地执行垃圾回收过程。另外在Android5.0以后的ART中，还引入了Semi-Space（SS）GC和Generational Semi-Space（GSS）、Mark-Compact（MC）GC的三个Compacting GC，可以有效的解决内存碎片问题。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3. ART运行时充分地利用了设备的CPU多核特性，在并行GC的执行过程中，将每一个并发阶段的工作划分成多个子任务，然后提交给一个线程池执行，这样就可以更高效率地完成整个GC过程，避免长时间对应用程序造成停顿。<br><br>&nbsp; &nbsp; &nbsp; &nbsp;4.&nbsp;Android 5.0 ART运行时还引进了另外一种称为Ros Alloc的Space，用来分配不可移动对象。但是Ros Alloc Space不像Dl Malloc Space一样使用C库内存管理接口来分配和释放内存，而是采用一种称为Ros（Runs-of-slots）的接口来进行内存分配和释放。Ros算法其实与Linux内核使用的SLAB算法类似，它们的核心思想都是将内存分为若干个Bucket，每一个Bucket都管理着相同大小的内存块。这样在分配内存时，就会先根据要分配的内存大小找到最合适的Bucket，然后再从这个Bucket找到一块空闲的内存进行分配。这是一种Best Fit分配策略，好处是可以将大小相同的对象集中在一起分配，这样可以有效地减少内存碎片。另外Ros依据Java多线程应用程序的特点而设计的，内存分配器有更细粒度的锁机制，可以直接对独立的对象上锁，而非对整个待分配的内存空间上锁。在线程局部区域中的小对象的分配，完全可以无视锁的存在了。没有了锁的请求和释放，线程局部小对象的访问速度也就大幅提升了。<br><br>&nbsp; &nbsp; &nbsp; &nbsp;5.&nbsp;在引进Compacting GC后，ART运行时优化了堆内存分配过程。最显著特点是为每个ART运行时线程增加局部分配缓冲区（Thead Local Allocation Buffer）和在OOM前进行一次同构空间压缩（Homogeneous Space Compact）。前者可提高堆内存分配效率，后者可解决内存碎片问题。</p>
+&nbsp; &nbsp; &nbsp; &nbsp;6.&nbsp;Large Object Space就是一些离散地址的集合，用来分配一些大对象从而提高了GC的管理效率和整体性能。Large Object Map Space分配内存的逻辑是很简单的，直接就是调用MemMap类的静态成员函数MapAnonymous创建一块指定大小的匿名内存，然后再将该匿名共享内存添加到成员变量large_objects_描述的一个向量中去，最后更新内部的各个统计数据。满足以下条件的，就在Large Object Space上分配：请求分配的内存大于等于Heap类的成员变量large_object_threshold_指定的值。这个值等于3 * kPageSize，即3个页面的大小。被分配的对象是一个原子类型数组，即byte数组、int数组和boolean数组等。<br><br>&nbsp; &nbsp; &nbsp; 7.&nbsp;ART引入的3种Compacting GC，都是在Stop-the-word前提下进行的，并且都是通过移动对象来实现垃圾回收和内存压缩的目的。不过Mark-Compact GC的对象移动操作是就地进行的，而Semi-Space（SS）GC和Generational Semi-Space（GSS）GC两者的对象移动操作是要通过一个额外的Space来进行的。当然，Mark-Compact GC的对象移动操作可以就地进行并不是免费的午餐，它要付出的代价在回收阶段执行一个额外的新地址计算操作。这又是一个以时间换空间或者说以空间换时间的做法。<br><br>&nbsp; &nbsp; &nbsp; Semi-Space（SS）GC和Generational Semi-Space（GSS）GC共同特点是都具有一个From Space和一个To Space。在GC执行期间，在From Space分配的还存活的对象会被依次拷贝到To Space中，这样就可以达到消除内存碎片的目的。与SS GC相比，GSS GC还多了一个Promote Space。当一个对象是在上一次GC之前分配的，并且在当前GC中仍然是存活的，那么它就会被拷贝到Promote Space中，而不是To Space中。这相当于是简单地将对象划分为新生代和老生代的，即在上一次GC之前分配的对象属于老生代的，而在上一次GC之后分配的对象属于新生代的。一般来说，老生代对象的存活性要比新生代的久，因此将它们拷贝到Promote Space中去，可以避免每次执行SS GC或者GSS GC时，都需要对它们进行无用的处理。<br>&nbsp; &nbsp; &nbsp; Mark-Compact（MC）GC，它的实现方式有很大不同。SS GC和GSS GC需两个Space来压缩内存，而MC GC只需一个Space来压缩内存。Mark-Compact GC执行完成之后，原来位于Bump Pointer Space上的仍然存活的对象会被依次移动至原Bump Pointer Space的左侧，并且按地址从小到大紧凑地排列在一起。这个过程不需要借助于额外的Space来完成。<br><br><h3 id="7"><span style="color:#339966;">2.2 对象的分配过程和GC触发时机：</span></h3>
+&nbsp; &nbsp; &nbsp; &nbsp;ART中的对象分配过程和Dalvik虚拟机类似，但是又复杂很多，分配的位置等都会有区别。回收遇到分配失败的时候，会尝试不同力度的GC算法，而Dalvik只有一种算法，最后在OOM前进行一次同构空间压缩（Homogeneous Space Compact）。<br>&nbsp; &nbsp; &nbsp; 同构空间压缩就是一个Compacting GC，可以解决由于内存碎片太多而引起的内存分配失败问题。<br>&nbsp; &nbsp; &nbsp;&nbsp;同构空间压缩的执行是有频率限制的，只有满足以下两个条件才会执行：<br>&nbsp; &nbsp; &nbsp; 1）ART运行时启动时设置了选项-XX:EnableHSpaceCompactForOOM；<br>&nbsp; &nbsp; &nbsp; 2）上次执行的同构空间压缩的时候离现在的时间超过了预先设置的阀值，这个阈值保存在Heap类的成员变量min_interval_homogeneous_space_compaction_by_oom_中，它被设置为100秒。<br><br>&nbsp; &nbsp; &nbsp;&nbsp;GC执行完毕，Heap类的成员函数CollectGarbageInternal还会调用Heap类的成员函数RequestHeapTrim请求对堆内存进行裁剪，将过多的内存归还给内核。<br><br><h3 id="8"><span style="color:#339966;">2.3 ART的GC的类型：</span></h3>
+&nbsp; &nbsp; &nbsp; ART运行时既支持Mark-Sweep GC，又支持Compacting GC。其中，Mark-Sweep GC执行效率更高，但是存在内存碎片问题；而Compacting GC执行效率较低，但是不存在内存碎片问题。ART运行时通过引入Foreground GC和Background GC的概念来对这两种GC进行扬长避短。<br><br>kGcCauseForAlloc: 当要分配内存的时候发现内存不够的情况下引起的GC，这种情况下的GC会Stop The World。<br>kGcCauseBackground: 当内存达到一定的阈值的时候会触发GC，这个时候是一个后台GC，不会引起长时间的Stop The World。<br>kGcCauseExplicit，显示调用的时候进行的gc，如果ART打开了这个选项的情况下，在system.gc的时候会进行GC。<br>kGcCauseForNativeAlloc：Natvie分配触发的GC。<br> kGcCauseCollectorTransition:&nbsp;Mark-Sweep GC 和Compacting GC 切换的时候触发。<br> kGcCauseDisableMovingGc: Not a real GC cause， used when we disable moving GC (currently for GetPrimitiveArrayCritical).&nbsp;<br> kGcCauseTrim: Not a real GC cause， used when we trim the heap.&nbsp;<br> kGcCauseHomogeneousSpaceCompact:在OOM前或者切换到background的时候，触发同构空间压缩GC，foreground 和 background 的垃圾收集器都是CMS。<br><br><h3 id="9"><span style="color:#339966;">2.3 并行和非并行GC：</span></h3>
+<img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/f2664fc19b541539627af075431d50f016355d00" alt="" width="580" height="1078"><br>非并发GC<br> 步骤1. 调用子类实现的成员函数InitializePhase执行GC初始化阶段。<br> 步骤2. 挂起所有的ART运行时线程。<br> 步骤3. 调用子类实现的成员函数MarkingPhase执行GC标记阶段。<br> 步骤4. 调用子类实现的成员函数ReclaimPhase执行GC回收阶段。<br> 步骤5. 恢复第2步挂起的ART运行时线程。<br> 步骤6. 调用子类实现的成员函数FinishPhase执行GC结束阶段。<br>并发GC<br> 步骤1. 调用子类实现的成员函数InitializePhase执行GC初始化阶段。<br> 步骤2. 获取用于访问Java堆的锁。<br> 步骤3. 调用子类实现的成员函数MarkingPhase执行GC并行标记阶段。<br> 步骤4. 释放用于访问Java堆的锁。<br> 步骤5. 挂起所有的ART运行时线程。<br> 步骤6. 调用子类实现的成员函数HandleDirtyObjectsPhase处理在GC并行标记阶段被修改的对象。<br> 步骤7. 恢复第4步挂起的ART运行时线程。<br> 步骤8. 重复第5到第7步，直到所有在GC并行阶段被修改的对象都处理完成。<br> 步骤9. 获取用于访问Java堆的锁。<br> 步骤10. 调用子类实现的成员函数ReclaimPhase执行GC回收阶段。<br> 步骤11. 释放用于访问Java堆的锁。<br> 步骤12. 调用子类实现的成员函数FinishPhase执行GC结束阶段。<br>&nbsp; &nbsp; &nbsp; 从上面的分析就可以看出，并行GC和非并行GC的区别在于：<br><br>&nbsp; &nbsp; &nbsp; 1. 非并行GC的标记阶段和回收阶段是在挂住所有的ART运行时线程的前提下进行的，因此，只需要执行一次标记即可。<br><br>&nbsp; &nbsp; &nbsp; 2. 并行GC的标记阶段只锁住了Java堆，因此它不能阻止那些不是正在分配对象的ART运行时线程同时运行，而这些同时运行的ART运行时线程可能会引用了一些在之前的标记阶段没有被标记的对象。如果不对这些对象进行重新标记的话，那么就会导致它们被GC回收，造成错误。因此，与非并行GC相比，并行GC多了一个处理脏对象的阶段。所谓的脏对象就是我们前面说的在GC标记阶段同时运行的ART运行时线程访问或者修改过的对象。<br><br>&nbsp; &nbsp; &nbsp; 3. 并行GC并不是自始至终都是并行的，例如，处理脏对象的阶段就是需要挂起除GC线程以外的其它ART运行时线程，这样才可以保证标记阶段可以结束。<br><br><h3 id="10"><span style="color:#339966;">2.3 ART对于Dalvik来说主要优点：</span></h3>
+&nbsp; &nbsp; &nbsp; 1、ART有多种GC方式可以选择，而Dalvik只有一种GC方式。<br>&nbsp; &nbsp; &nbsp; 在ART中kGcTypeSticky、kGcTypePartial和kGcTypeFull三种类型的GC的垃圾回收力度是依次加强。kGcTypeSticky只回收上次GC后在Allocation Space中新分配的垃圾对象；kGcTypePartial只回收Allocation Space的垃圾对象；kGcTypeFull同时回收Zygote Space和Allocation Space的垃圾对象。通过这种策略，就有可能以最小代价解决分配对象时遇到的内在不足问题。不过，对于类型为kGcTypeSticky和kGcTypePartial的GC，它们的执行有前提条件的。型为kGcTypeSticky的GC的执行代码虽然是最小的，但是它能够回收的垃圾也是最小的。如果回收的垃圾不足于满足请求分配的内存，那就相当于做了一次无用功了。因此，执行类型为kGcTypeSticky的GC需要满足两个条件。第一个条件是上次GC后在Allocation Space上分配的内存要达到一定的阈值（该值定义在Heap类的成员变量min_alloc_space_size_for_sticky_gc_中，它的值默认设置为2M），这样才有比较大的概率回收到较多的内存。第二个条件Allocation Space剩余的未分配内存要达到一定的阈值，这样可以保证在回收得到较少内存时，也有比较大的概率满足请求分配的内存（该值定义在Heap类的成员变量min_remaining_space_for_sticky_gc_中，它的值默认设置为1M）。 另外用于去除碎片的同构空间压缩的GC执行也是有频率限制的。<br>&nbsp; &nbsp; &nbsp; 2、通过额外记录新分配的对象来来支持更好的轻量级Sticky GC。<br>&nbsp; &nbsp; &nbsp; 上面提到过的ART中新增的轻量级回收kGcTypeSticky只回收上次GC后在Allocation Space中新分配的垃圾对象，Heap类的成员函数RecordAllocation首先是记录当前已经分配的内存字节数以及对象数，为了Sticky GC，还要接着再将新分配的对象压入到Heap类的成员变量allocation_stack_描述的Allocation Stack中去，而Dalvik虚拟机直接将新分配出来的对象记录在Live Bitmap中。如果不能成功将新分配的对象压入到Allocation Stack中，就说明上次GC以来，新分配的对象太多了，因此这时候就需要执行一个Sticky GC，将Allocation Stack里面的垃圾进行回收，然后再尝试将新分配的对象压入到Allocation Stack中，直到成功为止。<br>&nbsp; &nbsp; &nbsp; 3、大内存块额外单独管理，可以提高内存分配和回收效率。<br>&nbsp; &nbsp; &nbsp; 3、减少Suspend时间<br>&nbsp; &nbsp; &nbsp; &nbsp;对于并行GC，在Handle Dirty Object阶段是在挂起ART运行时线程的前提下进行的，因此，如果把所有的Dirty Card都放在Handle Dirty Object阶段处理，那么就会可能会造成应用程序停顿时间过长。于是，ART运行时就在并行Marking阶段也帮忙着处理Dirty Card，通过这种方式尽量减少在Handle Dirty Object阶段需要处理的Dirty Card，以达到减少应用程序因为GC造成的停顿时间。另外ART在垃圾回收过程中，也减少了挂起非GC线程的次数。<br><br>&nbsp; &nbsp; &nbsp; 从谷歌公布的信息来看，平均暂停时间已经降低到了3ms，这比Dalvik模式下的54ms快了很多。除此以外，谷歌还改进了内存分配系统，把内存分配的速度提升了10倍，垃圾回收的算法也进行了改进，减少应用被打断的次数，GC的效率也提高了2-3倍。<br><br><h2 id="11"><span style="color:#ff6600;">3、 GC频繁的主要原因</span></h2>
+<h3 id="12"><span style="color:#339966;">3.1 内存抖动</span></h3>
+&nbsp; &nbsp; &nbsp; 内存抖动是因为大量的对象被创建又在短时间内马上被释放，如循环中分配对象，很容易引起GC，特别是在较大的循环次数或者一个循环中分配较多的临时对象时。比如在I9300手机上，仅仅new TextView控件，2500次循环就会产生一次GC。<br><h3 id="13"><span style="color:#339966;">3.2&nbsp;瞬间产生大量的对象</span></h3>
+&nbsp; &nbsp; &nbsp; 瞬间产生大量的对象，即使对象不大，也可能使得堆的可用空间达到阈值触发GC或导致堆的扩容产生GC；<br><h3 id="14"><span style="color:#339966;">3.3 分配大内存块的对象</span></h3>
+&nbsp; &nbsp; &nbsp; 分配大内存块的对象，如图片，大的byte数组等，虽然堆剩余内存空间足够，但是仍然可能触发GC，因为内存碎片导致了找不到连续空间来分配这个大内存，从而触发GC。<br><h3 id="15"><span style="color:#339966;">3.4 内存泄露</span></h3>
+&nbsp; &nbsp; &nbsp; &nbsp;内存泄露，会导致可用内存越来越少，而且导致碎片也可能越来越严重，这样就更加容易触发GC。<br><h2 id="16"><span style="color:#ff6600;">4、 GC日志信息</span></h2>
+<h3 id="17"><span style="color:#339966;">4.1 Dalvik GC日志</span></h3>
+Dalvik的日志格式基本如下： <br> D/dalvikvm:&lt;GC_Reason&gt;&lt;Amount_freed&gt;，&lt;Heap_stats&gt;，&lt;Pause_time&gt;，&lt;Total_time&gt;<br> GC_Reason: 前面已经说到过几种GC的类型如，GC_FOR_MALLOC，GC_CONCURRENT，GC_EXPLICIT等。<br> Amount_freed: 表示系统通过这次GC操作释放了多少内存。<br> Heap_stats: 显示当前内存的空闲比例(%)以及使用情况（活动对象所占内存 / 当前程序总内存）。<br> Pause_time: 表示这次GC操作导致应用程序暂停的时间。并行GC和GC_EXPLICIT会显示两个暂停：一个是回收开始时间，另外一个是回收结束时间。如paused　2ms+2ms，第一个时间值表示markrootset的时间，第二个时间值表示第二次mark的时间。 如果触发原因是GC_FOR_MALLOC，这一行为单个时间值，表示垃圾收集的耗时。 <br> Total_time: 表示本次GC所花费的总时间。上面的Pause_time，也就是stop &nbsp;the world的时间是不一样的，卡顿时间主要看上面的pause_time。<br><br><h3 id="18"><span style="color:#339966;">4.2 ART GC日志</span></h3>
+I/art:&lt;GC_Reason&gt;&lt;Amount_freed&gt;，&lt;LOS_Space_Status&gt;，&lt;Heap_stats&gt;，&lt;Pause_time&gt;，&lt;Total_time&gt;<br> 基本情况和Dalvik相似，GC的Reason却更多了，还多了一个AllocSpace objects和一个LOS objects.<br> LOS_Space_Status：Large Object Space，大对象占用的空间，这部分内存并不是分配在堆上的，但仍属于应用程序内存空间，主要用来管理 bitmap 等占内存大的对象，避免因分配大内存导致堆频繁的GC。例如：<br>I/art(22361): Background sticky concurrent mark sweep GC freed 50047(4MB) AllocSpace objects， 37(1189KB) LOS objects， 5% free， 72MB/77MB， paused 7.693ms total 77.412ms。<br>我们能够看到有37个大对象。<br><br>&nbsp; &nbsp; &nbsp; 以上是对Dalvik虚拟机和ART运行时一些知识点，通过参考资料等一些整理后写的。因为涉及到的概念比较多，回收策略也比较多，如有疏漏之处还望指正。<br><br><strong>参考资料： 老罗的新浪微博：http://weibo.com/shengyangluo</strong>
+
+      </div>
+            
+      
+      <div class="_article-float hidden-xs" data-fixed="false">
+        <div class="container">
+          <div class="_article-float-inner">
+          <aside class="_article-side">
+    <a href="http://www.atatech.org/articles/43598/follow" class="btn btn-primary btn-block" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).parent().replaceWith(r)">关注</a>
+    <section class="_article-followers">
+    <h6 class="heading text-center">5人关注该文章</h6>
+    <ul class="list-inline">
+      <li><a href="http://www.atatech.org/users/150779" title="苯环"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_37dfd2576dc1bffe58ffbf9147bbe912.png_80x80" width="26" height="26" alt="苯环" class="img-user"></a></li><li><a href="http://www.atatech.org/users/30626" title="行直"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_8385583a61497aa5d15857e068482a65.png_80x80" width="26" height="26" alt="行直" class="img-user"></a></li><li><a href="http://www.atatech.org/users/104594" title="玄柯"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_21d8fa61a4cf633cbb325030f42a1762.png_80x80" width="26" height="26" alt="玄柯" class="img-user"></a></li><li><a href="http://www.atatech.org/users/75263" title="默燧"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_912df813514549e18aaadee45381f39c.png_80x80" width="26" height="26" alt="默燧" class="img-user"></a></li><li><a href="http://www.atatech.org/users/9930" title="泽胤"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_avatar_20140326181441_9930_60.jpeg_80x80" width="26" height="26" alt="泽胤" class="img-user"></a></li>    </ul>
+  </section>
+</aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="actions">
+        <a href="http://www.atatech.org/articles/43598#comment" class="btn btn-primary js-scroll-to">评论文章
+                      (3)
+                  </a>
+        <a href="http://www.atatech.org/articles/43598/voteup" title="赞" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle();$(&#39;#voters&#39;).html(r)">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          17
+        </a>
+        <a href="http://www.atatech.org/articles/43598/unvoteup" title="取消赞" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).prev().addBack().toggle();$(&#39;#voters&#39;).html(r)" style="display:none">
+          <span class="glyphicon glyphicon-thumbs-up"></span>
+          18
+        </a>
+                <button class="btn btn-default" data-toggle="modal" data-target="#modal-share" data-article-id="43598" data-share-count-target="#share-count" title="分享">
+          <span class="glyphicon glyphicon-share"></span>
+          <span id="share-count">0</span>
+        </button>
+                	<!-- 收藏 -->
+        <a href="http://www.atatech.org/articles/43598/mark" title="收藏" class="btn btn-default" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).next().addBack().toggle()">
+          <span class="glyphicon glyphicon-star"></span>
+          4
+        </a>
+        <a href="http://www.atatech.org/articles/43598/unmark" title="取消收藏" class="btn btn-primary" role="button" rel="nofollow" data-remote="true" data-done="$(this).prev().addBack().toggle()" data-method="post" style="display:none">
+          <span class="glyphicon glyphicon-star"></span>
+          5
+        </a>
+      </footer>
+    </article>
+
+    <hr>
+    
+
+    <div id="voters">
+      <div id="voters" class="_article-voters">
+  <h3 class="heading">他们赞过该文章</h3>
+  <ul class="list-inline"><li><a href="http://www.atatech.org/users/130624" title="陆影影"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_84383ff5059b675e4878cbdb012d0a3a.png_80x80" width="28" height="28" alt="陆影影" class="img-user"></a></li><li><a href="http://www.atatech.org/users/136062" title="锦颢"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/img_20150818111054.jpg_80x80" width="28" height="28" alt="锦颢" class="img-user"></a></li><li><a href="http://www.atatech.org/users/164080" title="狐忌"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_af16f5c4011aeb751eedec8b0ea4e6b8.png_80x80" width="28" height="28" alt="狐忌" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23303" title="墨昕"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/img_20141229103214.jpg_80x80" width="28" height="28" alt="墨昕" class="img-user"></a></li><li><a href="http://www.atatech.org/users/152916" title="凤煜"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_06d0d096c9459c85e47be1e40ce897cc.png_80x80" width="28" height="28" alt="凤煜" class="img-user"></a></li><li><a href="http://www.atatech.org/users/163974" title="依希"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/img_20150924164529.png_80x80" width="28" height="28" alt="依希" class="img-user"></a></li><li><a href="http://www.atatech.org/users/13855" title="执明"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_32f84b597629f37d9ef53d714fce6fa1.png_80x80" width="28" height="28" alt="执明" class="img-user"></a></li><li><a href="http://www.atatech.org/users/81631" title="士昭"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_3a8beff9989bacc12f6d2e64412c3f93.png_80x80" width="28" height="28" alt="士昭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/9930" title="泽胤"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_avatar_20140326181441_9930_60.jpeg_80x80" width="28" height="28" alt="泽胤" class="img-user"></a></li><li><a href="http://www.atatech.org/users/24478" title="陶岳"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_avatar_20120725183111_24478_60.jpeg_80x80" width="28" height="28" alt="陶岳" class="img-user"></a></li><li><a href="http://www.atatech.org/users/34964" title="丹琼"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_502c4afdfeedb869dd6c8c1496e7da0f.png_80x80" width="28" height="28" alt="丹琼" class="img-user"></a></li><li><a href="http://www.atatech.org/users/71656" title="敏俊"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_26223a0332cfa53625653ddb8de05948.png_80x80" width="28" height="28" alt="敏俊" class="img-user"></a></li><li><a href="http://www.atatech.org/users/66624" title="澜清"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_eef222c790cc35af6406e8f9663e7574.png_80x80" width="28" height="28" alt="澜清" class="img-user"></a></li><li><a href="http://www.atatech.org/users/64157" title="如盐"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_652fca5e93b01f8e5bea89231142bd1e.png_80x80" width="28" height="28" alt="如盐" class="img-user"></a></li><li><a href="http://www.atatech.org/users/150189" title="泛叶"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_30dd2f5216638636f41e15155433517d.png_80x80" width="28" height="28" alt="泛叶" class="img-user"></a></li><li><a href="http://www.atatech.org/users/19975" title="孟庭"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_bc3d0492b90227ca83cd1b798a8c3262.png_80x80" width="28" height="28" alt="孟庭" class="img-user"></a></li><li><a href="http://www.atatech.org/users/23062" title="吕莫"><img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_6706f0da72316a555818858ae81eb84e.png_80x80" width="28" height="28" alt="吕莫" class="img-user"></a></li><!-- <li><a href="#" class="img-user _article-voters-more" style="width:28px;height:28px">...</a></li> --></ul></div>
+<hr>
+    </div>
+
+            <table width="100%" class="cnzz-event" id="article-recommend">
+            <tbody><tr>
+                <th rowspan="3" width="5%">相<br>似<br>文<br>章</th>
+                <td width="50%"><li><a href="http://www.atatech.org/articles/3386">jemalloc原理分析</a></li></td>
+                <td width="45%"><li><a href="http://www.atatech.org/articles/17034">tcmalloc浅析</a></li></td>
+            </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/22506">学习一下netty4的内存管理</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/46470">zsmalloc分配器源码分析</a></li></td>
+                </tr>
+                            <tr>
+                    <td><li><a href="http://www.atatech.org/articles/36449">iOS内存管理和malloc源码解读</a></li></td>
+                    <td><li><a href="http://www.atatech.org/articles/14023">linux kswapd浅析</a></li></td>
+                </tr>
+                    </tbody></table>
+    
+        <ul class="pager _article-pager">
+            <li class="previous"><a href="http://www.atatech.org/articles/43380">上一篇：手淘安卓版性能优化5 - 手淘遇到的性能问题和优化工具</a></li>
+                  <li class="next"><a href="http://www.atatech.org/articles/44028">下一篇：手淘安卓版性能优化7- 启动阶段的问题和主要优化思路</a></li>
+          </ul>
+    <hr>
+    
+    <section class="comments-box clearfix">
+      <div class="media-list comments" id="comments">
+        
+<div class="comment media gaze in" id="comment-71822">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/126870" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_61172e71dca85da69cc67c95a12392bf.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        1F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/126870" class="author">归空</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43598#comment-71822" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-06T13:56:42+08:00">2015-11-06 13:56:42</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>我也喜欢老罗的微博，买了他的书，目前还没看完。。。</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71822/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71822/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71822&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71822">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71822" style="display:none">
+      <div class="sub-comments media-list" id="comment-71822-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71822/subcomments/" method="POST" data-remote="true" data-target="#comment-71822-sub" data-done="$(&#39;#sub-comments-count-71822&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-71998">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/164080" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_af16f5c4011aeb751eedec8b0ea4e6b8.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        2F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/164080" class="author">狐忌</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43598#comment-71998" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2015-11-09T16:54:18+08:00">2015-11-09 16:54:18</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>厉害。</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/71998/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71998/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-71998&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-71998">3</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-71998">
+      <div class="sub-comments media-list" id="comment-71998-sub">
+
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-09T19:16:12+08:00">2015-11-09 19:16:12</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>你每篇都读了^_^</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71998/subcomments/21970/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71998/subcomments/21970/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21970&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21970" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71998/subcomments/" method="POST" data-remote="true" data-target="#comment-71998-sub" data-done="$(&#39;#sub-comments-count-71998&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/164080" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_af16f5c4011aeb751eedec8b0ea4e6b8.png_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/164080" class="author">狐忌</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-09T20:43:18+08:00">2015-11-09 20:43:18</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/33951">@<span></span>雪鹭</a> 哈哈，唯独这篇没太看懂，要补的东西太多了。。。。汗颜。。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71998/subcomments/21976/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71998/subcomments/21976/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21976&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21976" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71998/subcomments/" method="POST" data-remote="true" data-target="#comment-71998-sub" data-done="$(&#39;#sub-comments-count-71998&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@狐忌 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+<div class="sub-comment media gaze in">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/33951" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/img_20151126155914.jpg_120x120" width="42" height="42" alt="">
+    </a>
+  </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/33951" class="author">雪鹭</a>
+            <time class="pull-right small js-relative-time" datetime="2015-11-10T11:29:43+08:00">2015-11-10 11:29:43</time>
+    </div>
+
+    <div class="content unsafe">
+      
+<p><a href="http://www.atatech.org/users/164080">@<span></span>狐忌</a> 这个确实有点多。</p>
+
+    </div>
+
+    <div class="actions clearfix">
+      <a href="http://www.atatech.org/comments/71998/subcomments/21997/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/71998/subcomments/21997/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comment-21997&#39;).toggle().find(&#39;textarea&#39;).focusend()"><span class="glyphicon glyphicon-comment"></span></button>
+
+          </div>
+
+    <form id="sub-comment-21997" class="js-active-on-valid js-comment-create" style="display:none" action="http://www.atatech.org/comments/71998/subcomments/" method="POST" data-remote="true" data-target="#comment-71998-sub" data-done="$(&#39;#sub-comments-count-71998&#39;).inc();$(this).hide();$.scrollTo($r)">
+      <input type="hidden" name="isCheck" value="1">
+            <div class="form-group">
+        <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" required="">@雪鹭 </textarea>          
+      </div>
+      <div class="form-group text-right">
+        <button type="reset" class="btn btn-default btn-sm" onclick="$(this.form).hide()">取消</button>
+        <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+      </div>
+    </form>
+  </div><!-- /.media-body -->
+
+  </div>
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/71998/subcomments/" method="POST" data-remote="true" data-target="#comment-71998-sub" data-done="$(&#39;#sub-comments-count-71998&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+<div class="comment media gaze in" id="comment-79305">
+  <div class="pull-left">
+    <a href="http://www.atatech.org/users/124999" class="avatar">
+      <img class="media-object img-circle" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/u_identicon_fce67dc749d595d4aec4d5dcf1a660ee.png_120x120" width="42" height="42" alt="">
+    </a>
+        <span style="margin-left: 10px">
+        3F
+    </span>
+      </div>
+  <div class="media-body">
+    <div class="source clearfix">
+      <a href="http://www.atatech.org/users/124999" class="author">专钻</a>
+                  <span class="pull-right small">
+        <a href="http://www.atatech.org/articles/43598#comment-79305" class="link"><span class="glyphicon glyphicon-link"></span></a>
+        <time class="js-relative-time" datetime="2016-01-13T19:45:41+08:00">2016-01-13 19:45:41</time>
+      </span>
+    </div>
+
+    <div class="content unsafe">
+      
+<p>写得真详细，通过收集Concurrent gc回收的对象、然后把对象按照创建次数、大小做一个排序、是否可以监控频繁创建的对像呢？通过监控引发alloc gc的内存申请，是否监控某些占用大内存的对象呢？</p>
+
+    </div>
+    
+        <div class="voters-p"></div>
+    
+    
+    <div class="actions clearfix">
+            <a href="http://www.atatech.org/comments/79305/voteup" title="赞" class="btn btn-link btn-sm action" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        0
+      </a>
+      <a href="http://www.atatech.org/comments/79305/unvoteup" title="取消赞" class="btn btn-link btn-sm action active" role="button" rel="nofollow" data-remote="true" data-method="post" data-done="$(this).closest(&#39;.comment&#39;).find(&#39;.voters-p:first&#39;).replaceWith(r);$(this).hide().siblings(&#39;:hidden&#39;).show()" style="display:none">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+        1
+      </a>
+      <span class="sep"></span>
+      <button class="btn btn-link btn-sm action" onclick="$(&#39;#sub-comments-box-79305&#39;).toggle()">
+        <span class="glyphicon glyphicon-comment"></span> 
+        <span id="sub-comments-count-79305">0</span>
+      </button>
+            
+          </div><!-- /.media-body -->
+    
+    <div class="sub-comments-box" id="sub-comments-box-79305" style="display:none">
+      <div class="sub-comments media-list" id="comment-79305-sub">
+
+
+  
+
+</div>
+
+
+<form action="http://www.atatech.org/comments/79305/subcomments/" method="POST" data-remote="true" data-target="#comment-79305-sub" data-done="$(&#39;#sub-comments-count-79305&#39;).inc()" class="sub-comment-form js-comment-create js-active-on-valid">
+  <input type="hidden" name="isCheck" value="1">
+    <div class="form-group">
+    <textarea name="content" rows="1" class="form-control js-mention js-auto-expand" placeholder="写下你的评论…" onfocus="$(this).closest(&#39;form&#39;).addClass(&#39;active&#39;)" required=""></textarea>
+  </div>
+  <div class="form-group text-right actions">
+    <button type="reset" class="btn btn-default btn-sm" onclick="$(this).closest(&#39;form&#39;).removeClass(&#39;active&#39;)">取消</button>
+    <button type="submit" class="btn btn-primary btn-sm" disabled="">评论</button>
+  </div>
+</form>
+    </div><!-- /.sub-comments-box -->
+  </div>
+  
+  </div>
+
+<div class="pages comment-tip">
+      
+    
+</div>
+      </div>
+      <script>require('comments')</script>
+
+      <form accept-charset="UTF-8" action="http://www.atatech.org/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid">
+        <input type="hidden" name="type" value="article">
+        <input type="hidden" name="isCheck" value="1">
+        <input type="hidden" name="pid" value="43598">
+        <div class="form-group">
+          <div class="editor">
+            <div class="editor-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-fullscreen" data-original-title="全屏">
+                  <span class="glyphicon glyphicon-fullscreen"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-preview" data-original-title="预览">
+                  <span class="glyphicon glyphicon-eye-open"></span>
+                </button>
+                <button type="button" class="btn btn-xs editor-action js-editor-upload" data-original-title="插入图片">
+                  <span class="glyphicon glyphicon-picture"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <textarea name="content" rows="4" class="form-control js-mention js-auto-expand editor-content" id="comment" placeholder="写下你的评论…" required=""></textarea>
+            </div><!-- /.editor-container -->
+
+            <div class="editor-preview-container">
+              <div class="editor-actions">
+                <button type="button" class="btn btn-xs editor-action js-editor-preview-off" data-original-title="取消预览">
+                  <span class="glyphicon glyphicon-eye-close"></span>
+                </button>
+              </div><!-- /.editor-actions -->
+              <div class="editor-preview content unsafe" data-disable-with="&lt;span class=&quot;text-muted&quot;&gt;loading...&lt;/span&gt;"></div>
+            </div><!-- /.editor-preview-container -->
+          </div><!-- /.editor  -->
+        </div>
+        <div class="form-group text-right">
+          <button type="submit" class="btn btn-primary" disabled="">评论</button>          
+        </div>
+      </form>
+    </section><!-- /.comments -->
+
+  </div><!-- /._article-box -->
+</div></div><!-- /.container -->
+        <footer class="footer" role="contentinfo">
+  <div class="container">
+	  <p class="copyright pull-left">
+	  	© 2016 阿里巴巴集团 版权所有 Copyright© 16 ATA. All rights reserved.
+
+	    <!-- cnzz PC-->
+	    <script>var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5837538'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s5.cnzz.com/stat.php%3Fid%3D5837538%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_5837538"><a href="http://www.cnzz.com/stat/website.php?web_id=5837538" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/stat.php" type="text/javascript"></script><script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/core.php" charset="utf-8" type="text/javascript"></script>
+
+	    <!-- cnzz 整站-->
+	    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254194462'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/stat.php%3Fid%3D1254194462%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script><span id="cnzz_stat_icon_1254194462"><a href="http://www.cnzz.com/stat/website.php?web_id=1254194462" target="_blank" title="站长统计"><img border="0" hspace="0" vspace="0" src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/pic.gif"></a></span><script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/stat(1).php" type="text/javascript"></script><script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/core(1).php" charset="utf-8" type="text/javascript"></script>
+	    <!-- /cnzz -->
+	    	  </p>
+    <ul class="list-inline pull-right">
+      <li><a href="http://www.atatech.org/articles/17702/" target="_blank">技术专题</a></li>
+      <li><a href="http://www.atatech.org/articles/13783" target="_blank">如何玩转ATA2.0</a></li>
+    </ul>
+  </div>
+</footer>
+          <div id="modal-followers" class="modal fade" role="dialog" aria-labelledby="followers" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">关注者</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary">分享</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->  <div id="modal-share" class="modal fade" role="dialog" aria-labelledby="share" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="http://www.atatech.org/articles/#{id}/share" method="POST" data-remote="true" data-done="$(this).closest(&#39;.modal&#39;).modal(&#39;hide&#39;);$(&#39;#share-group-or-team&#39;).selectize({plugins: [&#39;remove_button&#39;]})[0].selectize.clear();$($(this).data(&#39;shareCountTarget&#39;)).inc();$.alert(&#39;分享成功&#39;, &#39;success&#39;)" class="js-active-on-valid" novalidate="">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">分享</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <a href="https://work.alibaba-inc.com/home?publicAccount=%E5%91%A8%E6%9C%AB%E4%BA%86%EF%BC%8C%E6%8E%A8%E8%8D%90%E4%B8%80%E7%AF%87ATA%E4%B8%8A%E7%9A%84%E5%B9%B2%E8%B4%A7%E5%B8%A6%E5%9B%9E%E5%AE%B6%E5%85%85%E5%85%85%E7%94%B5%E5%90%A7%3A-%29%EF%BC%81%E6%89%8B%E6%B7%98%08%E5%AE%89%E5%8D%93%E7%89%88%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%966+-+%08+Dalvik%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CART%E8%BF%90%E8%A1%8C%E6%97%B6%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%AF%B9%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D%28http%3A%2F%2Fwww.atatech.org%2Farticles%2F43598%29" target="_blank">分享到阿里内外</a>
+        </div>
+        <div class="form-group">
+            <label for="share-group">分享到我的团队/圈子</label>
+                            
+                        <select name="share-group-or-team[]" id="share-group-or-team" class="form-control selectized" autocomplete="off" placeholder="Groups or Teams" disabled="" tabindex="-1" style="display: none;"><option value="" selected="selected"></option></select><div class="selectize-control form-control single plugin-remove_button"><div class="selectize-input items not-full disabled locked"><input type="text" autocomplete="off" tabindex="" placeholder="没有可分享的团队或圈子" style="width: 158px;"></div><div class="selectize-dropdown form-control single plugin-remove_button" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+        </div>
+        <div class="form-group">
+          <label for="share-users">分享给同事</label>
+          <input type="text" name="users" class="form-control js-user-complete" id="share-users" placeholder="Users" required="1">
+        </div>
+        <div class="form-group">
+          <textarea name="content" rows="3" class="form-control" placeholder="羞羞的内容"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-primary" disabled="">分享</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div><!-- /#modal-share -->
+<script>require('modal-share')</script>
+<script>
+$('#share-group-or-team').selectize({
+    plugins: ['remove_button']
+})[0].selectize.clear();
+</script>
+  <div id="modal-tag-history" class="modal fade" role="dialog" aria-labelledby="tag history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">标签历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+  <div id="modal-article-modify-history" class="modal fade" role="dialog" aria-labelledby="article modify history" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑历史</h4>
+      </div>
+      <div class="modal-body">      
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /#modal-share -->
+        <script data-group-id="" data-user-id="33951">require('module/mention')</script>  <script data-group-id="" data-user-id="33951">require('module/user-complete')</script>  <script>require('module/tag-complete')</script>
+  <script>require('module/editor')</script>
+  <script>hljs.initHighlightingOnLoad();//require('module/highlight')</script>
+  <script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/swfobject_modified.js"></script>
+    <script>
+  var _czc = _czc || [];
+  var statistics_obj = {
+  "article-recommend": ["文章", "相似文章"]
+  };
+  $('.cnzz-event a').on('click', function(){
+    var id = $(this).parents('.cnzz-event').attr('id');
+  _czc.push(["_trackEvent", statistics_obj[id][0], statistics_obj[id][1], "", "", id]);
+  })
+  </script>
+    <script>
+  $('.js-video').on('click', function(){
+
+    if ($('#taobao-online-video').length > 0)
+    {
+      swfobject.registerObject("taobao-online-video");
+    }
+    
+          setTimeout(function(){
+        _czc.push(["_trackEvent", '文章', "手淘安卓版性能优化6 -  Dalvik虚拟机和ART运行时的介绍及对性能的影响", "", "", 'article-43598']);
+      }, 1000);
+      })
+
+  $(function(){
+
+    $('body').append('<div id="article-outline"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style>')
+    var jOutline = $('#article-outline');
+
+    var jContent = $('article .content');
+    var jContentHeight = jContent.height();
+    jOutline.find('.close').on('click', function(){
+      jOutline.hide();
+    })
+
+    updateOutline();
+
+    var top = jOutline.offset().top;
+    scrollOutline();
+    $(window).on('scroll', scrollOutline);
+    function scrollOutline() {
+      var scrollTop = $(document).scrollTop();
+      var maxTop = jContent.offset().top + jContent.height() - jOutline.height();
+      if (scrollTop >= top && scrollTop <= maxTop)
+      {
+        jOutline.css({'position': 'fixed', 'top': 0});
+      }
+      else if(scrollTop < top)
+      {
+        jOutline.css({'position': 'absolute', 'top': '150px'});
+      }
+      else
+      {
+        jOutline.css({'position': 'absolute', 'top': maxTop+'px'});
+      }
+
+    }
+
+    function updateOutline() {
+        var arrAllHeader = jContent.find("h1,h2,h3,h4,h5,h6");
+        var arrOutline = ['<ul>'];
+        var header, headerText;
+        var id = 0;
+        var level = 0,
+            lastLevel = 1;
+        var levelCount = 0;
+        for (var i = 0, c = arrAllHeader.length; i < c; i++) {
+            header = arrAllHeader[i];
+            headerText = $(header).text();
+
+            header.setAttribute('id', id);
+
+            level = header.tagName.match(/^h(\d)$/i)[1];
+            levelCount = level - lastLevel;
+
+            if (levelCount > 0) {
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('<ul>');
+                }
+            } else if (levelCount < 0) {
+                levelCount *= -1;
+                for (var j = 0; j < levelCount; j++) {
+                    arrOutline.push('</ul>');
+                }
+            };
+            arrOutline.push('<li>');
+            arrOutline.push('<a href="#' + id + '">' + headerText + '</a>');
+            arrOutline.push('</li>');
+            lastLevel = level;
+            id++;
+        }
+        arrOutline.push('</ul>')
+        if(arrOutline.length > 2){
+            jOutline.append(arrOutline.join(''));
+            jOutline.find('ul').each(function(i,n){
+                var jThis = $(this);
+                if(jThis.children('li').length === 0){
+                    jThis.replaceWith(jThis.children());
+                }
+            });
+            showOutline();
+        }
+        else {
+            hideOutline();
+        }
+    }
+
+    function showOutline() {
+        var offset = jContent.offset();
+
+        jOutline.css({
+            left: offset.left + jContent.width() + 10 + 'px',
+        }).show();
+    }
+
+    function hideOutline(){
+        jOutline.hide();
+    }
+});
+  </script>
+  
+
+
+<script src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/MathJax.js"></script>
+  <script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({
+    jax: ["input/TeX","output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['\$','\$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    displayAlign: "left"
+  });
+  </script>
+    <a href="http://www.atatech.org/articles/43598#" class="go-top" style=""><span class="glyphicon glyphicon-arrow-up"></span></a>
+<script>require('module/go-top')</script>        <a href="https://work.alibaba-inc.com/work/group/8401" target="_blank" title="为ATA2.0提供反馈" style="position:fixed;right:0;bottom:100px;" class="hidden-xs">
+  <img src="./手淘 安卓版性能优化6 - Dalvik虚拟机和ART运行时的介绍及对性能的影响_files/T17D1tFrVeXXcUfo_w-30-100.png" alt="">
+</a>        <script type="text/javascript">
+    $('.form-submit-btn').click(function(){
+      var form = $(this).parents('form');
+      form.find('input').focus();
+      form.submit();
+      console.log(2);
+    });
+    //导航 dropdown
+    (function(){
+    var t;
+    $('.dropdown').hover(function(){
+      var that = $(this);
+      that.siblings().find('.dropdown-menu').hide();
+      that.children('.dropdown-menu').show();
+      clearTimeout(t);
+    }, function(){
+      var that = $(this);
+      t = setTimeout(function(){
+        that.children('.dropdown-menu').hide();
+      }, 500)
+      
+    })
+    }())
+    </script>
+  
+
+<div class="alert-container"></div><div id="article-outline" style="left: 1389.5px; display: block; position: fixed; top: 0px;"><div style="height:15px;"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><ul><li><a href="http://www.atatech.org/articles/43598#0">1、Dalvik虚拟机GC的相关知识</a></li><ul><li><a href="http://www.atatech.org/articles/43598#1">1.1 Dalvik虚拟机的GC的类型：</a></li><li><a href="http://www.atatech.org/articles/43598#2">1.2 对象的分配过程：</a></li><li><a href="http://www.atatech.org/articles/43598#3">1.2 GC触发时机：</a></li><li><a href="http://www.atatech.org/articles/43598#4">1.3 回收算法和内存碎片</a></li></ul><li><a href="http://www.atatech.org/articles/43598#5">2、ART内存回收机制</a></li><ul><li><a href="http://www.atatech.org/articles/43598#6">2.1 ART的垃圾回收改进：</a></li><li><a href="http://www.atatech.org/articles/43598#7">2.2 对象的分配过程和GC触发时机：</a></li><li><a href="http://www.atatech.org/articles/43598#8">2.3 ART的GC的类型：</a></li><li><a href="http://www.atatech.org/articles/43598#9">2.3 并行和非并行GC：</a></li><li><a href="http://www.atatech.org/articles/43598#10">2.3 ART对于Dalvik来说主要优点：</a></li></ul><li><a href="http://www.atatech.org/articles/43598#11">3、 GC频繁的主要原因</a></li><ul><li><a href="http://www.atatech.org/articles/43598#12">3.1 内存抖动</a></li><li><a href="http://www.atatech.org/articles/43598#13">3.2&nbsp;瞬间产生大量的对象</a></li><li><a href="http://www.atatech.org/articles/43598#14">3.3 分配大内存块的对象</a></li><li><a href="http://www.atatech.org/articles/43598#15">3.4 内存泄露</a></li></ul><li><a href="http://www.atatech.org/articles/43598#16">4、 GC日志信息</a></li><ul><li><a href="http://www.atatech.org/articles/43598#17">4.1 Dalvik GC日志</a></li><li><a href="http://www.atatech.org/articles/43598#18">4.2 ART GC日志</a></li></ul></ul></div><style>#article-outline{display:none;min-width:140p;max-width: 200px; max-height: 350px;position:absolute;top:150px;left:-999px;border:1px solid #ccc;box-shadow:5px 5px 2px #ccc;padding: 5px 10px;background-color: #fff;overflow-y: auto;scroll-x: auto;}#article-outline ul{margin:5px 0 5px 0;padding-left:30px;font-size:12px;border-left:1px dotted #ccc;}#article-outline ul:first-child{padding-left:15px;border:none;}#article-outline li{list-style-type:decimal;margin:3px 0;}</style></body></html>
